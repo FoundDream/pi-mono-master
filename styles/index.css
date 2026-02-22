@@ -1,0 +1,34 @@
+:root {
+  /* Brand: Rspack-style warm orange */
+  --rp-c-brand: #ff5e00;
+  --rp-c-brand-light: #ff7524;
+  --rp-c-brand-lighter: #ff7524;
+  --rp-c-brand-dark: #ff704d;
+  --rp-c-brand-darker: #ff704d;
+  --rp-c-brand-tint: rgba(255, 94, 0, 0.07);
+  --rp-c-link: var(--rp-c-brand);
+
+  /* Homepage hero */
+  --rp-home-hero-secondary-color: #ffb224;
+  --rp-home-hero-title-bg: linear-gradient(135deg, #ff5e00 0%, #ff7524 50%, #ffb224 100%);
+
+  /* Homepage background: large soft blobs */
+  --rp-home-background-bg:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255, 94, 0, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 90% 30%, rgba(255, 117, 36, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 10% 60%, rgba(255, 178, 36, 0.04) 0%, transparent 50%);
+
+  /* Feature cards */
+  --rp-home-feature-bg: linear-gradient(180deg, #ffffff 0%, #fefcf9 100%);
+}
+
+html.dark {
+  --rp-c-link: var(--rp-c-brand-light);
+
+  --rp-home-background-bg:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255, 94, 0, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 90% 30%, rgba(255, 117, 36, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 10% 60%, rgba(255, 178, 36, 0.06) 0%, transparent 50%);
+
+  --rp-home-feature-bg: linear-gradient(180deg, rgba(40, 40, 40, 0.6) 0%, rgba(50, 40, 30, 0.3) 100%);
+}

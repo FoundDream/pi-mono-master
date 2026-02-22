@@ -1,0 +1,11 @@
+[
+  "getting-started",
+  "01-hello-agent",
+  "02-streaming",
+  "03-custom-tools",
+  "04-session-persistence",
+  "05-confirmation-pattern",
+  "06-system-prompt-and-skills",
+  "07-multi-session",
+  "08-full-cli-agent"
+]

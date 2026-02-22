@@ -1,0 +1,29 @@
+{
+  "name": "pi-mono-master",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ch01": "tsx chapters/01-hello-agent/index.ts",
+    "ch02": "tsx chapters/02-streaming/index.ts",
+    "ch03": "tsx chapters/03-custom-tools/index.ts",
+    "ch04": "tsx chapters/04-session-persistence/index.ts",
+    "ch05": "tsx chapters/05-confirmation-pattern/index.ts",
+    "ch06": "tsx chapters/06-system-prompt-and-skills/index.ts",
+    "ch07": "tsx chapters/07-multi-session/index.ts",
+    "ch08": "tsx chapters/08-full-cli-agent/index.ts",
+    "docs:dev": "rspress dev",
+    "docs:build": "rspress build",
+    "docs:preview": "rspress preview"
+  },
+  "dependencies": {
+    "@mariozechner/pi-coding-agent": "^0.52.9",
+    "@mariozechner/pi-ai": "^0.52.9",
+    "@sinclair/typebox": "^0.34.48",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@rspress/core": "^2.0.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3"
+  }
+}

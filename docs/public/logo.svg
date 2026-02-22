@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="108 84 296 344" shape-rendering="crispEdges">
+  <!-- Layer 0 (back) - blues -->
+  <rect x="232" y="88" width="24" height="24" fill="#0077b6"/>
+  <rect x="256" y="88" width="24" height="24" fill="#0096c7"/>
+  <rect x="208" y="112" width="24" height="24" fill="#0077b6"/>
+  <rect x="232" y="112" width="24" height="24" fill="#00b4d8"/>
+  <rect x="256" y="112" width="24" height="24" fill="#00d2ff"/>
+  <rect x="280" y="112" width="24" height="24" fill="#0096c7"/>
+
+  <!-- Layer 1 - purple transition -->
+  <rect x="184" y="136" width="24" height="24" fill="#7b2fbe"/>
+  <rect x="208" y="136" width="24" height="24" fill="#9b59b6"/>
+  <rect x="232" y="136" width="24" height="24" fill="#c77dff"/>
+  <rect x="256" y="136" width="24" height="24" fill="#d4a5ff"/>
+  <rect x="280" y="136" width="24" height="24" fill="#9b59b6"/>
+  <rect x="304" y="136" width="24" height="24" fill="#7b2fbe"/>
+
+  <!-- Layer 2 - expanding, magenta -->
+  <rect x="160" y="160" width="24" height="24" fill="#c2185b"/>
+  <rect x="184" y="160" width="24" height="24" fill="#e040fb"/>
+  <rect x="208" y="160" width="24" height="24" fill="#ea80fc"/>
+  <rect x="232" y="160" width="24" height="24" fill="#f8bbd0"/>
+  <rect x="256" y="160" width="24" height="24" fill="#f8bbd0"/>
+  <rect x="280" y="160" width="24" height="24" fill="#ea80fc"/>
+  <rect x="304" y="160" width="24" height="24" fill="#e040fb"/>
+  <rect x="328" y="160" width="24" height="24" fill="#c2185b"/>
+
+  <!-- Layer 3 - wider, warm pink/red -->
+  <rect x="136" y="184" width="24" height="24" fill="#ff1744"/>
+  <rect x="160" y="184" width="24" height="24" fill="#ff5252"/>
+  <rect x="184" y="184" width="24" height="24" fill="#ff6b9d"/>
+  <rect x="208" y="184" width="24" height="24" fill="#ff8a80"/>
+  <rect x="232" y="184" width="24" height="24" fill="#ffab91"/>
+  <rect x="256" y="184" width="24" height="24" fill="#ffab91"/>
+  <rect x="280" y="184" width="24" height="24" fill="#ff8a80"/>
+  <rect x="304" y="184" width="24" height="24" fill="#ff6b9d"/>
+  <rect x="328" y="184" width="24" height="24" fill="#ff5252"/>
+  <rect x="352" y="184" width="24" height="24" fill="#ff1744"/>
+
+  <!-- Layer 4 - peak width, orange -->
+  <rect x="112" y="208" width="24" height="24" fill="#e65100"/>
+  <rect x="136" y="208" width="24" height="24" fill="#ff5e00"/>
+  <rect x="160" y="208" width="24" height="24" fill="#ff7524"/>
+  <rect x="184" y="208" width="24" height="24" fill="#ff8836"/>
+  <rect x="208" y="208" width="24" height="24" fill="#ff9b48"/>
+  <rect x="232" y="208" width="24" height="24" fill="#ffb224"/>
+  <rect x="256" y="208" width="24" height="24" fill="#ffb224"/>
+  <rect x="280" y="208" width="24" height="24" fill="#ff9b48"/>
+  <rect x="304" y="208" width="24" height="24" fill="#ff8836"/>
+  <rect x="328" y="208" width="24" height="24" fill="#ff7524"/>
+  <rect x="352" y="208" width="24" height="24" fill="#ff5e00"/>
+  <rect x="376" y="208" width="24" height="24" fill="#e65100"/>
+
+  <!-- Layer 5 - center bright, golden -->
+  <rect x="112" y="232" width="24" height="24" fill="#ff5e00"/>
+  <rect x="136" y="232" width="24" height="24" fill="#ff7524"/>
+  <rect x="160" y="232" width="24" height="24" fill="#ff9b48"/>
+  <rect x="184" y="232" width="24" height="24" fill="#ffb224"/>
+  <rect x="208" y="232" width="24" height="24" fill="#ffc44d"/>
+  <rect x="232" y="232" width="24" height="24" fill="#ffd666"/>
+  <rect x="256" y="232" width="24" height="24" fill="#ffe082"/>
+  <rect x="280" y="232" width="24" height="24" fill="#ffd666"/>
+  <rect x="304" y="232" width="24" height="24" fill="#ffc44d"/>
+  <rect x="328" y="232" width="24" height="24" fill="#ffb224"/>
+  <rect x="352" y="232" width="24" height="24" fill="#ff9b48"/>
+  <rect x="376" y="232" width="24" height="24" fill="#ff7524"/>
+
+  <!-- Layer 6 = Layer 5 mirrored -->
+  <rect x="112" y="256" width="24" height="24" fill="#ff5e00"/>
+  <rect x="136" y="256" width="24" height="24" fill="#ff7524"/>
+  <rect x="160" y="256" width="24" height="24" fill="#ff9b48"/>
+  <rect x="184" y="256" width="24" height="24" fill="#ffb224"/>
+  <rect x="208" y="256" width="24" height="24" fill="#ffc44d"/>
+  <rect x="232" y="256" width="24" height="24" fill="#ffd666"/>
+  <rect x="256" y="256" width="24" height="24" fill="#ffe082"/>
+  <rect x="280" y="256" width="24" height="24" fill="#ffd666"/>
+  <rect x="304" y="256" width="24" height="24" fill="#ffc44d"/>
+  <rect x="328" y="256" width="24" height="24" fill="#ffb224"/>
+  <rect x="352" y="256" width="24" height="24" fill="#ff9b48"/>
+  <rect x="376" y="256" width="24" height="24" fill="#ff7524"/>
+
+  <!-- Layer 7 = Layer 4 mirrored -->
+  <rect x="112" y="280" width="24" height="24" fill="#e65100"/>
+  <rect x="136" y="280" width="24" height="24" fill="#ff5e00"/>
+  <rect x="160" y="280" width="24" height="24" fill="#ff7524"/>
+  <rect x="184" y="280" width="24" height="24" fill="#ff8836"/>
+  <rect x="208" y="280" width="24" height="24" fill="#ff9b48"/>
+  <rect x="232" y="280" width="24" height="24" fill="#ffb224"/>
+  <rect x="256" y="280" width="24" height="24" fill="#ffb224"/>
+  <rect x="280" y="280" width="24" height="24" fill="#ff9b48"/>
+  <rect x="304" y="280" width="24" height="24" fill="#ff8836"/>
+  <rect x="328" y="280" width="24" height="24" fill="#ff7524"/>
+  <rect x="352" y="280" width="24" height="24" fill="#ff5e00"/>
+  <rect x="376" y="280" width="24" height="24" fill="#e65100"/>
+
+  <!-- Layer 8 = Layer 3 mirrored -->
+  <rect x="136" y="304" width="24" height="24" fill="#ff1744"/>
+  <rect x="160" y="304" width="24" height="24" fill="#ff5252"/>
+  <rect x="184" y="304" width="24" height="24" fill="#ff6b9d"/>
+  <rect x="208" y="304" width="24" height="24" fill="#ff8a80"/>
+  <rect x="232" y="304" width="24" height="24" fill="#ffab91"/>
+  <rect x="256" y="304" width="24" height="24" fill="#ffab91"/>
+  <rect x="280" y="304" width="24" height="24" fill="#ff8a80"/>
+  <rect x="304" y="304" width="24" height="24" fill="#ff6b9d"/>
+  <rect x="328" y="304" width="24" height="24" fill="#ff5252"/>
+  <rect x="352" y="304" width="24" height="24" fill="#ff1744"/>
+
+  <!-- Layer 9 = Layer 2 mirrored -->
+  <rect x="160" y="328" width="24" height="24" fill="#c2185b"/>
+  <rect x="184" y="328" width="24" height="24" fill="#e040fb"/>
+  <rect x="208" y="328" width="24" height="24" fill="#ea80fc"/>
+  <rect x="232" y="328" width="24" height="24" fill="#f8bbd0"/>
+  <rect x="256" y="328" width="24" height="24" fill="#f8bbd0"/>
+  <rect x="280" y="328" width="24" height="24" fill="#ea80fc"/>
+  <rect x="304" y="328" width="24" height="24" fill="#e040fb"/>
+  <rect x="328" y="328" width="24" height="24" fill="#c2185b"/>
+
+  <!-- Layer 10 = Layer 1 mirrored -->
+  <rect x="184" y="352" width="24" height="24" fill="#7b2fbe"/>
+  <rect x="208" y="352" width="24" height="24" fill="#9b59b6"/>
+  <rect x="232" y="352" width="24" height="24" fill="#c77dff"/>
+  <rect x="256" y="352" width="24" height="24" fill="#d4a5ff"/>
+  <rect x="280" y="352" width="24" height="24" fill="#9b59b6"/>
+  <rect x="304" y="352" width="24" height="24" fill="#7b2fbe"/>
+
+  <!-- Layer 11 = Layer 0 mirrored -->
+  <rect x="208" y="376" width="24" height="24" fill="#0077b6"/>
+  <rect x="232" y="376" width="24" height="24" fill="#00b4d8"/>
+  <rect x="256" y="376" width="24" height="24" fill="#00d2ff"/>
+  <rect x="280" y="376" width="24" height="24" fill="#0096c7"/>
+  <rect x="232" y="400" width="24" height="24" fill="#0077b6"/>
+  <rect x="256" y="400" width="24" height="24" fill="#0096c7"/>
+
+  <!-- White highlight center pixel -->
+  <rect x="244" y="244" width="24" height="24" fill="white" opacity="0.15"/>
+</svg>
