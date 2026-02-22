@@ -1,10 +1,15 @@
 # pi-mono-master
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/FoundDream/pi-mono-master)](https://github.com/FoundDream/pi-mono-master/stargazers)
+[![Bun](https://img.shields.io/badge/runtime-Bun-f472b6?logo=bun)](https://bun.sh)
+[![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+
 English | [简体中文](./README.zh-CN.md)
 
-A progressive tutorial for building AI agents with [`@mariozechner/pi-coding-agent`](https://github.com/nicepkg/pi).
+> Learn to build AI agents step by step — from a minimal "hello world" to a production-ready CLI agent.
 
-Each chapter is independently runnable and builds on the previous one, covering core patterns of agent development.
+A progressive 8-chapter tutorial for building AI agents from scratch with [`@mariozechner/pi-coding-agent`](https://github.com/nicepkg/pi). Each chapter is independently runnable and builds on the previous one, covering streaming, custom tools, session persistence, skills, and more.
 
 ## Documentation Site
 

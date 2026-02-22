@@ -1,10 +1,15 @@
 # pi-mono-master
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/FoundDream/pi-mono-master)](https://github.com/FoundDream/pi-mono-master/stargazers)
+[![Bun](https://img.shields.io/badge/runtime-Bun-f472b6?logo=bun)](https://bun.sh)
+[![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+
 [English](./README.md) | 简体中文
 
-使用 [`@mariozechner/pi-coding-agent`](https://github.com/nicepkg/pi) 构建 AI Agent 的渐进式教程。
+> 从零开始，一步步学会构建 AI Agent — 从最小化的 "hello world" 到生产级 CLI Agent。
 
-每个章节都可以独立运行，并在前一章的基础上递进，涵盖 Agent 开发的核心模式。
+使用 [`@mariozechner/pi-coding-agent`](https://github.com/nicepkg/pi) 构建 AI Agent 的渐进式 8 章教程。每个章节可独立运行，涵盖流式输出、自定义工具、会话持久化、技能系统等核心模式。
 
 ## 文档站点
 
