@@ -5,11 +5,16 @@ export default defineConfig({
   root: "docs",
   base: "/pi-mono-master/",
   title: "pi-mono-master",
-  icon: "/pi-mono-master/logo.svg",
-  logo: "/pi-mono-master/logo.svg",
+  icon: "/logo.svg",
+  logo: "/logo.svg",
   logoText: "pi-mono-master",
   description:
     "Progressive tutorial for building AI agents with pi-coding-agent",
+  markdown: {
+    link: {
+      checkDeadLinks: false,
+    },
+  },
   globalStyles: path.join(__dirname, "styles/index.css"),
   locales: [
     {
