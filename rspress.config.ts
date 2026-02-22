@@ -3,9 +3,10 @@ import { defineConfig } from "@rspress/core";
 
 export default defineConfig({
   root: "docs",
+  base: "/pi-mono-master/",
   title: "pi-mono-master",
-  icon: "/logo.svg",
-  logo: "/logo.svg",
+  icon: "/pi-mono-master/logo.svg",
+  logo: "/pi-mono-master/logo.svg",
   logoText: "pi-mono-master",
   description:
     "Progressive tutorial for building AI agents with pi-coding-agent",
