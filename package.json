@@ -13,7 +13,11 @@
     "ch08": "tsx chapters/08-full-cli-agent/index.ts",
     "docs:dev": "rspress dev",
     "docs:build": "rspress build",
-    "docs:preview": "rspress preview"
+    "docs:preview": "rspress preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@mariozechner/pi-coding-agent": "^0.52.9",
@@ -22,8 +26,14 @@
     "dotenv": "^16.4.7"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@rspress/core": "^2.0.3",
+    "eslint": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1",
     "tsx": "^4.19.4",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.56.0"
   }
 }
