@@ -7,6 +7,8 @@
 
 English | [简体中文](./README.zh-CN.md)
 
+> **🚧 WIP**: This project is under active development and being continuously improved.
+
 > Learn to build AI agents step by step — from a minimal "hello world" to a production-ready CLI agent.
 
 A progressive 8-chapter tutorial for building AI agents from scratch with [`@mariozechner/pi-coding-agent`](https://github.com/nicepkg/pi). Each chapter is independently runnable and builds on the previous one, covering streaming, custom tools, session persistence, skills, and more.
