@@ -6,10 +6,10 @@ LLM 的上下文窗口有限。当对话过长时，Pi 使用压缩来摘要较�
 
 Pi 有两种摘要机制：
 
-| 机制 | 触发条件 | 用途 |
-|------|---------|------|
-| 压缩 | 上下文超过阈值，或 `/compact` | 摘要旧消息以释放上下文 |
-| 分支摘要 | `/tree` 导航 | 切换分支时保留上下文 |
+| 机制     | 触发条件                      | 用途                   |
+| -------- | ----------------------------- | ---------------------- |
+| 压缩     | 上下文超过阈值，或 `/compact` | 摘要旧消息以释放上下文 |
+| 分支摘要 | `/tree` 导航                  | 切换分支时保留上下文   |
 
 两者使用相同的结构化摘要格式，并累积追踪文件操作。
 
@@ -92,12 +92,14 @@ LLM 看到的内容：
 ```
 
 对于分裂回合，Pi 生成两个摘要并合并：
+
 1. **历史摘要**：之前的上下文（如果有）
 2. **回合前缀摘要**：分裂回合的前半部分
 
 ### 切点规则
 
 有效的切点为：
+
 - 用户消息
 - 助手消息
 - BashExecution 消息
@@ -116,8 +118,8 @@ interface CompactionEntry<T = unknown> {
   summary: string;
   firstKeptEntryId: string;
   tokensBefore: number;
-  fromHook?: boolean;  // true 表示由扩展提供（遗留字段名）
-  details?: T;         // 实现特定的数据
+  fromHook?: boolean; // true 表示由扩展提供（遗留字段名）
+  details?: T; // 实现特定的数据
 }
 
 // 默认压缩使用以下结构作为 details：
@@ -163,6 +165,7 @@ interface CompactionDetails {
 ### 累积文件追踪
 
 压缩和分支摘要都会累积追踪文件。生成摘要时，Pi 从以下来源提取文件操作：
+
 - 被摘要消息中的工具调用
 - 之前的压缩或分支摘要的 `details`（如果有）
 
@@ -177,9 +180,9 @@ interface BranchSummaryEntry<T = unknown> {
   parentId: string;
   timestamp: number;
   summary: string;
-  fromId: string;      // 导航来源的条目
-  fromHook?: boolean;  // true 表示由扩展提供（遗留字段名）
-  details?: T;         // 实现特定的数据
+  fromId: string; // 导航来源的条目
+  fromHook?: boolean; // true 表示由扩展提供（遗留字段名）
+  details?: T; // 实现特定的数据
 }
 
 // 默认分支摘要使用以下结构作为 details：
@@ -197,28 +200,37 @@ interface BranchSummaryDetails {
 
 ```markdown
 ## Goal
+
 [用户试图完成的目标]
 
 ## Constraints & Preferences
+
 - [用户提到的要求]
 
 ## Progress
+
 ### Done
+
 - [x] [已完成的任务]
 
 ### In Progress
+
 - [ ] [当前工作]
 
 ### Blocked
+
 - [问题，如果有]
 
 ## Key Decisions
+
 - **[决策]**: [理由]
 
 ## Next Steps
+
 1. [下一步应该做什么]
 
 ## Critical Context
+
 - [继续所需的数据]
 
 <read-files>
@@ -277,8 +289,10 @@ pi.on("session_before_compact", async (event, ctx) => {
       summary: "Your summary...",
       firstKeptEntryId: preparation.firstKeptEntryId,
       tokensBefore: preparation.tokensBefore,
-      details: { /* 自定义数据 */ },
-    }
+      details: {
+        /* 自定义数据 */
+      },
+    },
   };
 });
 ```
@@ -288,14 +302,17 @@ pi.on("session_before_compact", async (event, ctx) => {
 要使用你自己的模型生成摘要，可通过 `serializeConversation` 将消息转换为文本：
 
 ```typescript
-import { convertToLlm, serializeConversation } from "@mariozechner/pi-coding-agent";
+import {
+  convertToLlm,
+  serializeConversation,
+} from "@mariozechner/pi-coding-agent";
 
 pi.on("session_before_compact", async (event, ctx) => {
   const { preparation } = event;
 
   // 将 AgentMessage[] 转换为 Message[]，然后序列化为文本
   const conversationText = serializeConversation(
-    convertToLlm(preparation.messagesToSummarize)
+    convertToLlm(preparation.messagesToSummarize),
   );
 
   // 发送给你的模型进行摘要
@@ -306,7 +323,7 @@ pi.on("session_before_compact", async (event, ctx) => {
       summary,
       firstKeptEntryId: preparation.firstKeptEntryId,
       tokensBefore: preparation.tokensBefore,
-    }
+    },
   };
 });
 ```
@@ -333,8 +350,10 @@ pi.on("session_before_tree", async (event, ctx) => {
     return {
       summary: {
         summary: "Your summary...",
-        details: { /* 自定义数据 */ },
-      }
+        details: {
+          /* 自定义数据 */
+        },
+      },
     };
   }
 });
@@ -354,10 +373,10 @@ pi.on("session_before_tree", async (event, ctx) => {
 }
 ```
 
-| 设置 | 默认值 | 说明 |
-|------|--------|------|
-| `enabled` | `true` | 启用自动压缩 |
-| `reserveTokens` | `16384` | 为 LLM 响应预留的 token |
+| 设置               | 默认值  | 说明                         |
+| ------------------ | ------- | ---------------------------- |
+| `enabled`          | `true`  | 启用自动压缩                 |
+| `reserveTokens`    | `16384` | 为 LLM 响应预留的 token      |
 | `keepRecentTokens` | `20000` | 保留的最近 token（不被摘要） |
 
 使用 `"enabled": false` 禁用自动压缩。你仍然可以通过 `/compact` 手动压缩。

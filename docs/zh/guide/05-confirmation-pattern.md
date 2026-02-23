@@ -9,6 +9,7 @@
 在 AI Agent 的世界里，有一条至关重要的原则：**AI 可以建议，但不可代替人类做不可逆的决策。** 确认模式就是这一原则的代码实现——它在"AI 决策"和"实际执行"之间插入了一道人工审核的关卡。
 
 这个模式广泛应用于生产级 AI Agent 中：
+
 - **Claude Code** 在执行 bash 命令前会请求用户确认
 - **GitHub Copilot Workspace** 在修改文件前需要用户审批
 - **AirJelly Desktop** 在创建日历事件、设置提醒等操作时都会弹出确认对话框
@@ -47,25 +48,25 @@
 
 ```typescript
 function createConfirmationWaiter() {
-  let pendingResolve: ((v: { confirmed: boolean }) => void) | null = null
+  let pendingResolve: ((v: { confirmed: boolean }) => void) | null = null;
 
   const waiter = (): Promise<{ confirmed: boolean }> =>
     new Promise((resolve) => {
-      pendingResolve = resolve
-    })
+      pendingResolve = resolve;
+    });
 
   // 监听 stdin 输入来 resolve 待确认的 Promise
   const stdinListener = (data: Buffer) => {
     if (pendingResolve) {
-      const input = data.toString().trim().toLowerCase()
-      const confirmed = input === 'y' || input === 'yes'
-      pendingResolve({ confirmed })
-      pendingResolve = null
+      const input = data.toString().trim().toLowerCase();
+      const confirmed = input === "y" || input === "yes";
+      pendingResolve({ confirmed });
+      pendingResolve = null;
     }
-  }
-  process.stdin.on('data', stdinListener)
+  };
+  process.stdin.on("data", stdinListener);
 
-  return { waiter, cleanup: () => process.stdin.off('data', stdinListener) }
+  return { waiter, cleanup: () => process.stdin.off("data", stdinListener) };
 }
 ```
 
@@ -80,6 +81,7 @@ function createConfirmationWaiter() {
 3. **`cleanup` 函数**：移除 stdin 监听器，防止内存泄漏。
 
 你可以把它想象成一个"接力赛"：
+
 - `waiter()` 创建了一个接力棒（Promise），但接力棒需要有人来接（resolve）
 - `stdinListener` 是等在跑道另一端的队友，当用户输入到来时，它接过接力棒完成这一棒
 
@@ -91,12 +93,12 @@ function createConfirmationWaiter() {
 
 在设计确认机制时，有几种常见方案：
 
-| 方案 | 优点 | 缺点 |
-|------|------|------|
-| **Promise 阻塞（本章）** | 代码简洁，工具内部自包含 | 阻塞了整个 Agent 执行 |
-| **回调 + 状态机** | 不阻塞主线程 | 代码复杂，状态管理困难 |
-| **事件驱动 + 队列** | 可并发处理多个确认 | 过度设计，CLI 场景不需要 |
-| **超时自动拒绝** | 防止无限等待 | 用户可能错过确认窗口 |
+| 方案                     | 优点                     | 缺点                     |
+| ------------------------ | ------------------------ | ------------------------ |
+| **Promise 阻塞（本章）** | 代码简洁，工具内部自包含 | 阻塞了整个 Agent 执行    |
+| **回调 + 状态机**        | 不阻塞主线程             | 代码复杂，状态管理困难   |
+| **事件驱动 + 队列**      | 可并发处理多个确认       | 过度设计，CLI 场景不需要 |
+| **超时自动拒绝**         | 防止无限等待             | 用户可能错过确认窗口     |
 
 对于 CLI Agent 来说，Promise 阻塞方案是最优选择：它简单、直观，而且恰好符合 CLI 的单线程交互模型——用户同一时间只能回答一个问题。
 
@@ -109,46 +111,51 @@ function createConfirmationWaiter() {
 现在让我们看看如何将确认等待器接入到具体的工具中。注意 `waitForConfirmation` 是通过参数注入的——这是**依赖注入**模式，让工具的定义和确认机制解耦：
 
 ```typescript
-import { Type } from '@sinclair/typebox'
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import { Type } from "@sinclair/typebox";
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 
 export function createDeleteFileTool(
-  waitForConfirmation: () => Promise<{ confirmed: boolean }>
+  waitForConfirmation: () => Promise<{ confirmed: boolean }>,
 ): ToolDefinition {
   return {
-    name: 'delete_file',
-    label: 'Delete File',
-    description: 'Delete a file at the given path. This is irreversible and requires user confirmation.',
+    name: "delete_file",
+    label: "Delete File",
+    description:
+      "Delete a file at the given path. This is irreversible and requires user confirmation.",
     parameters: Type.Object({
-      path: Type.String({ description: 'File path to delete' }),
-      reason: Type.String({ description: 'Why this file should be deleted' }),
+      path: Type.String({ description: "File path to delete" }),
+      reason: Type.String({ description: "Why this file should be deleted" }),
     }),
     execute: async (_toolCallId, params) => {
-      const { path, reason } = params as { path: string; reason: string }
+      const { path, reason } = params as { path: string; reason: string };
 
-      console.log(`\n⚠️  Agent 想要删除: ${path}`)
-      console.log(`   原因: ${reason}`)
-      console.log('   确认？[y/N]')
+      console.log(`\n⚠️  Agent 想要删除: ${path}`);
+      console.log(`   原因: ${reason}`);
+      console.log("   确认？[y/N]");
 
       // 阻塞直到用户响应
-      const { confirmed } = await waitForConfirmation()
+      const { confirmed } = await waitForConfirmation();
 
       if (!confirmed) {
-        console.log('   ❌ 用户已取消\n')
+        console.log("   ❌ 用户已取消\n");
         return {
-          content: [{ type: 'text' as const, text: 'User cancelled the deletion.' }],
+          content: [
+            { type: "text" as const, text: "User cancelled the deletion." },
+          ],
           details: {},
-        }
+        };
       }
 
       // 实际应用中这里会真正删除文件
-      console.log(`   ✅ 已删除（模拟）\n`)
+      console.log(`   ✅ 已删除（模拟）\n`);
       return {
-        content: [{ type: 'text' as const, text: `Successfully deleted ${path}` }],
+        content: [
+          { type: "text" as const, text: `Successfully deleted ${path}` },
+        ],
         details: {},
-      }
+      };
     },
-  }
+  };
 }
 ```
 
@@ -175,11 +182,11 @@ export function createDeleteFileTool(
 将确认等待器和需要确认的工具组装到一起：
 
 ```typescript
-const { waiter, cleanup } = createConfirmationWaiter()
+const { waiter, cleanup } = createConfirmationWaiter();
 
 // 创建需要确认的工具
-const deleteFileTool = createDeleteFileTool(waiter)
-const sendEmailTool = createSendEmailTool(waiter)
+const deleteFileTool = createDeleteFileTool(waiter);
+const sendEmailTool = createSendEmailTool(waiter);
 
 const { session } = await createAgentSession({
   model,
@@ -187,7 +194,7 @@ const { session } = await createAgentSession({
   customTools: [deleteFileTool, sendEmailTool],
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 ```
 
 注意这里所有需要确认的工具 **共享同一个 `waiter`**。这是因为在 CLI 环境中，同一时间只会有一个工具在等待确认（Agent 是串行执行工具的）。如果你的场景需要并行执行多个需要确认的工具，就需要为每个工具创建独立的等待器。
@@ -200,12 +207,12 @@ const { session } = await createAgentSession({
 
 确认模式是 AI 安全的**最后一道防线**，但不应该是唯一的防线。在生产环境中，你应该考虑分层防御：
 
-| 层级 | 措施 | 说明 |
-|------|------|------|
-| **第一层：Prompt 约束** | 在系统提示词中明确禁止某些操作 | "永远不要删除用户的 home 目录" |
+| 层级                     | 措施                            | 说明                                         |
+| ------------------------ | ------------------------------- | -------------------------------------------- |
+| **第一层：Prompt 约束**  | 在系统提示词中明确禁止某些操作  | "永远不要删除用户的 home 目录"               |
 | **第二层：工具参数校验** | 在 `execute()` 中检查参数合法性 | 拒绝包含 `..` 的路径、拒绝 `/etc` 等系统目录 |
-| **第三层：确认模式** | 本章的 Promise 阻塞确认 | 让用户最终决定是否执行 |
-| **第四层：操作审计日志** | 记录所有敏感操作 | 事后追溯和审查 |
+| **第三层：确认模式**     | 本章的 Promise 阻塞确认         | 让用户最终决定是否执行                       |
+| **第四层：操作审计日志** | 记录所有敏感操作                | 事后追溯和审查                               |
 
 :::tip 提示
 一个更安全的做法是为工具添加 **"危险等级"标签**。低危操作（读文件）可以自动执行，中危操作（写文件）显示通知，高危操作（删除、发送）必须确认。这正是 Claude Code 的实际做法。
@@ -217,24 +224,24 @@ const { session } = await createAgentSession({
 
 ```typescript
 // 错误：没有 await，确认还没完成就继续执行了
-const result = waitForConfirmation()
+const result = waitForConfirmation();
 // result 是 Promise 对象，不是 { confirmed: boolean }
 
 // 正确：
-const { confirmed } = await waitForConfirmation()
+const { confirmed } = await waitForConfirmation();
 ```
 
 **2. 在确认前就执行了操作**
 
 ```typescript
 // 错误：先执行了操作，再问确认——为时已晚！
-await fs.unlink(path)
-const { confirmed } = await waitForConfirmation()
+await fs.unlink(path);
+const { confirmed } = await waitForConfirmation();
 
 // 正确：先确认，再执行
-const { confirmed } = await waitForConfirmation()
+const { confirmed } = await waitForConfirmation();
 if (confirmed) {
-  await fs.unlink(path)
+  await fs.unlink(path);
 }
 ```
 
@@ -242,13 +249,13 @@ if (confirmed) {
 
 ```typescript
 // 差：用户不知道要确认什么
-console.log('确认？[y/N]')
+console.log("确认？[y/N]");
 
 // 好：提供完整的上下文
-console.log(`⚠️  Agent 想要删除: ${path}`)
-console.log(`   原因: ${reason}`)
-console.log(`   文件大小: ${fileSize}`)
-console.log('   确认删除？[y/N]')
+console.log(`⚠️  Agent 想要删除: ${path}`);
+console.log(`   原因: ${reason}`);
+console.log(`   文件大小: ${fileSize}`);
+console.log("   确认删除？[y/N]");
 ```
 
 ## 运行
@@ -258,6 +265,7 @@ bun run ch05
 ```
 
 然后试试：
+
 - "Delete the file /tmp/old-backup.log because it is outdated" → 用 `y` 或 `n` 确认
 - "Send an email to alice@example.com about the meeting" → 用 `y` 或 `n` 确认
 

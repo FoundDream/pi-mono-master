@@ -51,49 +51,51 @@ This tool-calling loop is what transforms a language model from a text generator
 
 If you've worked with TypeScript validation libraries, you've likely used [Zod](https://zod.dev). It's the most popular choice in the ecosystem. So why does pi-coding-agent use [TypeBox](https://github.com/sinclairzx81/typebox) instead?
 
-The reason is **JSON Schema compatibility**. When your tool definitions are sent to the LLM, the parameter schemas must be serialized as JSON Schema -- the format that OpenAI, Anthropic, and Google all use in their API specifications. TypeBox schemas *are* JSON Schema by construction. Every `Type.String()`, `Type.Object()`, and `Type.Number()` call produces a plain JSON Schema object directly, with no conversion step needed.
+The reason is **JSON Schema compatibility**. When your tool definitions are sent to the LLM, the parameter schemas must be serialized as JSON Schema -- the format that OpenAI, Anthropic, and Google all use in their API specifications. TypeBox schemas _are_ JSON Schema by construction. Every `Type.String()`, `Type.Object()`, and `Type.Number()` call produces a plain JSON Schema object directly, with no conversion step needed.
 
 Zod, by contrast, uses its own internal representation. Converting Zod schemas to JSON Schema requires a separate library (`zod-to-json-schema`), introduces edge cases, and adds a dependency. TypeBox eliminates this entire category of problems.
 
 :::tip
 If you're coming from Zod, the mapping is straightforward:
+
 - `z.string()` becomes `Type.String()`
 - `z.number()` becomes `Type.Number()`
 - `z.object({...})` becomes `Type.Object({...})`
 - `z.enum([...])` becomes `Type.Union([Type.Literal(...), ...])`
 - Descriptions: `z.string().describe('...')` becomes `Type.String({ description: '...' })`
-:::
+  :::
 
 ## Tool Anatomy
 
 Every tool in pi-coding-agent is defined as a `ToolDefinition` object with five fields:
 
 ```typescript
-import { Type } from '@sinclair/typebox'
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import { Type } from "@sinclair/typebox";
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 
 const myTool: ToolDefinition = {
-  name: 'tool_name',          // Used in LLM tool calls (snake_case)
-  label: 'Tool Name',         // Human-readable label
-  description: '...',         // Description for the LLM
-  parameters: Type.Object({   // TypeBox schema
-    param: Type.String({ description: '...' }),
+  name: "tool_name", // Used in LLM tool calls (snake_case)
+  label: "Tool Name", // Human-readable label
+  description: "...", // Description for the LLM
+  parameters: Type.Object({
+    // TypeBox schema
+    param: Type.String({ description: "..." }),
   }),
   execute: async (toolCallId, params, signal, onUpdate) => {
-    const { param } = params as { param: string }
+    const { param } = params as { param: string };
     return {
-      content: [{ type: 'text', text: '...' }],
+      content: [{ type: "text", text: "..." }],
       details: {},
-    }
+    };
   },
-}
+};
 ```
 
 Let's examine each field:
 
 - **`name`** -- The identifier the LLM uses when calling this tool. Use `snake_case` (e.g., `get_weather`, `run_query`). This must be unique across all tools in a session.
 - **`label`** -- A human-readable name shown in UIs and logs. Not sent to the LLM.
-- **`description`** -- This is critically important. The LLM reads this description to decide *when* and *how* to use the tool. A vague description leads to the tool being used incorrectly or not at all. (More on this below.)
+- **`description`** -- This is critically important. The LLM reads this description to decide _when_ and _how_ to use the tool. A vague description leads to the tool being used incorrectly or not at all. (More on this below.)
 - **`parameters`** -- A TypeBox schema defining the inputs the tool accepts. The LLM generates arguments matching this schema. Each parameter should include a `description` to help the LLM fill it in correctly.
 - **`execute`** -- The async function that runs when the LLM calls the tool. It receives the tool call ID, parsed parameters, an abort signal, and an update callback. It must return an object with `content` (array of result items) and `details` (metadata).
 
@@ -128,37 +130,47 @@ The key insight is that tool execution happens **inside the agent loop**. After 
 This tool simulates a weather API. In production, you'd replace the hardcoded data with a real HTTP call:
 
 ```typescript
-import { Type } from '@sinclair/typebox'
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import { Type } from "@sinclair/typebox";
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 
 export const weatherTool: ToolDefinition = {
-  name: 'get_weather',
-  label: 'Get Weather',
-  description: 'Get current weather for a city. Use this when the user asks about weather.',
+  name: "get_weather",
+  label: "Get Weather",
+  description:
+    "Get current weather for a city. Use this when the user asks about weather.",
   parameters: Type.Object({
     city: Type.String({ description: 'City name (e.g. "Tokyo", "London")' }),
   }),
   execute: async (_toolCallId, params) => {
-    const { city } = params as { city: string }
+    const { city } = params as { city: string };
 
-    const weatherData: Record<string, { temp: string; condition: string; humidity: string }> = {
-      tokyo: { temp: '22°C', condition: 'Sunny', humidity: '45%' },
-      london: { temp: '14°C', condition: 'Cloudy', humidity: '78%' },
-      'new york': { temp: '18°C', condition: 'Partly cloudy', humidity: '55%' },
-    }
+    const weatherData: Record<
+      string,
+      { temp: string; condition: string; humidity: string }
+    > = {
+      tokyo: { temp: "22°C", condition: "Sunny", humidity: "45%" },
+      london: { temp: "14°C", condition: "Cloudy", humidity: "78%" },
+      "new york": { temp: "18°C", condition: "Partly cloudy", humidity: "55%" },
+    };
 
-    const key = city.toLowerCase()
-    const weather = weatherData[key] || { temp: '20°C', condition: 'Clear', humidity: '50%' }
+    const key = city.toLowerCase();
+    const weather = weatherData[key] || {
+      temp: "20°C",
+      condition: "Clear",
+      humidity: "50%",
+    };
 
     return {
-      content: [{
-        type: 'text' as const,
-        text: JSON.stringify({ city, ...weather }),
-      }],
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify({ city, ...weather }),
+        },
+      ],
       details: {},
-    }
+    };
   },
-}
+};
 ```
 
 Notice that the tool returns **structured data as a JSON string**, not a natural language sentence. This is intentional -- the LLM is better at interpreting structured data and weaving it into a natural response than receiving a pre-formatted sentence. Let the model handle the presentation.
@@ -167,28 +179,36 @@ Notice that the tool returns **structured data as a JSON string**, not a natural
 
 ```typescript
 export const calculatorTool: ToolDefinition = {
-  name: 'calculate',
-  label: 'Calculator',
-  description: 'Evaluate a mathematical expression. Use for any math calculations.',
+  name: "calculate",
+  label: "Calculator",
+  description:
+    "Evaluate a mathematical expression. Use for any math calculations.",
   parameters: Type.Object({
-    expression: Type.String({ description: 'Math expression to evaluate (e.g. "2 + 3 * 4")' }),
+    expression: Type.String({
+      description: 'Math expression to evaluate (e.g. "2 + 3 * 4")',
+    }),
   }),
   execute: async (_toolCallId, params) => {
-    const { expression } = params as { expression: string }
+    const { expression } = params as { expression: string };
     try {
-      const result = Function(`"use strict"; return (${expression})`)()
+      const result = Function(`"use strict"; return (${expression})`)();
       return {
-        content: [{ type: 'text' as const, text: String(result) }],
+        content: [{ type: "text" as const, text: String(result) }],
         details: {},
-      }
+      };
     } catch (e) {
       return {
-        content: [{ type: 'text' as const, text: `Error: ${e instanceof Error ? e.message : String(e)}` }],
+        content: [
+          {
+            type: "text" as const,
+            text: `Error: ${e instanceof Error ? e.message : String(e)}`,
+          },
+        ],
         details: {},
-      }
+      };
     }
   },
-}
+};
 ```
 
 This tool demonstrates **error handling within `execute()`**. When the expression is invalid, instead of throwing an exception, the tool returns an error message as its content. This lets the LLM see the error, understand what went wrong, and potentially retry with a corrected expression or explain the issue to the user.
@@ -204,11 +224,11 @@ Pass tools via the `customTools` array:
 ```typescript
 const { session } = await createAgentSession({
   model,
-  tools: [],                                    // No built-in coding tools
-  customTools: [weatherTool, calculatorTool],   // Our custom tools
+  tools: [], // No built-in coding tools
+  customTools: [weatherTool, calculatorTool], // Our custom tools
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 ```
 
 The `tools` array is for pi-coding-agent's **built-in** coding tools (file read, file write, bash execution, etc.). The `customTools` array is for **your** tools. Keep them separate -- this makes it easy to enable or disable built-in coding capabilities independently of your custom tools.
@@ -220,24 +240,26 @@ Just like text streaming, tool execution is observable through the event system:
 ```typescript
 session.subscribe((event) => {
   switch (event.type) {
-    case 'message_update':
-      if (event.assistantMessageEvent.type === 'text_delta') {
-        process.stdout.write(event.assistantMessageEvent.delta)
+    case "message_update":
+      if (event.assistantMessageEvent.type === "text_delta") {
+        process.stdout.write(event.assistantMessageEvent.delta);
       }
-      break
+      break;
 
-    case 'tool_execution_start':
-      console.log(`\n🔧 Tool call: ${event.toolName}(${JSON.stringify(event.args)})`)
-      break
+    case "tool_execution_start":
+      console.log(
+        `\n🔧 Tool call: ${event.toolName}(${JSON.stringify(event.args)})`,
+      );
+      break;
 
-    case 'tool_execution_end':
-      console.log(`✅ Result: ${JSON.stringify(event.result)}\n`)
-      break
+    case "tool_execution_end":
+      console.log(`✅ Result: ${JSON.stringify(event.result)}\n`);
+      break;
   }
-})
+});
 ```
 
-The `tool_execution_start` event fires *before* your `execute()` function runs, and `tool_execution_end` fires *after* it returns. This lets you build UIs that show "Loading weather data..." while the tool is running, or log tool calls for debugging.
+The `tool_execution_start` event fires _before_ your `execute()` function runs, and `tool_execution_end` fires _after_ it returns. This lets you build UIs that show "Loading weather data..." while the tool is running, or log tool calls for debugging.
 
 ## Designing Effective Tools
 
@@ -249,10 +271,10 @@ Your `description` is the LLM's only guide for deciding when to use a tool. Writ
 
 ```typescript
 // Bad -- too vague, the LLM doesn't know when to use it
-description: 'Weather tool'
+description: "Weather tool";
 
 // Good -- clear trigger condition and purpose
-description: 'Get current weather for a city. Use this when the user asks about weather, temperature, or climate conditions for a specific location.'
+description: "Get current weather for a city. Use this when the user asks about weather, temperature, or climate conditions for a specific location.";
 ```
 
 ### Include examples in parameter descriptions
@@ -261,10 +283,12 @@ LLMs understand structured data better with examples:
 
 ```typescript
 // Bad
-city: Type.String({ description: 'The city' })
+city: Type.String({ description: "The city" });
 
 // Good
-city: Type.String({ description: 'City name (e.g. "Tokyo", "London", "New York")' })
+city: Type.String({
+  description: 'City name (e.g. "Tokyo", "London", "New York")',
+});
 ```
 
 ### Keep tools focused
@@ -277,10 +301,19 @@ Return JSON objects or structured text, not pre-formatted sentences. The LLM is 
 
 ```typescript
 // Bad -- the LLM will awkwardly quote or paraphrase this
-return { content: [{ type: 'text', text: 'It is 22 degrees and sunny in Tokyo.' }] }
+return {
+  content: [{ type: "text", text: "It is 22 degrees and sunny in Tokyo." }],
+};
 
 // Good -- the LLM can present this naturally
-return { content: [{ type: 'text', text: JSON.stringify({ city: 'Tokyo', temp: '22°C', condition: 'Sunny' }) }] }
+return {
+  content: [
+    {
+      type: "text",
+      text: JSON.stringify({ city: "Tokyo", temp: "22°C", condition: "Sunny" }),
+    },
+  ],
+};
 ```
 
 ### Handle errors gracefully
@@ -290,15 +323,18 @@ Never throw exceptions from `execute()`. Always return an error as content so th
 ```typescript
 execute: async (_id, params) => {
   try {
-    const result = await riskyOperation()
-    return { content: [{ type: 'text', text: JSON.stringify(result) }], details: {} }
+    const result = await riskyOperation();
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+      details: {},
+    };
   } catch (e) {
     return {
-      content: [{ type: 'text', text: `Error: ${e.message}` }],
+      content: [{ type: "text", text: `Error: ${e.message}` }],
       details: {},
-    }
+    };
   }
-}
+};
 ```
 
 :::tip
@@ -338,14 +374,14 @@ You: What's the weather in Tokyo? Also, what is 42 * 17?
 The weather in Tokyo is 22°C and sunny. And 42 × 17 = 714.
 ```
 
-Notice how the LLM correctly identifies that it needs *two* tools and calls them both before composing its final response. This is the agent loop in action -- the model reasons about what tools to call, executes them, and then synthesizes the results into a coherent answer.
+Notice how the LLM correctly identifies that it needs _two_ tools and calls them both before composing its final response. This is the agent loop in action -- the model reasons about what tools to call, executes them, and then synthesizes the results into a coherent answer.
 
 ## Key Takeaways
 
 - **Tool calling** lets LLMs interact with the outside world by requesting your code to execute functions on their behalf.
 - Tools are defined with a `ToolDefinition` object containing a name, description, TypeBox parameter schema, and an `execute()` function.
 - **TypeBox** is used instead of Zod because it generates JSON Schema natively, which is the format LLM APIs expect.
-- The quality of your tool descriptions is critical -- the LLM reads them to decide *when* and *how* to use each tool.
+- The quality of your tool descriptions is critical -- the LLM reads them to decide _when_ and _how_ to use each tool.
 - Tool execution happens inside the agent loop: the LLM can call multiple tools in sequence and reason about their results before producing a final response.
 - Always handle errors inside `execute()` and return them as content rather than throwing exceptions.
 

@@ -78,29 +78,29 @@ The data flow follows a clean pipeline:
 
 ## Features
 
-| Feature | Source Chapter | What It Adds |
-|---------|---------------|--------------|
-| Model creation from env | Ch 01 | Flexible provider switching via env vars |
-| Streaming with DeltaBatcher | Ch 02 | Smooth, batched terminal output |
-| Custom tools (weather, time) | Ch 03 | Domain-specific capabilities |
-| Session persistence (JSONL) | Ch 04 | Conversation continuity across restarts |
-| Tool confirmation pattern | Ch 05 | Safety gating for dangerous operations |
-| System prompt + Skills | Ch 06 | Agent personality and domain knowledge |
-| Multi-session management | Ch 07 | Independent conversation threads |
-| Coding tools (read, write, edit, bash) | New | File system and shell access |
-| Abort with Ctrl+C | New | Graceful cancellation of generation |
+| Feature                                | Source Chapter | What It Adds                             |
+| -------------------------------------- | -------------- | ---------------------------------------- |
+| Model creation from env                | Ch 01          | Flexible provider switching via env vars |
+| Streaming with DeltaBatcher            | Ch 02          | Smooth, batched terminal output          |
+| Custom tools (weather, time)           | Ch 03          | Domain-specific capabilities             |
+| Session persistence (JSONL)            | Ch 04          | Conversation continuity across restarts  |
+| Tool confirmation pattern              | Ch 05          | Safety gating for dangerous operations   |
+| System prompt + Skills                 | Ch 06          | Agent personality and domain knowledge   |
+| Multi-session management               | Ch 07          | Independent conversation threads         |
+| Coding tools (read, write, edit, bash) | New            | File system and shell access             |
+| Abort with Ctrl+C                      | New            | Graceful cancellation of generation      |
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/sessions` | List all saved sessions |
-| `/new` | Start a new session |
-| `/open <n>` | Open session N from list |
+| Command     | Description                |
+| ----------- | -------------------------- |
+| `/sessions` | List all saved sessions    |
+| `/new`      | Start a new session        |
+| `/open <n>` | Open session N from list   |
 | `/continue` | Resume most recent session |
-| `/abort` | Abort current streaming |
-| `/help` | Show all commands |
-| `/quit` | Exit |
+| `/abort`    | Abort current streaming    |
+| `/help`     | Show all commands          |
+| `/quit`     | Exit                       |
 
 ## Deep Dive: DeltaBatcher
 
@@ -122,31 +122,34 @@ The result is smooth, fluid text output that feels like a human typing at a natu
 
 ```typescript
 class DeltaBatcher {
-  private pendingText = ''
-  private flushTimer: ReturnType<typeof setTimeout> | null = null
+  private pendingText = "";
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly onFlush: (text: string) => void,
-    private readonly intervalMs = 32
+    private readonly intervalMs = 32,
   ) {}
 
   push(delta: string): void {
-    this.pendingText += delta
+    this.pendingText += delta;
     if (!this.flushTimer) {
       this.flushTimer = setTimeout(() => {
-        this.flushTimer = null
-        const text = this.pendingText
-        this.pendingText = ''
-        if (text) this.onFlush(text)
-      }, this.intervalMs)
+        this.flushTimer = null;
+        const text = this.pendingText;
+        this.pendingText = "";
+        if (text) this.onFlush(text);
+      }, this.intervalMs);
     }
   }
 
   flush(): void {
-    if (this.flushTimer) { clearTimeout(this.flushTimer); this.flushTimer = null }
-    const text = this.pendingText
-    this.pendingText = ''
-    if (text) this.onFlush(text)
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+    const text = this.pendingText;
+    this.pendingText = "";
+    if (text) this.onFlush(text);
   }
 }
 ```
@@ -172,18 +175,24 @@ In the `AgentRuntime`, the batcher sits between the event subscription and the t
 ```typescript
 // Without DeltaBatcher (stuttery):
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    process.stdout.write(event.assistantMessageEvent.delta)  // "H", "e", "l", "l", "o"
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    process.stdout.write(event.assistantMessageEvent.delta); // "H", "e", "l", "l", "o"
   }
-})
+});
 
 // With DeltaBatcher (smooth):
-const batcher = new DeltaBatcher((text) => process.stdout.write(text))
+const batcher = new DeltaBatcher((text) => process.stdout.write(text));
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    batcher.push(event.assistantMessageEvent.delta)  // Collects, then "Hello, how"
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    batcher.push(event.assistantMessageEvent.delta); // Collects, then "Hello, how"
   }
-})
+});
 ```
 
 The `flush()` method is called when the response completes, ensuring any remaining buffered text is written out immediately. Without this, the last few characters of a response might be stuck in the buffer.
@@ -205,10 +214,10 @@ In a CLI application, the universal escape hatch is **Ctrl+C** (SIGINT). When th
 
 ```typescript
 // In index.ts
-process.on('SIGINT', () => {
-  runtime.abort()
-  console.log('\n🛑 Aborted.')
-})
+process.on("SIGINT", () => {
+  runtime.abort();
+  console.log("\n🛑 Aborted.");
+});
 ```
 
 Inside `AgentRuntime`, `abort()` calls `session.abort()` on the underlying `AgentSession`. This triggers a cancellation cascade:
@@ -219,7 +228,7 @@ Inside `AgentRuntime`, `abort()` calls `session.abort()` on the underlying `Agen
 4. **The DeltaBatcher is flushed** to write out any remaining buffered text
 
 :::warning
-Ctrl+C in Node.js sends SIGINT to the process, which by default terminates it. By registering a handler with `process.on('SIGINT', ...)`, we intercept the signal and perform a graceful abort instead. However, pressing Ctrl+C *twice* rapidly will usually force-kill the process (depending on the platform). This is intentional -- it gives the user a way out if the graceful abort hangs.
+Ctrl+C in Node.js sends SIGINT to the process, which by default terminates it. By registering a handler with `process.on('SIGINT', ...)`, we intercept the signal and perform a graceful abort instead. However, pressing Ctrl+C _twice_ rapidly will usually force-kill the process (depending on the platform). This is intentional -- it gives the user a way out if the graceful abort hangs.
 :::
 
 ### Abort and Tool Execution
@@ -229,14 +238,15 @@ For tools that perform long-running operations (like shell commands or API calls
 ```typescript
 execute: async (_toolCallId, params, signal, onUpdate) => {
   // Pass the signal to fetch calls, child processes, etc.
-  const response = await fetch(url, { signal })
+  const response = await fetch(url, { signal });
 
   // Or check it periodically in loops
   for (const item of items) {
-    if (signal?.aborted) return { content: [{ type: 'text', text: 'Aborted' }], details: {} }
-    await processItem(item)
+    if (signal?.aborted)
+      return { content: [{ type: "text", text: "Aborted" }], details: {} };
+    await processItem(item);
   }
-}
+};
 ```
 
 ## AgentRuntime
@@ -283,13 +293,13 @@ A class encapsulates this mutable state behind a clean API, preventing the calle
 
 ```typescript
 interface RuntimeConfig {
-  model: Model<Api>
-  cwd: string
-  sessionDir: string
-  skillsDir?: string
-  systemPrompt: string
-  customTools?: ToolDefinition[]
-  includeCodingTools?: boolean
+  model: Model<Api>;
+  cwd: string;
+  sessionDir: string;
+  skillsDir?: string;
+  systemPrompt: string;
+  customTools?: ToolDefinition[];
+  includeCodingTools?: boolean;
 }
 ```
 
@@ -302,38 +312,41 @@ Enabling coding tools gives the agent filesystem and shell access. This is power
 ## Main Entry Point
 
 ```typescript
-import { createModel } from '../../shared/model'
-import { AgentRuntime } from './runtime'
-import { weatherTool, createTimeTool, createDangerousTool } from './tools'
-import { handleCommand } from './commands'
+import { createModel } from "../../shared/model";
+import { AgentRuntime } from "./runtime";
+import { weatherTool, createTimeTool, createDangerousTool } from "./tools";
+import { handleCommand } from "./commands";
 
-const model = createModel()
+const model = createModel();
 
 const runtime = new AgentRuntime({
   model,
   cwd: process.cwd(),
   sessionDir: SESSION_DIR,
   skillsDir: SKILLS_DIR,
-  systemPrompt: 'You are a versatile CLI assistant...',
+  systemPrompt: "You are a versatile CLI assistant...",
   customTools: [weatherTool, createTimeTool(), createDangerousTool(waiter)],
   includeCodingTools: true,
-})
+});
 
 // Ctrl+C to abort
-process.on('SIGINT', () => {
-  runtime.abort()
-  console.log('\n🛑 Aborted.')
-})
+process.on("SIGINT", () => {
+  runtime.abort();
+  console.log("\n🛑 Aborted.");
+});
 
 // REPL loop
 const ask = () => {
-  rl.question('You: ', async (input) => {
-    if (await handleCommand(input.trim(), runtime)) { ask(); return }
-    await runtime.prompt(input.trim())
-    ask()
-  })
-}
-ask()
+  rl.question("You: ", async (input) => {
+    if (await handleCommand(input.trim(), runtime)) {
+      ask();
+      return;
+    }
+    await runtime.prompt(input.trim());
+    ask();
+  });
+};
+ask();
 ```
 
 Notice how clean the entry point is. All the complexity of session management, streaming, confirmation, and abort handling is hidden inside `AgentRuntime`. The entry point only needs to:
@@ -349,18 +362,35 @@ This is the payoff of good encapsulation -- the top-level code reads like a desc
 The command handler is extracted into a separate module for testability and separation of concerns. It takes user input and the runtime, and returns `true` if the input was a command (so the REPL knows not to send it to the LLM):
 
 ```typescript
-export async function handleCommand(input: string, runtime: AgentRuntime): Promise<boolean> {
-  if (!input.startsWith('/')) return false
+export async function handleCommand(
+  input: string,
+  runtime: AgentRuntime,
+): Promise<boolean> {
+  if (!input.startsWith("/")) return false;
 
-  switch (input.split(' ')[0]) {
-    case '/help':     printHelp(); return true
-    case '/sessions': /* list sessions */; return true
-    case '/new':      runtime.newSession(); return true
-    case '/open':     /* open by index */; return true
-    case '/continue': runtime.continueRecentSession(); return true
-    case '/abort':    runtime.abort(); return true
-    case '/quit':     runtime.destroy(); process.exit(0)
-    default:          console.log('Unknown command'); return true
+  switch (input.split(" ")[0]) {
+    case "/help":
+      printHelp();
+      return true;
+    case "/sessions" /* list sessions */:
+      return true;
+    case "/new":
+      runtime.newSession();
+      return true;
+    case "/open" /* open by index */:
+      return true;
+    case "/continue":
+      runtime.continueRecentSession();
+      return true;
+    case "/abort":
+      runtime.abort();
+      return true;
+    case "/quit":
+      runtime.destroy();
+      process.exit(0);
+    default:
+      console.log("Unknown command");
+      return true;
   }
 }
 ```
@@ -404,6 +434,7 @@ Congratulations -- you have built a production-quality CLI agent from scratch. H
 ### Extension Ideas
 
 **Add more tools**: The agent's capabilities are limited only by the tools you provide. Consider adding tools for:
+
 - Web browsing (fetch and summarize URLs)
 - Database queries (read from SQLite, PostgreSQL)
 - API integrations (GitHub, Jira, Slack)

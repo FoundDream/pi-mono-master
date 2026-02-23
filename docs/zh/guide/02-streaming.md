@@ -65,11 +65,11 @@
 
 ### 核心事件类型
 
-| 事件 | 触发时机 | 包含的数据 |
-|------|---------|-----------|
-| `agent_start` | Agent 开始处理用户的 prompt | 无额外数据 |
-| `message_update` | Agent 产生了新的输出内容 | `assistantMessageEvent`（包含 delta 类型和内容） |
-| `agent_end` | Agent 完成了本轮回答 | 无额外数据 |
+| 事件             | 触发时机                    | 包含的数据                                       |
+| ---------------- | --------------------------- | ------------------------------------------------ |
+| `agent_start`    | Agent 开始处理用户的 prompt | 无额外数据                                       |
+| `message_update` | Agent 产生了新的输出内容    | `assistantMessageEvent`（包含 delta 类型和内容） |
+| `agent_end`      | Agent 完成了本轮回答        | 无额外数据                                       |
 
 其中 `message_update` 事件的 `assistantMessageEvent` 有多种类型，本章我们只关注 `text_delta` —— 代表一小段新生成的文本。在后续的工具章节中，你还会遇到工具调用相关的事件类型。
 
@@ -80,19 +80,19 @@ import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const model = createModel()
+const model = createModel();
 
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => 'You are a helpful assistant. Respond in detail.',
+  systemPromptOverride: () => "You are a helpful assistant. Respond in detail.",
   noExtensions: true,
   noSkills: true,
   noPromptTemplates: true,
   noThemes: true,
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 
 const { session } = await createAgentSession({
   model,
@@ -100,36 +100,37 @@ const { session } = await createAgentSession({
   customTools: [],
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 
 // 订阅事件 —— 将 delta 实时写入 stdout（打字机效果）
 session.subscribe((event) => {
-  if (event.type === 'message_update') {
-    const { assistantMessageEvent } = event
+  if (event.type === "message_update") {
+    const { assistantMessageEvent } = event;
     switch (assistantMessageEvent.type) {
-      case 'text_delta':
+      case "text_delta":
         // 将每个文本 chunk 直接写入 stdout（不换行）
-        process.stdout.write(assistantMessageEvent.delta)
-        break
+        process.stdout.write(assistantMessageEvent.delta);
+        break;
     }
   }
 
   // 你也可以监听 Agent 生命周期事件
-  if (event.type === 'agent_start') {
-    console.log('[Agent 开始思考...]\n')
+  if (event.type === "agent_start") {
+    console.log("[Agent 开始思考...]\n");
   }
-  if (event.type === 'agent_end') {
-    console.log('\n\n[Agent 完成]')
+  if (event.type === "agent_end") {
+    console.log("\n\n[Agent 完成]");
   }
-})
+});
 
-const question = process.argv[2] || 'Explain how a CPU executes instructions, step by step.'
-console.log(`You: ${question}\n`)
+const question =
+  process.argv[2] || "Explain how a CPU executes instructions, step by step.";
+console.log(`You: ${question}\n`);
 
-await session.prompt(question)
+await session.prompt(question);
 
-console.log()
-process.exit(0)
+console.log();
+process.exit(0);
 ```
 
 ## 逐步解析
@@ -140,21 +141,24 @@ process.exit(0)
 
 ```typescript
 // 第 01 章的方式：缓冲输出
-let response = ''
+let response = "";
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    response += event.assistantMessageEvent.delta  // 拼接到字符串
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    response += event.assistantMessageEvent.delta; // 拼接到字符串
   }
-})
-await session.prompt('...')
-console.log('Agent:', response)  // 一次性打印
+});
+await session.prompt("...");
+console.log("Agent:", response); // 一次性打印
 ```
 
 而本章的关键改变只有一处 —— 我们将每个 delta **直接写入 stdout**：
 
 ```typescript
 // 第 02 章的方式：流式输出
-process.stdout.write(assistantMessageEvent.delta)
+process.stdout.write(assistantMessageEvent.delta);
 ```
 
 :::tip `process.stdout.write()` vs `console.log()`
@@ -184,11 +188,11 @@ agent_end
 ### 生命周期事件的作用
 
 ```typescript
-if (event.type === 'agent_start') {
-  console.log('[Agent 开始思考...]\n')
+if (event.type === "agent_start") {
+  console.log("[Agent 开始思考...]\n");
 }
-if (event.type === 'agent_end') {
-  console.log('\n\n[Agent 完成]')
+if (event.type === "agent_end") {
+  console.log("\n\n[Agent 完成]");
 }
 ```
 
@@ -230,15 +234,18 @@ data: [DONE]            → agent_end 事件   →  显示 "[完成]"
 ```typescript
 // 错误：没有检查事件类型
 session.subscribe((event) => {
-  process.stdout.write(event.assistantMessageEvent.delta)  // event 可能没有 assistantMessageEvent!
-})
+  process.stdout.write(event.assistantMessageEvent.delta); // event 可能没有 assistantMessageEvent!
+});
 
 // 正确：先检查事件类型
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    process.stdout.write(event.assistantMessageEvent.delta)
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    process.stdout.write(event.assistantMessageEvent.delta);
   }
-})
+});
 ```
 
 ### 流式输出中的错误处理
@@ -247,11 +254,11 @@ session.subscribe((event) => {
 
 ```typescript
 session.subscribe((event) => {
-  if (event.type === 'error') {
-    console.error('Agent 出错:', event.error)
+  if (event.type === "error") {
+    console.error("Agent 出错:", event.error);
     // 可以在这里实现重试逻辑或优雅降级
   }
-})
+});
 ```
 
 :::warning 注意
@@ -274,6 +281,7 @@ bun run ch02 "What is quantum computing?"
 文本在终端中逐字出现，类似 ChatGPT 的打字效果。你应该能明显感觉到文字是"一点点冒出来的"，而不是突然出现一大段。
 
 如果你仔细观察，还会注意到：
+
 - 开头先显示 `[Agent 开始思考...]`
 - 然后文字逐渐出现
 - 最后显示 `[Agent 完成]`

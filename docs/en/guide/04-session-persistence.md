@@ -2,7 +2,7 @@
 
 ## The Stateless Problem
 
-Here's a fundamental truth about LLMs that surprises many newcomers: **language models have no memory**. Every API call is stateless. When you send a prompt to Claude or GPT-4, the model doesn't "remember" your previous conversation -- it processes the *entire* message history you send it from scratch each time.
+Here's a fundamental truth about LLMs that surprises many newcomers: **language models have no memory**. Every API call is stateless. When you send a prompt to Claude or GPT-4, the model doesn't "remember" your previous conversation -- it processes the _entire_ message history you send it from scratch each time.
 
 This means that if you want an agent to "remember" that your name is Alice from five messages ago, you must include those five earlier messages in every subsequent API call. The model's "memory" is really just your code replaying the conversation transcript.
 
@@ -22,12 +22,12 @@ This is what session persistence solves. In this chapter, we'll store conversati
 
 pi-coding-agent stores sessions in **JSONL** (JSON Lines) format -- one JSON object per line, each line representing a message or event in the conversation. Why this format over alternatives?
 
-| Format | Pros | Cons |
-|--------|------|------|
-| **JSONL** | Append-only (fast writes), human-readable, streamable, crash-safe | Slightly larger than binary formats |
-| **Single JSON file** | Easy to read as a whole | Must rewrite the entire file for each new message; corrupt if crash mid-write |
-| **SQLite** | Queryable, transactional | Heavier dependency; overkill for sequential message logs |
-| **Binary (protobuf, etc.)** | Compact, fast | Not human-readable; harder to debug |
+| Format                      | Pros                                                              | Cons                                                                          |
+| --------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **JSONL**                   | Append-only (fast writes), human-readable, streamable, crash-safe | Slightly larger than binary formats                                           |
+| **Single JSON file**        | Easy to read as a whole                                           | Must rewrite the entire file for each new message; corrupt if crash mid-write |
+| **SQLite**                  | Queryable, transactional                                          | Heavier dependency; overkill for sequential message logs                      |
+| **Binary (protobuf, etc.)** | Compact, fast                                                     | Not human-readable; harder to debug                                           |
 
 JSONL is the sweet spot for conversation storage because conversations are **append-only** by nature. You add messages sequentially; you never edit the middle of a conversation. With JSONL, adding a new message means appending a single line to the file -- there's no need to parse and rewrite the entire file. And if the process crashes mid-write, only the last (incomplete) line is corrupted; all previous messages are safe.
 
@@ -89,51 +89,52 @@ The critical thing to understand is that when you resume a session, the `Session
 
 ## Key API Methods
 
-| Method | Description |
-|--------|-------------|
-| `SessionManager.create(cwd, dir)` | Creates a new session with a fresh JSONL file in `dir/`. Returns a `SessionManager` instance. |
+| Method                                    | Description                                                                                                                    |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `SessionManager.create(cwd, dir)`         | Creates a new session with a fresh JSONL file in `dir/`. Returns a `SessionManager` instance.                                  |
 | `SessionManager.continueRecent(cwd, dir)` | Finds the most recently modified JSONL file in `dir/` and loads it. Returns a `SessionManager` instance pointing to that file. |
-| `sessionManager.buildSessionContext()` | Returns `{ messages }` -- the array of all messages in the current session. Useful for checking conversation length. |
-| `sessionManager.getSessionFile()` | Returns the absolute path to the JSONL file. Useful for logging or debugging. |
+| `sessionManager.buildSessionContext()`    | Returns `{ messages }` -- the array of all messages in the current session. Useful for checking conversation length.           |
+| `sessionManager.getSessionFile()`         | Returns the absolute path to the JSONL file. Useful for logging or debugging.                                                  |
 
 ## Full Code
 
 ```typescript
-import * as path from 'node:path'
-import * as readline from 'node:readline'
+import * as path from "node:path";
+import * as readline from "node:readline";
 import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const SESSION_DIR = path.join(import.meta.dirname, '.sessions')
-const model = createModel()
+const SESSION_DIR = path.join(import.meta.dirname, ".sessions");
+const model = createModel();
 
 // Determine session strategy from CLI argument
-const arg = process.argv[2] // 'continue' or undefined
+const arg = process.argv[2]; // 'continue' or undefined
 
-let sessionManager: SessionManager
-if (arg === 'continue') {
-  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR)
-  const ctx = sessionManager.buildSessionContext()
-  console.log(`📂 Resumed session (${ctx.messages.length} previous messages)`)
-  console.log(`   Session file: ${sessionManager.getSessionFile()}\n`)
+let sessionManager: SessionManager;
+if (arg === "continue") {
+  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR);
+  const ctx = sessionManager.buildSessionContext();
+  console.log(`📂 Resumed session (${ctx.messages.length} previous messages)`);
+  console.log(`   Session file: ${sessionManager.getSessionFile()}\n`);
 } else {
-  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-  console.log('📝 New session created')
-  console.log(`   Session file: ${sessionManager.getSessionFile()}\n`)
+  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+  console.log("📝 New session created");
+  console.log(`   Session file: ${sessionManager.getSessionFile()}\n`);
 }
 
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => 'You are a helpful assistant. Be concise. Remember our conversation context.',
+  systemPromptOverride: () =>
+    "You are a helpful assistant. Be concise. Remember our conversation context.",
   noExtensions: true,
   noSkills: true,
   noPromptTemplates: true,
   noThemes: true,
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 
 const { session } = await createAgentSession({
   model,
@@ -141,44 +142,47 @@ const { session } = await createAgentSession({
   customTools: [],
   sessionManager,
   resourceLoader,
-})
+});
 
 // Stream output
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    process.stdout.write(event.assistantMessageEvent.delta)
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    process.stdout.write(event.assistantMessageEvent.delta);
   }
-})
+});
 
 // REPL loop
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-})
+});
 
-console.log('Type your message (or /quit to exit):\n')
+console.log("Type your message (or /quit to exit):\n");
 
 const ask = () => {
-  rl.question('You: ', async (input) => {
-    const trimmed = input.trim()
-    if (trimmed === '/quit' || trimmed === '/exit') {
-      console.log('\nGoodbye! Your session has been saved.')
-      rl.close()
-      process.exit(0)
+  rl.question("You: ", async (input) => {
+    const trimmed = input.trim();
+    if (trimmed === "/quit" || trimmed === "/exit") {
+      console.log("\nGoodbye! Your session has been saved.");
+      rl.close();
+      process.exit(0);
     }
     if (!trimmed) {
-      ask()
-      return
+      ask();
+      return;
     }
 
-    process.stdout.write('\nAgent: ')
-    await session.prompt(trimmed)
-    console.log('\n')
-    ask()
-  })
-}
+    process.stdout.write("\nAgent: ");
+    await session.prompt(trimmed);
+    console.log("\n");
+    ask();
+  });
+};
 
-ask()
+ask();
 ```
 
 ## Step-by-Step Breakdown
@@ -186,7 +190,7 @@ ask()
 ### 1. Choose where to store sessions
 
 ```typescript
-const SESSION_DIR = path.join(import.meta.dirname, '.sessions')
+const SESSION_DIR = path.join(import.meta.dirname, ".sessions");
 ```
 
 The `.sessions/` directory lives inside the chapter folder. pi-coding-agent creates it automatically if it doesn't exist. Each session gets a unique JSONL file with a generated name (e.g., `session-abc123.jsonl`).
@@ -198,16 +202,16 @@ In production, you'd typically store sessions in a user-specific data directory 
 ### 2. Create or resume a session
 
 ```typescript
-const arg = process.argv[2]
+const arg = process.argv[2];
 
-let sessionManager: SessionManager
-if (arg === 'continue') {
-  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR)
-  const ctx = sessionManager.buildSessionContext()
-  console.log(`📂 Resumed session (${ctx.messages.length} previous messages)`)
+let sessionManager: SessionManager;
+if (arg === "continue") {
+  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR);
+  const ctx = sessionManager.buildSessionContext();
+  console.log(`📂 Resumed session (${ctx.messages.length} previous messages)`);
 } else {
-  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-  console.log('📝 New session created')
+  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+  console.log("📝 New session created");
 }
 ```
 
@@ -221,17 +225,17 @@ After resuming, `buildSessionContext()` lets you inspect the loaded conversation
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-})
+});
 
 const ask = () => {
-  rl.question('You: ', async (input) => {
+  rl.question("You: ", async (input) => {
     // ... handle input ...
-    await session.prompt(trimmed)
-    ask()  // Ask again (loop)
-  })
-}
+    await session.prompt(trimmed);
+    ask(); // Ask again (loop)
+  });
+};
 
-ask()
+ask();
 ```
 
 The REPL (Read-Eval-Print Loop) is a classic interactive pattern. We use Node's built-in `readline` module to read user input, send it to the agent, display the response, and loop. The `/quit` command exits gracefully.
@@ -284,9 +288,10 @@ cat .sessions/session-abc123.jsonl | jq .
 
 ### Context window limits
 
-Every time you resume a session, the *entire* conversation history is sent to the LLM. Long conversations will eventually exceed the model's context window (e.g., 128K tokens for Claude, 128K for GPT-4o). At that point, the API call will fail.
+Every time you resume a session, the _entire_ conversation history is sent to the LLM. Long conversations will eventually exceed the model's context window (e.g., 128K tokens for Claude, 128K for GPT-4o). At that point, the API call will fail.
 
 In production, you need a strategy for this:
+
 - **Truncation** -- Drop the oldest messages to stay within the token budget
 - **Summarization** -- Periodically summarize older messages and replace them with a summary
 - **Session rotation** -- Start a new session when the current one gets too long, carrying over a summary

@@ -40,6 +40,7 @@ Add to `keybindings.json`:
 ```
 
 Locations:
+
 - macOS: `~/Library/Application Support/Code/User/keybindings.json`
 - Linux: `~/.config/Code/User/keybindings.json`
 - Windows: `%APPDATA%\\Code\\User\\keybindings.json`

@@ -24,10 +24,7 @@
       "baseUrl": "http://localhost:11434/v1",
       "api": "openai-completions",
       "apiKey": "ollama",
-      "models": [
-        { "id": "llama3.1:8b" },
-        { "id": "qwen2.5-coder:7b" }
-      ]
+      "models": [{ "id": "llama3.1:8b" }, { "id": "qwen2.5-coder:7b" }]
     }
   }
 }
@@ -66,26 +63,26 @@
 
 ## 支持的 API
 
-| API | 说明 |
-|-----|------|
-| `openai-completions` | OpenAI Chat Completions（兼容性最广） |
-| `openai-responses` | OpenAI Responses API |
-| `anthropic-messages` | Anthropic Messages API |
-| `google-generative-ai` | Google Generative AI |
+| API                    | 说明                                  |
+| ---------------------- | ------------------------------------- |
+| `openai-completions`   | OpenAI Chat Completions（兼容性最广） |
+| `openai-responses`     | OpenAI Responses API                  |
+| `anthropic-messages`   | Anthropic Messages API                |
+| `google-generative-ai` | Google Generative AI                  |
 
 在 Provider 级别设置 `api`（作为所有模型的默认值），或在模型级别设置（每个模型覆盖）。
 
 ## Provider 配置
 
-| 字段 | 说明 |
-|------|------|
-| `baseUrl` | API 端点 URL |
-| `api` | API 类型（见上表） |
-| `apiKey` | API 密钥（见值解析） |
-| `headers` | 自定义请求头（见值解析） |
-| `authHeader` | 设为 `true` 自动添加 `Authorization: Bearer <apiKey>` |
-| `models` | 模型配置数组 |
-| `modelOverrides` | 应用于此 Provider 内置模型的 per-model 覆盖 |
+| 字段             | 说明                                                  |
+| ---------------- | ----------------------------------------------------- |
+| `baseUrl`        | API 端点 URL                                          |
+| `api`            | API 类型（见上表）                                    |
+| `apiKey`         | API 密钥（见值解析）                                  |
+| `headers`        | 自定义请求头（见值解析）                              |
+| `authHeader`     | 设为 `true` 自动添加 `Authorization: Bearer <apiKey>` |
+| `models`         | 模型配置数组                                          |
+| `modelOverrides` | 应用于此 Provider 内置模型的 per-model 覆盖           |
 
 ### 值解析
 
@@ -126,16 +123,16 @@
 
 ## 模型配置
 
-| 字段 | 必需 | 默认值 | 说明 |
-|------|------|--------|------|
-| `id` | 是 | -- | 模型标识符（传递给 API） |
-| `name` | 否 | `id` | 模型选择器中的显示名称 |
-| `api` | 否 | Provider 的 `api` | 覆盖 Provider 的 API 类型 |
-| `reasoning` | 否 | `false` | 是否支持扩展思考 |
-| `input` | 否 | `["text"]` | 输入类型：`["text"]` 或 `["text", "image"]` |
-| `contextWindow` | 否 | `128000` | 上下文窗口大小（token） |
-| `maxTokens` | 否 | `16384` | 最大输出 token |
-| `cost` | 否 | 全部为零 | `{"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}`（每百万 token） |
+| 字段            | 必需 | 默认值            | 说明                                                                         |
+| --------------- | ---- | ----------------- | ---------------------------------------------------------------------------- |
+| `id`            | 是   | --                | 模型标识符（传递给 API）                                                     |
+| `name`          | 否   | `id`              | 模型选择器中的显示名称                                                       |
+| `api`           | 否   | Provider 的 `api` | 覆盖 Provider 的 API 类型                                                    |
+| `reasoning`     | 否   | `false`           | 是否支持扩展思考                                                             |
+| `input`         | 否   | `["text"]`        | 输入类型：`["text"]` 或 `["text", "image"]`                                  |
+| `contextWindow` | 否   | `128000`          | 上下文窗口大小（token）                                                      |
+| `maxTokens`     | 否   | `16384`           | 最大输出 token                                                               |
+| `cost`          | 否   | 全部为零          | `{"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}`（每百万 token） |
 
 ## 覆盖内置 Provider
 
@@ -169,6 +166,7 @@
 ```
 
 合并语义：
+
 - 内置模型保留
 - 自定义模型按 `id` 在 Provider 内进行 upsert
 - 如果自定义模型 `id` 与内置模型 `id` 匹配，自定义模型替换该内置模型
@@ -200,6 +198,7 @@
 `modelOverrides` 支持每个模型的以下字段：`name`、`reasoning`、`input`、`cost`（部分）、`contextWindow`、`maxTokens`、`headers`、`compat`。
 
 行为说明：
+
 - `modelOverrides` 应用于内置 Provider 模型
 - 未知的模型 ID 会被忽略
 - 可以将 Provider 级别的 `baseUrl`/`headers` 与 `modelOverrides` 结合使用
@@ -225,15 +224,15 @@
 }
 ```
 
-| 字段 | 说明 |
-|------|------|
-| `supportsStore` | Provider 是否支持 `store` 字段 |
-| `supportsDeveloperRole` | 使用 `developer` 还是 `system` 角色 |
-| `supportsReasoningEffort` | 是否支持 `reasoning_effort` 参数 |
+| 字段                       | 说明                                                               |
+| -------------------------- | ------------------------------------------------------------------ |
+| `supportsStore`            | Provider 是否支持 `store` 字段                                     |
+| `supportsDeveloperRole`    | 使用 `developer` 还是 `system` 角色                                |
+| `supportsReasoningEffort`  | 是否支持 `reasoning_effort` 参数                                   |
 | `supportsUsageInStreaming` | 是否支持 `stream_options: { include_usage: true }`（默认：`true`） |
-| `maxTokensField` | 使用 `max_completion_tokens` 还是 `max_tokens` |
-| `openRouterRouting` | OpenRouter 路由配置，传递给 OpenRouter 用于模型/Provider 选择 |
-| `vercelGatewayRouting` | Vercel AI Gateway 路由配置，用于 Provider 选择（`only`、`order`） |
+| `maxTokensField`           | 使用 `max_completion_tokens` 还是 `max_tokens`                     |
+| `openRouterRouting`        | OpenRouter 路由配置，传递给 OpenRouter 用于模型/Provider 选择      |
+| `vercelGatewayRouting`     | Vercel AI Gateway 路由配置，用于 Provider 选择（`only`、`order`）  |
 
 示例：
 
@@ -276,7 +275,12 @@ Vercel AI Gateway 示例：
           "name": "Kimi K2.5 (Fireworks via Vercel)",
           "reasoning": true,
           "input": ["text", "image"],
-          "cost": { "input": 0.6, "output": 3, "cacheRead": 0, "cacheWrite": 0 },
+          "cost": {
+            "input": 0.6,
+            "output": 3,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
           "contextWindow": 262144,
           "maxTokens": 262144,
           "compat": {

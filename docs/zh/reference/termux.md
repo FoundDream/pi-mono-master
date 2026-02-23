@@ -48,6 +48,7 @@ Pi 在 Termux 上的剪贴板集成使用 Termux:API 包中的 `termux-clipboard
 This project runs on Android via Termux. Keep the following in mind:
 
 ## Available Commands
+
 - `termux-clipboard-get` - Read text from clipboard
 - `termux-clipboard-set` - Write text to clipboard
 - `termux-open` - Open a file or URL in an Android app
@@ -62,6 +63,7 @@ This project runs on Android via Termux. Keep the following in mind:
 - `termux-storage-get` - Request a file from Android storage
 
 ## Notes
+
 - Home directory is `~/` which maps to `/data/data/com.termux/files/home`
 - Shared storage is at `~/storage/shared` (requires `termux-setup-storage`)
 - No systemd or traditional init system
@@ -78,14 +80,17 @@ This project runs on Android via Termux. Keep the following in mind:
 ## 故障排除
 
 ### 剪贴板不工作
+
 1. 确认已安装 **Termux:API** 应用（与 Termux 终端是独立的应用）。
 2. 手动运行 `termux-clipboard-get` 验证是否能返回剪贴板内容。
 3. 如果出现权限错误，在 Android 设置中为 Termux:API 授予所需权限。
 
 ### 权限被拒绝
+
 运行 `termux-setup-storage` 授予 Termux 共享存储访问权限。这会在 `~/storage/` 下创建符号链接。
 
 ### Node.js 问题
+
 如果 `pkg install nodejs-lts` 失败，先更新包仓库：
 
 ```bash

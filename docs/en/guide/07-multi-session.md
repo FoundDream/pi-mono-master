@@ -28,12 +28,12 @@ Think of sessions like browser tabs: each one is an independent workspace, and y
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
+| Command     | Description                                 |
+| ----------- | ------------------------------------------- |
 | `/sessions` | List all saved sessions with message counts |
-| `/new` | Create a new session |
-| `/open <n>` | Open session number N from the list |
-| `/quit` | Exit |
+| `/new`      | Create a new session                        |
+| `/open <n>` | Open session number N from the list         |
+| `/quit`     | Exit                                        |
 
 ## Key Patterns
 
@@ -64,13 +64,13 @@ Forgetting to call `dispose()` before creating a new session is the most common 
 ### Listing Sessions
 
 ```typescript
-const sessions = await SessionManager.list(process.cwd(), SESSION_DIR)
+const sessions = await SessionManager.list(process.cwd(), SESSION_DIR);
 
 sessions.forEach((s, i) => {
-  const name = s.name || s.firstMessage.slice(0, 50) || '(empty)'
-  const date = s.modified.toLocaleDateString()
-  console.log(`${i + 1}. [${s.messageCount} msgs, ${date}] ${name}`)
-})
+  const name = s.name || s.firstMessage.slice(0, 50) || "(empty)";
+  const date = s.modified.toLocaleDateString();
+  console.log(`${i + 1}. [${s.messageCount} msgs, ${date}] ${name}`);
+});
 ```
 
 `SessionManager.list()` scans the session directory for JSONL files and returns metadata about each one. This is a read-only operation -- it does not load the full conversation history into memory. It reads just enough of each file to extract:
@@ -88,14 +88,14 @@ Always `dispose()` the current session before switching:
 
 ```typescript
 // Switch to a new session
-session.dispose()
-sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-session = await buildSession(sessionManager)
+session.dispose();
+sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+session = await buildSession(sessionManager);
 
 // Switch to an existing session
-session.dispose()
-sessionManager = SessionManager.open(target.path, SESSION_DIR)
-session = await buildSession(sessionManager)
+session.dispose();
+sessionManager = SessionManager.open(target.path, SESSION_DIR);
+session = await buildSession(sessionManager);
 ```
 
 Notice the three-step pattern: **dispose, create/open, build**. The `buildSession()` helper (defined in the full code below) encapsulates the process of creating a new `AgentSession` with the correct resource loader and event subscriptions. This helper is essential because every time you switch sessions, you need a completely fresh `AgentSession` instance -- you cannot reuse the old one.
@@ -108,13 +108,13 @@ Extract session creation into a helper function (like `buildSession()` above). T
 
 ```typescript
 interface SessionInfo {
-  path: string          // Full path to session file
-  id: string            // Unique session ID
-  name?: string         // User-defined name
-  created: Date
-  modified: Date
-  messageCount: number
-  firstMessage: string  // Preview of first user message
+  path: string; // Full path to session file
+  id: string; // Unique session ID
+  name?: string; // User-defined name
+  created: Date;
+  modified: Date;
+  messageCount: number;
+  firstMessage: string; // Preview of first user message
 }
 ```
 
@@ -138,7 +138,7 @@ The result is seamless continuity -- the agent sees the full conversation histor
 
 ## Tips for Session Organization
 
-**Let sessions grow organically**: Do not create a new session for every question. A session should represent a *topic* or *task* -- "debugging the auth issue" might span 20 exchanges over several days.
+**Let sessions grow organically**: Do not create a new session for every question. A session should represent a _topic_ or _task_ -- "debugging the auth issue" might span 20 exchanges over several days.
 
 **Use the first message wisely**: Since the first message becomes the session preview in `/sessions`, make it descriptive. "Fix the login bug on the settings page" is a better first message than "hey."
 
@@ -149,104 +149,122 @@ The result is seamless continuity -- the agent sees the full conversation histor
 ## Full Code
 
 ```typescript
-import * as path from 'node:path'
-import * as readline from 'node:readline'
+import * as path from "node:path";
+import * as readline from "node:readline";
 import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
   type AgentSession,
   type SessionInfo,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const SESSION_DIR = path.join(import.meta.dirname, '.sessions')
-const model = createModel()
+const SESSION_DIR = path.join(import.meta.dirname, ".sessions");
+const model = createModel();
 
 // --- Helpers ---
 
 async function createResourceLoader() {
   const rl = new DefaultResourceLoader({
-    systemPromptOverride: () => 'You are a helpful assistant. Be concise.',
+    systemPromptOverride: () => "You are a helpful assistant. Be concise.",
     noExtensions: true,
     noSkills: true,
     noPromptTemplates: true,
     noThemes: true,
-  })
-  await rl.reload()
-  return rl
+  });
+  await rl.reload();
+  return rl;
 }
 
 async function buildSession(sm: SessionManager): Promise<AgentSession> {
-  const resourceLoader = await createResourceLoader()
+  const resourceLoader = await createResourceLoader();
   const { session } = await createAgentSession({
     model,
     tools: [],
     customTools: [],
     sessionManager: sm,
     resourceLoader,
-  })
+  });
   session.subscribe((event) => {
-    if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-      process.stdout.write(event.assistantMessageEvent.delta)
+    if (
+      event.type === "message_update" &&
+      event.assistantMessageEvent.type === "text_delta"
+    ) {
+      process.stdout.write(event.assistantMessageEvent.delta);
     }
-  })
-  return session
+  });
+  return session;
 }
 
 // --- State ---
 
-let sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-let session = await buildSession(sessionManager)
-let cachedSessions: SessionInfo[] = []
+let sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+let session = await buildSession(sessionManager);
+let cachedSessions: SessionInfo[] = [];
 
 // --- REPL with commands ---
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 const ask = () => {
-  rl.question('You: ', async (input) => {
-    const trimmed = input.trim()
+  rl.question("You: ", async (input) => {
+    const trimmed = input.trim();
 
-    if (trimmed === '/sessions') {
-      cachedSessions = await SessionManager.list(process.cwd(), SESSION_DIR)
+    if (trimmed === "/sessions") {
+      cachedSessions = await SessionManager.list(process.cwd(), SESSION_DIR);
       cachedSessions.forEach((s, i) => {
-        const name = s.name || s.firstMessage.slice(0, 50) || '(empty)'
-        console.log(`  ${i + 1}. [${s.messageCount} msgs] ${name}`)
-      })
-      ask(); return
+        const name = s.name || s.firstMessage.slice(0, 50) || "(empty)";
+        console.log(`  ${i + 1}. [${s.messageCount} msgs] ${name}`);
+      });
+      ask();
+      return;
     }
 
-    if (trimmed === '/new') {
-      session.dispose()
-      sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-      session = await buildSession(sessionManager)
-      console.log('📝 New session created\n')
-      ask(); return
+    if (trimmed === "/new") {
+      session.dispose();
+      sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+      session = await buildSession(sessionManager);
+      console.log("📝 New session created\n");
+      ask();
+      return;
     }
 
-    if (trimmed.startsWith('/open ')) {
-      const idx = parseInt(trimmed.split(' ')[1]) - 1
+    if (trimmed.startsWith("/open ")) {
+      const idx = parseInt(trimmed.split(" ")[1]) - 1;
       if (cachedSessions[idx]) {
-        session.dispose()
-        sessionManager = SessionManager.open(cachedSessions[idx].path, SESSION_DIR)
-        session = await buildSession(sessionManager)
-        console.log(`📂 Opened session ${idx + 1}\n`)
+        session.dispose();
+        sessionManager = SessionManager.open(
+          cachedSessions[idx].path,
+          SESSION_DIR,
+        );
+        session = await buildSession(sessionManager);
+        console.log(`📂 Opened session ${idx + 1}\n`);
       }
-      ask(); return
+      ask();
+      return;
     }
 
-    if (trimmed === '/quit') { rl.close(); process.exit(0) }
-    if (!trimmed) { ask(); return }
+    if (trimmed === "/quit") {
+      rl.close();
+      process.exit(0);
+    }
+    if (!trimmed) {
+      ask();
+      return;
+    }
 
-    process.stdout.write('\nAgent: ')
-    await session.prompt(trimmed)
-    console.log('\n')
-    ask()
-  })
-}
+    process.stdout.write("\nAgent: ");
+    await session.prompt(trimmed);
+    console.log("\n");
+    ask();
+  });
+};
 
-ask()
+ask();
 ```
 
 ### Code Walkthrough

@@ -8,12 +8,12 @@ Pi supports multiple LLM providers through two authentication methods: subscript
 
 Subscription providers use OAuth to authenticate through your existing service account. No API key is needed.
 
-| Provider | Subscription | Command |
-|----------|-------------|---------|
-| Anthropic | Claude Pro / Max | `pi --provider anthropic` |
-| OpenAI | ChatGPT Plus / Pro | `pi --provider openai` |
+| Provider       | Subscription                | Command                        |
+| -------------- | --------------------------- | ------------------------------ |
+| Anthropic      | Claude Pro / Max            | `pi --provider anthropic`      |
+| OpenAI         | ChatGPT Plus / Pro          | `pi --provider openai`         |
 | GitHub Copilot | GitHub Copilot subscription | `pi --provider github-copilot` |
-| Google | Google AI subscription | `pi --provider google` |
+| Google         | Google AI subscription      | `pi --provider google`         |
 
 On first use, Pi opens a browser window for OAuth login. Credentials are stored securely and refreshed automatically.
 
@@ -27,14 +27,14 @@ For direct API access, configure keys via environment variables or the auth file
 
 Set the appropriate environment variable for your provider:
 
-| Provider | Environment Variable |
-|----------|---------------------|
-| Anthropic | `ANTHROPIC_API_KEY` |
-| OpenAI | `OPENAI_API_KEY` |
-| Google | `GOOGLE_API_KEY` |
-| Azure OpenAI | `AZURE_OPENAI_API_KEY` |
-| Amazon Bedrock | `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` |
-| Google Vertex AI | `GOOGLE_APPLICATION_CREDENTIALS` |
+| Provider         | Environment Variable                          |
+| ---------------- | --------------------------------------------- |
+| Anthropic        | `ANTHROPIC_API_KEY`                           |
+| OpenAI           | `OPENAI_API_KEY`                              |
+| Google           | `GOOGLE_API_KEY`                              |
+| Azure OpenAI     | `AZURE_OPENAI_API_KEY`                        |
+| Amazon Bedrock   | `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` |
+| Google Vertex AI | `GOOGLE_APPLICATION_CREDENTIALS`              |
 
 ### Auth File
 
@@ -52,11 +52,11 @@ Store keys in `~/.pi/agent/auth.json`:
 
 Values in `auth.json` support three formats:
 
-| Format | Example | Description |
-|--------|---------|-------------|
-| Literal | `"sk-ant-xxx"` | Key value used directly |
-| Environment variable | `"$OPENAI_API_KEY"` | Reads from environment at runtime |
-| Shell command | `"!gcloud auth print-access-token"` | Executes command, uses stdout |
+| Format               | Example                             | Description                       |
+| -------------------- | ----------------------------------- | --------------------------------- |
+| Literal              | `"sk-ant-xxx"`                      | Key value used directly           |
+| Environment variable | `"$OPENAI_API_KEY"`                 | Reads from environment at runtime |
+| Shell command        | `"!gcloud auth print-access-token"` | Executes command, uses stdout     |
 
 ## Credential Resolution Priority
 

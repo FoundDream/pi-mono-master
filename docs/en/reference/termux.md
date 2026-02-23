@@ -48,6 +48,7 @@ Add this to your project's `AGENTS.md` to help Pi understand the Termux environm
 This project runs on Android via Termux. Keep the following in mind:
 
 ## Available Commands
+
 - `termux-clipboard-get` - Read text from clipboard
 - `termux-clipboard-set` - Write text to clipboard
 - `termux-open` - Open a file or URL in an Android app
@@ -62,6 +63,7 @@ This project runs on Android via Termux. Keep the following in mind:
 - `termux-storage-get` - Request a file from Android storage
 
 ## Notes
+
 - Home directory is `~/` which maps to `/data/data/com.termux/files/home`
 - Shared storage is at `~/storage/shared` (requires `termux-setup-storage`)
 - No systemd or traditional init system
@@ -78,14 +80,17 @@ This project runs on Android via Termux. Keep the following in mind:
 ## Troubleshooting
 
 ### Clipboard not working
+
 1. Confirm **Termux:API** app is installed (separate from the Termux terminal).
 2. Run `termux-clipboard-get` manually to verify it returns clipboard content.
 3. If you see a permission error, open Android Settings and grant Termux:API the required permissions.
 
 ### Permission denied errors
+
 Run `termux-setup-storage` to grant Termux access to shared storage. This creates symlinks under `~/storage/`.
 
 ### Node.js issues
+
 If `pkg install nodejs-lts` fails, update your package repositories first:
 
 ```bash

@@ -27,11 +27,11 @@ bun run docs:build
 
 站点包含三个板块：
 
-| 板块 | 说明 |
-|------|------|
-| **Guide（教程）** | 8 章渐进式教程，含代码详解 |
-| **API Reference（API 参考）** | Model 和 ToolDefinition 接口文档 |
-| **Reference（参考文档）** | pi-coding-agent 官方文档（SDK、Session、Extensions、Skills 等） |
+| 板块                          | 说明                                                            |
+| ----------------------------- | --------------------------------------------------------------- |
+| **Guide（教程）**             | 8 章渐进式教程，含代码详解                                      |
+| **API Reference（API 参考）** | Model 和 ToolDefinition 接口文档                                |
+| **Reference（参考文档）**     | pi-coding-agent 官方文档（SDK、Session、Extensions、Skills 等） |
 
 > Reference 板块搬运自 [pi-coding-agent 官方文档](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent/docs)，涵盖 SDK 使用、会话格式、上下文压缩、RPC 模式、扩展、技能、主题、平台配置等 22 个主题。
 
@@ -50,16 +50,16 @@ bun run ch01
 
 ## 章节目录
 
-| # | 章节 | 核心概念 |
-|---|------|----------|
-| 01 | [Hello Agent](chapters/01-hello-agent/) | `createAgentSession`、`session.prompt()`、最小化流程 |
-| 02 | [流式输出](chapters/02-streaming/) | `subscribe()` 事件、`text_delta`、打字机效果 |
-| 03 | [自定义工具](chapters/03-custom-tools/) | `ToolDefinition`、TypeBox Schema、工具执行事件 |
-| 04 | [会话持久化](chapters/04-session-persistence/) | `SessionManager`、JSONL 会话文件、对话恢复 |
-| 05 | [确认模式](chapters/05-confirmation-pattern/) | 阻塞式工具执行、用户确认流程 |
-| 06 | [系统提示词与技能](chapters/06-system-prompt-and-skills/) | `DefaultResourceLoader`、`loadSkillsFromDir`、提示词工程 |
-| 07 | [多会话管理](chapters/07-multi-session/) | 会话列表、切换、创建、`SessionManager.list()` |
-| 08 | [完整 CLI Agent](chapters/08-full-cli-agent/) | 所有模式整合，构建生产级 CLI Agent |
+| #   | 章节                                                      | 核心概念                                                 |
+| --- | --------------------------------------------------------- | -------------------------------------------------------- |
+| 01  | [Hello Agent](chapters/01-hello-agent/)                   | `createAgentSession`、`session.prompt()`、最小化流程     |
+| 02  | [流式输出](chapters/02-streaming/)                        | `subscribe()` 事件、`text_delta`、打字机效果             |
+| 03  | [自定义工具](chapters/03-custom-tools/)                   | `ToolDefinition`、TypeBox Schema、工具执行事件           |
+| 04  | [会话持久化](chapters/04-session-persistence/)            | `SessionManager`、JSONL 会话文件、对话恢复               |
+| 05  | [确认模式](chapters/05-confirmation-pattern/)             | 阻塞式工具执行、用户确认流程                             |
+| 06  | [系统提示词与技能](chapters/06-system-prompt-and-skills/) | `DefaultResourceLoader`、`loadSkillsFromDir`、提示词工程 |
+| 07  | [多会话管理](chapters/07-multi-session/)                  | 会话列表、切换、创建、`SessionManager.list()`            |
+| 08  | [完整 CLI Agent](chapters/08-full-cli-agent/)             | 所有模式整合，构建生产级 CLI Agent                       |
 
 ## 前置要求
 
@@ -104,11 +104,11 @@ pi-mono-master/
 
 ## 核心依赖
 
-| 包名 | 用途 |
-|------|------|
-| `@mariozechner/pi-coding-agent` | Agent 框架（会话、工具、资源加载） |
-| `@mariozechner/pi-ai` | 模型抽象层（Anthropic、OpenAI、Google） |
-| `@sinclair/typebox` | 工具参数的 TypeBox Schema |
-| `dotenv` | 环境变量加载 |
-| `tsx` | TypeScript 执行器 |
-| `@rspress/core` | 文档站框架 |
+| 包名                            | 用途                                    |
+| ------------------------------- | --------------------------------------- |
+| `@mariozechner/pi-coding-agent` | Agent 框架（会话、工具、资源加载）      |
+| `@mariozechner/pi-ai`           | 模型抽象层（Anthropic、OpenAI、Google） |
+| `@sinclair/typebox`             | 工具参数的 TypeBox Schema               |
+| `dotenv`                        | 环境变量加载                            |
+| `tsx`                           | TypeScript 执行器                       |
+| `@rspress/core`                 | 文档站框架                              |

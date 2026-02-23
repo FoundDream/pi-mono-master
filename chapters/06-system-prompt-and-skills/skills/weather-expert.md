@@ -20,6 +20,7 @@ Example response for a weather query:
 > **Advisory**: Great day for outdoor activities. UV index is moderate -- sunscreen recommended.
 
 Do NOT:
+
 - Predict weather more than 3 days out (accuracy drops significantly)
 - Provide severe weather warnings without data from the get_weather tool
 - Guess temperatures -- always use the tool first

@@ -42,35 +42,36 @@ Agent 收到结果，继续思考，生成最终回答:
 一个工具定义由五个核心部分组成：
 
 ```typescript
-import { Type } from '@sinclair/typebox'
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import { Type } from "@sinclair/typebox";
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 
 const myTool: ToolDefinition = {
-  name: 'tool_name',          // LLM 工具调用中使用的名称（snake_case）
-  label: 'Tool Name',         // 人类可读的标签
-  description: '...',         // 给 LLM 的描述，帮助它决定何时使用
-  parameters: Type.Object({   // TypeBox Schema
-    param: Type.String({ description: '...' }),
+  name: "tool_name", // LLM 工具调用中使用的名称（snake_case）
+  label: "Tool Name", // 人类可读的标签
+  description: "...", // 给 LLM 的描述，帮助它决定何时使用
+  parameters: Type.Object({
+    // TypeBox Schema
+    param: Type.String({ description: "..." }),
   }),
   execute: async (toolCallId, params, signal, onUpdate) => {
-    const { param } = params as { param: string }
+    const { param } = params as { param: string };
     return {
-      content: [{ type: 'text', text: '...' }],
+      content: [{ type: "text", text: "..." }],
       details: {},
-    }
+    };
   },
-}
+};
 ```
 
 让我们逐一理解每个字段：
 
-| 字段 | 给谁看的？ | 作用 |
-|------|-----------|------|
-| `name` | AI 模型 | 工具的唯一标识符。AI 在决定调用工具时会引用这个名称。**必须是 snake_case** |
-| `label` | 用户 | 人类可读的显示名称，用于 UI 展示 |
-| `description` | AI 模型 | **最重要的字段之一**。AI 根据这段描述来决定什么时候应该使用这个工具 |
-| `parameters` | AI 模型 + 框架 | 用 TypeBox Schema 描述工具接受的参数，AI 会根据这个 Schema 生成参数 |
-| `execute` | 框架 | 实际执行工具逻辑的异步函数。接收参数，返回结果 |
+| 字段          | 给谁看的？     | 作用                                                                       |
+| ------------- | -------------- | -------------------------------------------------------------------------- |
+| `name`        | AI 模型        | 工具的唯一标识符。AI 在决定调用工具时会引用这个名称。**必须是 snake_case** |
+| `label`       | 用户           | 人类可读的显示名称，用于 UI 展示                                           |
+| `description` | AI 模型        | **最重要的字段之一**。AI 根据这段描述来决定什么时候应该使用这个工具        |
+| `parameters`  | AI 模型 + 框架 | 用 TypeBox Schema 描述工具接受的参数，AI 会根据这个 Schema 生成参数        |
+| `execute`     | 框架           | 实际执行工具逻辑的异步函数。接收参数，返回结果                             |
 
 详见 [ToolDefinition API 参考](/zh/api/tool-definition)。
 
@@ -93,21 +94,24 @@ AI 模型决定是否使用一个工具，**几乎完全依赖于 `description` 
 以下是一些经验法则：
 
 **好的 description：**
+
 ```typescript
-description: 'Get current weather for a city. Use this when the user asks about weather, temperature, or climate conditions for a specific location.'
+description: "Get current weather for a city. Use this when the user asks about weather, temperature, or climate conditions for a specific location.";
 ```
 
 **差的 description：**
+
 ```typescript
-description: 'Weather tool'  // 太模糊，AI 不知道什么时候该用
+description: "Weather tool"; // 太模糊，AI 不知道什么时候该用
 ```
 
 :::tip 编写 description 的技巧
+
 1. **说清楚工具做什么** —— "Get current weather for a city"
 2. **说清楚什么时候该用** —— "Use this when the user asks about weather..."
 3. **说清楚参数格式** —— 可以在参数的 `description` 中补充示例，如 `'City name (e.g. "Tokyo", "London")'`
 4. **说清楚局限性** —— 如果工具只支持部分城市，在 description 中说明
-:::
+   :::
 
 :::warning 注意
 不要在 description 中使用"请"、"你应该"这类对 AI 的指令性语言。Description 是对工具功能的**客观描述**，不是对 AI 的命令。系统提示词才是下达指令的地方。
@@ -118,37 +122,47 @@ description: 'Weather tool'  // 太模糊，AI 不知道什么时候该用
 让我们来实现第一个工具 —— 一个模拟的天气查询工具：
 
 ```typescript
-import { Type } from '@sinclair/typebox'
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import { Type } from "@sinclair/typebox";
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 
 export const weatherTool: ToolDefinition = {
-  name: 'get_weather',
-  label: 'Get Weather',
-  description: 'Get current weather for a city. Use this when the user asks about weather.',
+  name: "get_weather",
+  label: "Get Weather",
+  description:
+    "Get current weather for a city. Use this when the user asks about weather.",
   parameters: Type.Object({
     city: Type.String({ description: 'City name (e.g. "Tokyo", "London")' }),
   }),
   execute: async (_toolCallId, params) => {
-    const { city } = params as { city: string }
+    const { city } = params as { city: string };
 
-    const weatherData: Record<string, { temp: string; condition: string; humidity: string }> = {
-      tokyo: { temp: '22°C', condition: 'Sunny', humidity: '45%' },
-      london: { temp: '14°C', condition: 'Cloudy', humidity: '78%' },
-      'new york': { temp: '18°C', condition: 'Partly cloudy', humidity: '55%' },
-    }
+    const weatherData: Record<
+      string,
+      { temp: string; condition: string; humidity: string }
+    > = {
+      tokyo: { temp: "22°C", condition: "Sunny", humidity: "45%" },
+      london: { temp: "14°C", condition: "Cloudy", humidity: "78%" },
+      "new york": { temp: "18°C", condition: "Partly cloudy", humidity: "55%" },
+    };
 
-    const key = city.toLowerCase()
-    const weather = weatherData[key] || { temp: '20°C', condition: 'Clear', humidity: '50%' }
+    const key = city.toLowerCase();
+    const weather = weatherData[key] || {
+      temp: "20°C",
+      condition: "Clear",
+      humidity: "50%",
+    };
 
     return {
-      content: [{
-        type: 'text' as const,
-        text: JSON.stringify({ city, ...weather }),
-      }],
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify({ city, ...weather }),
+        },
+      ],
       details: {},
-    }
+    };
   },
-}
+};
 ```
 
 这个示例使用了硬编码的天气数据来模拟真实的 API 调用。在生产环境中，你会在 `execute` 函数中调用真正的天气 API（如 OpenWeatherMap）。
@@ -170,28 +184,36 @@ export const weatherTool: ToolDefinition = {
 
 ```typescript
 export const calculatorTool: ToolDefinition = {
-  name: 'calculate',
-  label: 'Calculator',
-  description: 'Evaluate a mathematical expression. Use for any math calculations.',
+  name: "calculate",
+  label: "Calculator",
+  description:
+    "Evaluate a mathematical expression. Use for any math calculations.",
   parameters: Type.Object({
-    expression: Type.String({ description: 'Math expression to evaluate (e.g. "2 + 3 * 4")' }),
+    expression: Type.String({
+      description: 'Math expression to evaluate (e.g. "2 + 3 * 4")',
+    }),
   }),
   execute: async (_toolCallId, params) => {
-    const { expression } = params as { expression: string }
+    const { expression } = params as { expression: string };
     try {
-      const result = Function(`"use strict"; return (${expression})`)()
+      const result = Function(`"use strict"; return (${expression})`)();
       return {
-        content: [{ type: 'text' as const, text: String(result) }],
+        content: [{ type: "text" as const, text: String(result) }],
         details: {},
-      }
+      };
     } catch (e) {
       return {
-        content: [{ type: 'text' as const, text: `Error: ${e instanceof Error ? e.message : String(e)}` }],
+        content: [
+          {
+            type: "text" as const,
+            text: `Error: ${e instanceof Error ? e.message : String(e)}`,
+          },
+        ],
         details: {},
-      }
+      };
     }
   },
-}
+};
 ```
 
 :::warning 注意
@@ -233,16 +255,17 @@ export const calculatorTool: ToolDefinition = {
 ```typescript
 const { session } = await createAgentSession({
   model,
-  tools: [],                                    // 不使用内置编码工具
-  customTools: [weatherTool, calculatorTool],   // 我们的自定义工具
+  tools: [], // 不使用内置编码工具
+  customTools: [weatherTool, calculatorTool], // 我们的自定义工具
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 ```
 
 就这么简单！框架会自动将工具定义转换为 AI 模型能理解的格式，并在 AI 请求调用工具时执行对应的 `execute` 函数。
 
 :::tip `tools` vs `customTools` 的区别
+
 - **`tools`**：框架内置的编码工具（文件读写、命令执行等），通过字符串名称引用
 - **`customTools`**：你自己定义的工具，传入 `ToolDefinition` 对象数组
 
@@ -256,21 +279,23 @@ const { session } = await createAgentSession({
 ```typescript
 session.subscribe((event) => {
   switch (event.type) {
-    case 'message_update':
-      if (event.assistantMessageEvent.type === 'text_delta') {
-        process.stdout.write(event.assistantMessageEvent.delta)
+    case "message_update":
+      if (event.assistantMessageEvent.type === "text_delta") {
+        process.stdout.write(event.assistantMessageEvent.delta);
       }
-      break
+      break;
 
-    case 'tool_execution_start':
-      console.log(`\n🔧 工具调用: ${event.toolName}(${JSON.stringify(event.args)})`)
-      break
+    case "tool_execution_start":
+      console.log(
+        `\n🔧 工具调用: ${event.toolName}(${JSON.stringify(event.args)})`,
+      );
+      break;
 
-    case 'tool_execution_end':
-      console.log(`✅ 结果: ${JSON.stringify(event.result)}\n`)
-      break
+    case "tool_execution_end":
+      console.log(`✅ 结果: ${JSON.stringify(event.result)}\n`);
+      break;
   }
-})
+});
 ```
 
 `tool_execution_start` 在工具开始执行时触发，包含工具名称和参数；`tool_execution_end` 在执行完成后触发，包含返回结果。这两个事件对于调试和用户反馈都非常有用。
@@ -308,7 +333,7 @@ AI 模型会根据用户的问题和工具的 description 来**自主决定**是
 
 ```typescript
 // 推荐的方式
-const { city } = params as { city: string }
+const { city } = params as { city: string };
 ```
 
 ## 运行

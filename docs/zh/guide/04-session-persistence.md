@@ -22,12 +22,12 @@
 
 ## 核心概念
 
-| 方法 | 说明 |
-|------|------|
-| `SessionManager.create(cwd, dir)` | 创建新会话，写入 `dir/` 目录 |
-| `SessionManager.continueRecent(cwd, dir)` | 查找并恢复最新的会话 |
-| `sessionManager.buildSessionContext()` | 返回当前会话的 `{ messages }` |
-| `sessionManager.getSessionFile()` | JSONL 文件的路径 |
+| 方法                                      | 说明                          |
+| ----------------------------------------- | ----------------------------- |
+| `SessionManager.create(cwd, dir)`         | 创建新会话，写入 `dir/` 目录  |
+| `SessionManager.continueRecent(cwd, dir)` | 查找并恢复最新的会话          |
+| `sessionManager.buildSessionContext()`    | 返回当前会话的 `{ messages }` |
+| `sessionManager.getSessionFile()`         | JSONL 文件的路径              |
 
 ### 会话的三种生命状态
 
@@ -66,41 +66,42 @@
 ## 完整代码
 
 ```typescript
-import * as path from 'node:path'
-import * as readline from 'node:readline'
+import * as path from "node:path";
+import * as readline from "node:readline";
 import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const SESSION_DIR = path.join(import.meta.dirname, '.sessions')
-const model = createModel()
+const SESSION_DIR = path.join(import.meta.dirname, ".sessions");
+const model = createModel();
 
 // 根据 CLI 参数决定会话策略
-const arg = process.argv[2] // 'continue' 或 undefined
+const arg = process.argv[2]; // 'continue' 或 undefined
 
-let sessionManager: SessionManager
-if (arg === 'continue') {
-  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR)
-  const ctx = sessionManager.buildSessionContext()
-  console.log(`📂 已恢复会话（${ctx.messages.length} 条历史消息）`)
-  console.log(`   会话文件: ${sessionManager.getSessionFile()}\n`)
+let sessionManager: SessionManager;
+if (arg === "continue") {
+  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR);
+  const ctx = sessionManager.buildSessionContext();
+  console.log(`📂 已恢复会话（${ctx.messages.length} 条历史消息）`);
+  console.log(`   会话文件: ${sessionManager.getSessionFile()}\n`);
 } else {
-  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-  console.log('📝 已创建新会话')
-  console.log(`   会话文件: ${sessionManager.getSessionFile()}\n`)
+  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+  console.log("📝 已创建新会话");
+  console.log(`   会话文件: ${sessionManager.getSessionFile()}\n`);
 }
 
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => 'You are a helpful assistant. Be concise. Remember our conversation context.',
+  systemPromptOverride: () =>
+    "You are a helpful assistant. Be concise. Remember our conversation context.",
   noExtensions: true,
   noSkills: true,
   noPromptTemplates: true,
   noThemes: true,
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 
 const { session } = await createAgentSession({
   model,
@@ -108,44 +109,47 @@ const { session } = await createAgentSession({
   customTools: [],
   sessionManager,
   resourceLoader,
-})
+});
 
 // 流式输出
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    process.stdout.write(event.assistantMessageEvent.delta)
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    process.stdout.write(event.assistantMessageEvent.delta);
   }
-})
+});
 
 // REPL 循环
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-})
+});
 
-console.log('输入你的消息（或 /quit 退出）:\n')
+console.log("输入你的消息（或 /quit 退出）:\n");
 
 const ask = () => {
-  rl.question('You: ', async (input) => {
-    const trimmed = input.trim()
-    if (trimmed === '/quit' || trimmed === '/exit') {
-      console.log('\n再见！你的会话已保存。')
-      rl.close()
-      process.exit(0)
+  rl.question("You: ", async (input) => {
+    const trimmed = input.trim();
+    if (trimmed === "/quit" || trimmed === "/exit") {
+      console.log("\n再见！你的会话已保存。");
+      rl.close();
+      process.exit(0);
     }
     if (!trimmed) {
-      ask()
-      return
+      ask();
+      return;
     }
 
-    process.stdout.write('\nAgent: ')
-    await session.prompt(trimmed)
-    console.log('\n')
-    ask()
-  })
-}
+    process.stdout.write("\nAgent: ");
+    await session.prompt(trimmed);
+    console.log("\n");
+    ask();
+  });
+};
 
-ask()
+ask();
 ```
 
 ## 逐步解析
@@ -156,13 +160,14 @@ ask()
 
 ```typescript
 // 新会话 —— 创建一个新的 JSONL 文件
-sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
+sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
 
 // 恢复 —— 查找最新的会话文件并加载其消息
-sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR)
+sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR);
 ```
 
 `SessionManager.create()` 接收两个参数：
+
 - **`cwd`**（当前工作目录）—— 作为会话的上下文路径，某些内置工具（如文件操作）会使用它
 - **`dir`**（会话目录）—— JSONL 文件将存储在这个目录下
 
@@ -171,8 +176,8 @@ sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR)
 ### 2. 查看恢复的上下文
 
 ```typescript
-const ctx = sessionManager.buildSessionContext()
-console.log(`📂 已恢复会话（${ctx.messages.length} 条历史消息）`)
+const ctx = sessionManager.buildSessionContext();
+console.log(`📂 已恢复会话（${ctx.messages.length} 条历史消息）`);
 ```
 
 `buildSessionContext()` 返回一个包含 `messages` 数组的对象。这个数组就是从 JSONL 文件中加载的完整对话历史。当你把这个 `sessionManager` 传给 `createAgentSession()` 时，框架会自动将这些历史消息作为上下文发送给 AI 模型。
@@ -185,17 +190,17 @@ REPL（Read-Eval-Print Loop）是命令行交互程序的经典模式。我们�
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-})
+});
 
 const ask = () => {
-  rl.question('You: ', async (input) => {
+  rl.question("You: ", async (input) => {
     // 处理输入...
-    await session.prompt(trimmed)
-    ask()  // 递归调用，实现循环
-  })
-}
+    await session.prompt(trimmed);
+    ask(); // 递归调用，实现循环
+  });
+};
 
-ask()
+ask();
 ```
 
 这里使用了**递归模式**来实现循环：每次用户输入后，处理完响应再次调用 `ask()`。这比 `while` 循环更适合 Node.js 的异步模型。
@@ -255,10 +260,10 @@ mkdir -p chapters/04-session-persistence/.sessions
 
 ```typescript
 try {
-  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR)
+  sessionManager = SessionManager.continueRecent(process.cwd(), SESSION_DIR);
 } catch {
-  console.log('没有找到可恢复的会话，创建新会话...')
-  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
+  console.log("没有找到可恢复的会话，创建新会话...");
+  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
 }
 ```
 
@@ -308,6 +313,7 @@ bun run ch04 continue
 这个实验清楚地展示了会话持久化的效果：即使程序完全退出重启，Agent 仍然能访问之前的对话上下文。
 
 你还可以进一步实验：
+
 - 查看 `.sessions/` 目录下生成的 JSONL 文件内容
 - 多次恢复同一个会话，观察历史消息数量的增长
 - 尝试不带 `continue` 参数重新运行，验证新会话确实不记得之前的对话

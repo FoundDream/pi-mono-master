@@ -21,11 +21,13 @@ pi install /absolute/path/to/package
 默认情况下，安装到全局设置。使用 `-l` 安装到项目级（`.pi/settings.json`）。
 
 **临时测试：**
+
 ```bash
 pi -e npm:@foo/bar
 ```
 
 **管理操作：**
+
 ```bash
 pi remove npm:@foo/bar
 pi list
@@ -63,12 +65,14 @@ pi update
 路径支持 glob 模式和 `!exclusions` 排除。包含 `pi-package` 关键字可在应用商店中展示。
 
 应用商店元数据：
+
 - `video`：MP4 格式
 - `image`：PNG、JPEG、GIF、WebP 格式
 
 ## 自动发现
 
 如果没有显式清单配置，Pi 会自动发现以下目录结构：
+
 - `extensions/` — `.ts` 和 `.js` 文件
 - `skills/` — 包含 `SKILL.md` 的目录和顶层 `.md` 文件
 - `prompts/` — `.md` 文件
@@ -99,6 +103,7 @@ pi update
 ## 作用域与去重
 
 项目设置优先于全局设置。通过以下方式进行身份匹配和去重：
+
 - **npm 包**：按包名称
 - **Git 仓库**：按仓库 URL
 - **本地路径**：按绝对路径

@@ -92,12 +92,12 @@ The `shared/model.ts` helper reads these environment variables at startup and co
 
 ### Supported Providers
 
-| Provider  | `AI_PROVIDER` | API Key Env Var     | Example Model              |
-| --------- | ------------- | ------------------- | -------------------------- |
-| Anthropic | `anthropic`   | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6`  |
+| Provider  | `AI_PROVIDER` | API Key Env Var     | Example Model       |
+| --------- | ------------- | ------------------- | ------------------- |
+| Anthropic | `anthropic`   | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
 | OpenAI    | `openai`      | `OPENAI_API_KEY`    | `gpt-5.2`           |
-| Google    | `google`      | `GOOGLE_API_KEY`    | `gemini-2.5-flash`   |
-| DeepSeek  | `deepseek`    | `OPENAI_API_KEY`    | `deepseek-chat`      |
+| Google    | `google`      | `GOOGLE_API_KEY`    | `gemini-2.5-flash`  |
+| DeepSeek  | `deepseek`    | `OPENAI_API_KEY`    | `deepseek-chat`     |
 
 :::tip
 DeepSeek uses the OpenAI-compatible API format, which is why it shares the `OPENAI_API_KEY` environment variable. If you want to use both OpenAI and DeepSeek, you'll need to switch the key when switching providers.

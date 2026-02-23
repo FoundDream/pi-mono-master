@@ -23,11 +23,11 @@ npm link
 
 Pi 支持通过环境变量或配置进行品牌和路径自定义：
 
-| 自定义项 | 环境变量 | 说明 |
-|----------|----------|------|
-| 名称 | `PI_NAME` | 自定义应用名称 |
-| 配置目录 | `PI_CONFIG_DIR` | 自定义配置文件目录 |
-| 可执行文件名 | `PI_BIN` | 自定义命令行工具名称 |
+| 自定义项     | 环境变量        | 说明                 |
+| ------------ | --------------- | -------------------- |
+| 名称         | `PI_NAME`       | 自定义应用名称       |
+| 配置目录     | `PI_CONFIG_DIR` | 自定义配置文件目录   |
+| 可执行文件名 | `PI_BIN`        | 自定义命令行工具名称 |
 
 ```bash
 # 示例：使用自定义名称运行
@@ -64,6 +64,7 @@ npm run format
 ```
 
 调试模式会输出以下信息：
+
 - API 请求和响应详情
 - 工具调用的完整参数
 - Token 使用统计
@@ -78,12 +79,12 @@ DEBUG=pi:* pi
 
 ### 日志级别
 
-| 级别 | 说明 |
-|------|------|
-| `pi:api` | API 请求和响应 |
-| `pi:tools` | 工具执行详情 |
-| `pi:session` | 会话管理 |
-| `pi:*` | 所有调试信息 |
+| 级别         | 说明           |
+| ------------ | -------------- |
+| `pi:api`     | API 请求和响应 |
+| `pi:tools`   | 工具执行详情   |
+| `pi:session` | 会话管理       |
+| `pi:*`       | 所有调试信息   |
 
 ## 测试
 
@@ -114,15 +115,15 @@ tests/
 
 Pi 采用模块化的包架构：
 
-| 包 | 说明 |
-|----|------|
-| `core` | 核心运行时和会话管理 |
-| `cli` | 命令行界面和 TUI |
-| `tools` | 内置工具实现 |
-| `providers` | LLM Provider 适配器 |
-| `extensions` | 扩展加载和管理 |
-| `skills` | 技能加载和管理 |
-| `shared` | 共享类型和工具函数 |
+| 包           | 说明                 |
+| ------------ | -------------------- |
+| `core`       | 核心运行时和会话管理 |
+| `cli`        | 命令行界面和 TUI     |
+| `tools`      | 内置工具实现         |
+| `providers`  | LLM Provider 适配器  |
+| `extensions` | 扩展加载和管理       |
+| `skills`     | 技能加载和管理       |
+| `shared`     | 共享类型和工具函数   |
 
 ### 目录结构
 
@@ -150,9 +151,9 @@ packages/
 
 ### 关键入口点
 
-| 文件 | 说明 |
-|------|------|
-| `packages/cli/src/index.ts` | CLI 入口 |
-| `packages/core/src/session.ts` | 会话核心 |
-| `packages/core/src/tools/registry.ts` | 工具注册表 |
-| `packages/providers/src/index.ts` | Provider 注册 |
+| 文件                                  | 说明          |
+| ------------------------------------- | ------------- |
+| `packages/cli/src/index.ts`           | CLI 入口      |
+| `packages/core/src/session.ts`        | 会话核心      |
+| `packages/core/src/tools/registry.ts` | 工具注册表    |
+| `packages/providers/src/index.ts`     | Provider 注册 |

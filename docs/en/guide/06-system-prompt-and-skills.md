@@ -1,6 +1,6 @@
 # 06 - System Prompt & Skills
 
-Control agent behavior with system prompts and skill files -- the two mechanisms that shape *who* your agent is and *what* it knows.
+Control agent behavior with system prompts and skill files -- the two mechanisms that shape _who_ your agent is and _what_ it knows.
 
 ## Why This Chapter Matters
 
@@ -9,7 +9,7 @@ So far, our agent has been a blank slate with a one-liner system prompt like "Yo
 - "You are a helpful assistant." -- generic, no guardrails, no domain expertise
 - A weather forecasting agent that always structures responses as weather reports, uses meteorological terminology, and cites data sources
 
-The first is a chatbot. The second is a **specialist**. The difference is not in the model weights or the tools available -- it is in the *instructions* the agent receives before it ever sees a user message.
+The first is a chatbot. The second is a **specialist**. The difference is not in the model weights or the tools available -- it is in the _instructions_ the agent receives before it ever sees a user message.
 
 This chapter introduces two complementary mechanisms for shaping agent behavior:
 
@@ -59,13 +59,13 @@ Skills are Markdown files that extend the agent's knowledge and behavior. If the
 
 Skills serve a different purpose than system prompts:
 
-| Aspect | System Prompt | Skills |
-|--------|--------------|--------|
-| **Scope** | Global -- applies to all interactions | Domain-specific -- applies when relevant |
-| **Format** | Plain text string | Markdown with YAML frontmatter |
-| **Source** | Hardcoded in your application | Loaded dynamically from the filesystem |
-| **Quantity** | One per session | Many can be loaded simultaneously |
-| **Mutability** | Fixed at session creation | Can be changed between sessions |
+| Aspect         | System Prompt                         | Skills                                   |
+| -------------- | ------------------------------------- | ---------------------------------------- |
+| **Scope**      | Global -- applies to all interactions | Domain-specific -- applies when relevant |
+| **Format**     | Plain text string                     | Markdown with YAML frontmatter           |
+| **Source**     | Hardcoded in your application         | Loaded dynamically from the filesystem   |
+| **Quantity**   | One per session                       | Many can be loaded simultaneously        |
+| **Mutability** | Fixed at session creation             | Can be changed between sessions          |
 
 ### Skills as a Plugin System
 
@@ -100,11 +100,11 @@ Keep the tone professional but friendly, like a TV weather presenter.
 
 ### Frontmatter Fields
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Unique identifier for the skill (kebab-case recommended) |
-| `description` | Yes | Short summary shown when listing skills |
-| `disable-model-invocation` | No | If `true`, prevents the model from dynamically invoking this skill |
+| Field                      | Required | Description                                                        |
+| -------------------------- | -------- | ------------------------------------------------------------------ |
+| `name`                     | Yes      | Unique identifier for the skill (kebab-case recommended)           |
+| `description`              | Yes      | Short summary shown when listing skills                            |
+| `disable-model-invocation` | No       | If `true`, prevents the model from dynamically invoking this skill |
 
 ### What's Happening Under the Hood
 
@@ -142,16 +142,16 @@ Use the single-file format for simple behavioral rules (like response formatting
 ## Loading Skills
 
 ```typescript
-import { loadSkillsFromDir } from '@mariozechner/pi-coding-agent'
+import { loadSkillsFromDir } from "@mariozechner/pi-coding-agent";
 
-const SKILLS_DIR = path.join(import.meta.dirname, 'skills')
+const SKILLS_DIR = path.join(import.meta.dirname, "skills");
 const { skills, diagnostics } = loadSkillsFromDir({
   dir: SKILLS_DIR,
-  source: 'tutorial',
-})
+  source: "tutorial",
+});
 
-console.log(`Loaded ${skills.length} skill(s):`)
-skills.forEach((s) => console.log(`  - ${s.name}: ${s.description}`))
+console.log(`Loaded ${skills.length} skill(s):`);
+skills.forEach((s) => console.log(`  - ${s.name}: ${s.description}`));
 ```
 
 The `diagnostics` array contains any warnings or errors from skill parsing -- for example, a skill file with invalid frontmatter. Always check diagnostics in development to catch problems early.
@@ -162,11 +162,12 @@ The `source` parameter is a label that helps you track where skills came from wh
 
 ```typescript
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => [
-    'You are WeatherBot, a friendly weather assistant.',
-    'Always greet the user warmly.',
-    'When asked about weather, use the get_weather tool first.',
-  ].join('\n'),
+  systemPromptOverride: () =>
+    [
+      "You are WeatherBot, a friendly weather assistant.",
+      "Always greet the user warmly.",
+      "When asked about weather, use the get_weather tool first.",
+    ].join("\n"),
   noExtensions: true,
   noPromptTemplates: true,
   noThemes: true,
@@ -175,8 +176,8 @@ const resourceLoader = new DefaultResourceLoader({
   ...(skills.length > 0 && {
     skillsOverride: () => ({ skills, diagnostics: [] }),
   }),
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 ```
 
 Let's break down the key configuration points:
@@ -200,13 +201,16 @@ Here are guidelines for writing skills that produce reliable, high-quality agent
 ### Be Explicit About Response Structure
 
 Bad:
+
 ```markdown
 Help users with weather questions.
 ```
 
 Good:
+
 ```markdown
 When discussing weather, structure your response as:
+
 1. **Current conditions**: Temperature and sky condition
 2. **Humidity**: Current humidity percentage
 3. **Forecast**: Outlook for the next 24 hours
@@ -231,6 +235,7 @@ Tell the skill what the agent should NOT do:
 
 ```markdown
 Do NOT:
+
 - Predict weather more than 3 days out (accuracy drops significantly)
 - Provide severe weather warnings without data from the get_weather tool
 - Guess temperatures -- always use the tool first
@@ -253,55 +258,75 @@ When designing a skill library, think in layers: **base skills** (tone, formatti
 ## Full Code
 
 ```typescript
-import * as path from 'node:path'
-import { Type } from '@sinclair/typebox'
+import * as path from "node:path";
+import { Type } from "@sinclair/typebox";
 import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
   loadSkillsFromDir,
   type ToolDefinition,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const model = createModel()
+const model = createModel();
 
 // Load skills from the skills/ directory
-const SKILLS_DIR = path.join(import.meta.dirname, 'skills')
-const { skills, diagnostics } = loadSkillsFromDir({ dir: SKILLS_DIR, source: 'tutorial' })
+const SKILLS_DIR = path.join(import.meta.dirname, "skills");
+const { skills, diagnostics } = loadSkillsFromDir({
+  dir: SKILLS_DIR,
+  source: "tutorial",
+});
 
-console.log(`📚 Loaded ${skills.length} skill(s):`)
-skills.forEach((s) => console.log(`   - ${s.name}: ${s.description}`))
+console.log(`📚 Loaded ${skills.length} skill(s):`);
+skills.forEach((s) => console.log(`   - ${s.name}: ${s.description}`));
 
 // Weather tool (same as ch03 but inline)
 const weatherTool: ToolDefinition = {
-  name: 'get_weather',
-  label: 'Get Weather',
-  description: 'Get current weather for a city.',
+  name: "get_weather",
+  label: "Get Weather",
+  description: "Get current weather for a city.",
   parameters: Type.Object({
-    city: Type.String({ description: 'City name' }),
+    city: Type.String({ description: "City name" }),
   }),
   execute: async (_toolCallId, params) => {
-    const { city } = params as { city: string }
+    const { city } = params as { city: string };
     const data: Record<string, object> = {
-      tokyo: { temp: '22°C', condition: 'Sunny', humidity: '45%', forecast: 'Clear skies' },
-      london: { temp: '14°C', condition: 'Overcast', humidity: '82%', forecast: 'Rain expected' },
-    }
-    const weather = data[city.toLowerCase()] || { temp: '20°C', condition: 'Clear', humidity: '50%' }
+      tokyo: {
+        temp: "22°C",
+        condition: "Sunny",
+        humidity: "45%",
+        forecast: "Clear skies",
+      },
+      london: {
+        temp: "14°C",
+        condition: "Overcast",
+        humidity: "82%",
+        forecast: "Rain expected",
+      },
+    };
+    const weather = data[city.toLowerCase()] || {
+      temp: "20°C",
+      condition: "Clear",
+      humidity: "50%",
+    };
     return {
-      content: [{ type: 'text' as const, text: JSON.stringify({ city, ...weather }) }],
+      content: [
+        { type: "text" as const, text: JSON.stringify({ city, ...weather }) },
+      ],
       details: {},
-    }
+    };
   },
-}
+};
 
 // Resource loader with system prompt + skills
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => [
-    'You are WeatherBot, a friendly weather assistant.',
-    'Always greet the user warmly.',
-    'When asked about weather, use the get_weather tool first.',
-  ].join('\n'),
+  systemPromptOverride: () =>
+    [
+      "You are WeatherBot, a friendly weather assistant.",
+      "Always greet the user warmly.",
+      "When asked about weather, use the get_weather tool first.",
+    ].join("\n"),
   noExtensions: true,
   noPromptTemplates: true,
   noThemes: true,
@@ -309,8 +334,8 @@ const resourceLoader = new DefaultResourceLoader({
   ...(skills.length > 0 && {
     skillsOverride: () => ({ skills, diagnostics: [] }),
   }),
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 
 const { session } = await createAgentSession({
   model,
@@ -318,29 +343,32 @@ const { session } = await createAgentSession({
   customTools: [weatherTool],
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 
 // Stream output with tool events
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    process.stdout.write(event.assistantMessageEvent.delta)
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    process.stdout.write(event.assistantMessageEvent.delta);
   }
-  if (event.type === 'tool_execution_start') {
-    console.log(`\n🔧 ${event.toolName}(${JSON.stringify(event.args)})`)
+  if (event.type === "tool_execution_start") {
+    console.log(`\n🔧 ${event.toolName}(${JSON.stringify(event.args)})`);
   }
-  if (event.type === 'tool_execution_end') {
-    console.log(`✅ Done\n`)
+  if (event.type === "tool_execution_end") {
+    console.log(`✅ Done\n`);
   }
-})
+});
 
-const question = process.argv[2] || "What's the weather like in London today?"
-console.log(`You: ${question}\n`)
-process.stdout.write('Agent: ')
+const question = process.argv[2] || "What's the weather like in London today?";
+console.log(`You: ${question}\n`);
+process.stdout.write("Agent: ");
 
-await session.prompt(question)
+await session.prompt(question);
 
-console.log()
-process.exit(0)
+console.log();
+process.exit(0);
 ```
 
 ## Run
@@ -360,7 +388,7 @@ The agent responds as "WeatherBot" -- notice the personality and response struct
 2. **Tool usage**: It calls `get_weather` before responding (from the system prompt's tool guidance)
 3. **Response format**: It structures the response with Temperature, Humidity, Forecast, and Advisory sections (from the weather-expert skill)
 
-Without the skill, the agent would call the tool and give you a plain-text answer. With the skill, it formats the response like a professional weather report. This is the power of skill composition -- the system prompt defines *who* the agent is, and the skill defines *how* it presents domain-specific information.
+Without the skill, the agent would call the tool and give you a plain-text answer. With the skill, it formats the response like a professional weather report. This is the power of skill composition -- the system prompt defines _who_ the agent is, and the skill defines _how_ it presents domain-specific information.
 
 ## Common Mistakes and Gotchas
 
@@ -378,7 +406,7 @@ Without the skill, the agent would call the tool and give you a plain-text answe
 
 2. **Skills add domain knowledge**: They are modular Markdown files that inject specialized instructions. Think of them as training manuals.
 
-3. **The two work together**: System prompt for who the agent *is*, skills for what the agent *knows*. This separation keeps your configuration modular and maintainable.
+3. **The two work together**: System prompt for who the agent _is_, skills for what the agent _knows_. This separation keeps your configuration modular and maintainable.
 
 4. **Skills are a plugin system**: You can build a library of reusable skills and compose them for different agent configurations, just like selecting plugins for a web framework.
 

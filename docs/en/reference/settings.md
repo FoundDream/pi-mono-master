@@ -2,10 +2,10 @@
 
 Pi uses JSON settings files with project settings overriding global settings.
 
-| Location | Scope |
-|----------|-------|
-| `~/.pi/agent/settings.json` | Global (all projects) |
-| `.pi/settings.json` | Project (current directory) |
+| Location                    | Scope                       |
+| --------------------------- | --------------------------- |
+| `~/.pi/agent/settings.json` | Global (all projects)       |
+| `.pi/settings.json`         | Project (current directory) |
 
 Edit directly or use `/settings` for common options.
 
@@ -13,13 +13,13 @@ Edit directly or use `/settings` for common options.
 
 ### Model & Thinking
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `defaultProvider` | string | - | Default provider (e.g., `"anthropic"`, `"openai"`) |
-| `defaultModel` | string | - | Default model ID |
-| `defaultThinkingLevel` | string | - | `"off"`, `"minimal"`, `"low"`, `"medium"`, `"high"`, `"xhigh"` |
-| `hideThinkingBlock` | boolean | `false` | Hide thinking blocks in output |
-| `thinkingBudgets` | object | - | Custom token budgets per thinking level |
+| Setting                | Type    | Default | Description                                                    |
+| ---------------------- | ------- | ------- | -------------------------------------------------------------- |
+| `defaultProvider`      | string  | -       | Default provider (e.g., `"anthropic"`, `"openai"`)             |
+| `defaultModel`         | string  | -       | Default model ID                                               |
+| `defaultThinkingLevel` | string  | -       | `"off"`, `"minimal"`, `"low"`, `"medium"`, `"high"`, `"xhigh"` |
+| `hideThinkingBlock`    | boolean | `false` | Hide thinking blocks in output                                 |
+| `thinkingBudgets`      | object  | -       | Custom token budgets per thinking level                        |
 
 #### thinkingBudgets
 
@@ -36,23 +36,23 @@ Edit directly or use `/settings` for common options.
 
 ### UI & Display
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `theme` | string | `"dark"` | Theme name |
-| `quietStartup` | boolean | `false` | Hide startup header |
-| `collapseChangelog` | boolean | `false` | Condensed changelog after updates |
-| `doubleEscapeAction` | string | `"tree"` | Double-escape: `"tree"`, `"fork"`, or `"none"` |
-| `editorPaddingX` | number | `0` | Horizontal padding (0-3) |
-| `autocompleteMaxVisible` | number | `5` | Max autocomplete items (3-20) |
-| `showHardwareCursor` | boolean | `false` | Show terminal cursor |
+| Setting                  | Type    | Default  | Description                                    |
+| ------------------------ | ------- | -------- | ---------------------------------------------- |
+| `theme`                  | string  | `"dark"` | Theme name                                     |
+| `quietStartup`           | boolean | `false`  | Hide startup header                            |
+| `collapseChangelog`      | boolean | `false`  | Condensed changelog after updates              |
+| `doubleEscapeAction`     | string  | `"tree"` | Double-escape: `"tree"`, `"fork"`, or `"none"` |
+| `editorPaddingX`         | number  | `0`      | Horizontal padding (0-3)                       |
+| `autocompleteMaxVisible` | number  | `5`      | Max autocomplete items (3-20)                  |
+| `showHardwareCursor`     | boolean | `false`  | Show terminal cursor                           |
 
 ### Compaction
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `compaction.enabled` | boolean | `true` | Enable auto-compaction |
-| `compaction.reserveTokens` | number | `16384` | Tokens reserved for response |
-| `compaction.keepRecentTokens` | number | `20000` | Recent tokens to keep |
+| Setting                       | Type    | Default | Description                  |
+| ----------------------------- | ------- | ------- | ---------------------------- |
+| `compaction.enabled`          | boolean | `true`  | Enable auto-compaction       |
+| `compaction.reserveTokens`    | number  | `16384` | Tokens reserved for response |
+| `compaction.keepRecentTokens` | number  | `20000` | Recent tokens to keep        |
 
 ```json
 {
@@ -66,18 +66,18 @@ Edit directly or use `/settings` for common options.
 
 ### Branch Summary
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
+| Setting                       | Type   | Default | Description                              |
+| ----------------------------- | ------ | ------- | ---------------------------------------- |
 | `branchSummary.reserveTokens` | number | `16384` | Tokens reserved for branch summarization |
 
 ### Retry
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `retry.enabled` | boolean | `true` | Enable automatic retry |
-| `retry.maxRetries` | number | `3` | Max retry attempts |
-| `retry.baseDelayMs` | number | `2000` | Base delay for exponential backoff |
-| `retry.maxDelayMs` | number | `60000` | Max server-requested delay before failing |
+| Setting             | Type    | Default | Description                               |
+| ------------------- | ------- | ------- | ----------------------------------------- |
+| `retry.enabled`     | boolean | `true`  | Enable automatic retry                    |
+| `retry.maxRetries`  | number  | `3`     | Max retry attempts                        |
+| `retry.baseDelayMs` | number  | `2000`  | Base delay for exponential backoff        |
+| `retry.maxDelayMs`  | number  | `60000` | Max server-requested delay before failing |
 
 ```json
 {
@@ -92,27 +92,27 @@ Edit directly or use `/settings` for common options.
 
 ### Message Delivery
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `steeringMode` | string | `"one-at-a-time"` | How steering messages are sent |
-| `followUpMode` | string | `"one-at-a-time"` | How follow-up messages are sent |
-| `transport` | string | `"sse"` | Preferred transport: `"sse"`, `"websocket"`, or `"auto"` |
+| Setting        | Type   | Default           | Description                                              |
+| -------------- | ------ | ----------------- | -------------------------------------------------------- |
+| `steeringMode` | string | `"one-at-a-time"` | How steering messages are sent                           |
+| `followUpMode` | string | `"one-at-a-time"` | How follow-up messages are sent                          |
+| `transport`    | string | `"sse"`           | Preferred transport: `"sse"`, `"websocket"`, or `"auto"` |
 
 ### Terminal & Images
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `terminal.showImages` | boolean | `true` | Show images in terminal |
-| `terminal.clearOnShrink` | boolean | `false` | Clear empty rows on shrink |
-| `images.autoResize` | boolean | `true` | Resize images to 2000x2000 max |
-| `images.blockImages` | boolean | `false` | Block all images to LLM |
+| Setting                  | Type    | Default | Description                    |
+| ------------------------ | ------- | ------- | ------------------------------ |
+| `terminal.showImages`    | boolean | `true`  | Show images in terminal        |
+| `terminal.clearOnShrink` | boolean | `false` | Clear empty rows on shrink     |
+| `images.autoResize`      | boolean | `true`  | Resize images to 2000x2000 max |
+| `images.blockImages`     | boolean | `false` | Block all images to LLM        |
 
 ### Shell
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `shellPath` | string | - | Custom shell path |
-| `shellCommandPrefix` | string | - | Prefix for every bash command |
+| Setting              | Type   | Default | Description                   |
+| -------------------- | ------ | ------- | ----------------------------- |
+| `shellPath`          | string | -       | Custom shell path             |
+| `shellCommandPrefix` | string | -       | Prefix for every bash command |
 
 ### Model Cycling
 
@@ -124,14 +124,14 @@ Edit directly or use `/settings` for common options.
 
 ### Resources
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `packages` | array | `[]` | npm/git packages to load |
-| `extensions` | string[] | `[]` | Extension paths |
-| `skills` | string[] | `[]` | Skill paths |
-| `prompts` | string[] | `[]` | Prompt template paths |
-| `themes` | string[] | `[]` | Theme paths |
-| `enableSkillCommands` | boolean | `true` | Register skills as commands |
+| Setting               | Type     | Default | Description                 |
+| --------------------- | -------- | ------- | --------------------------- |
+| `packages`            | array    | `[]`    | npm/git packages to load    |
+| `extensions`          | string[] | `[]`    | Extension paths             |
+| `skills`              | string[] | `[]`    | Skill paths                 |
+| `prompts`             | string[] | `[]`    | Prompt template paths       |
+| `themes`              | string[] | `[]`    | Theme paths                 |
+| `enableSkillCommands` | boolean  | `true`  | Register skills as commands |
 
 ### Example
 

@@ -12,11 +12,11 @@
 
 ## 放置位置
 
-| 位置 | 作用域 | 说明 |
-|------|--------|------|
-| `~/.pi/agent/extensions/*.ts` | 全局 | 所有项目生效 |
-| `.pi/extensions/*.ts` | 项目级 | 仅当前项目生效 |
-| 包中的扩展 | 依赖包 | 通过 `pi install` 安装 |
+| 位置                          | 作用域 | 说明                   |
+| ----------------------------- | ------ | ---------------------- |
+| `~/.pi/agent/extensions/*.ts` | 全局   | 所有项目生效           |
+| `.pi/extensions/*.ts`         | 项目级 | 仅当前项目生效         |
+| 包中的扩展                    | 依赖包 | 通过 `pi install` 安装 |
 
 扩展支持热重载：修改文件后 Pi 会自动重新加载扩展，无需重启。
 
@@ -86,17 +86,17 @@ export default (ctx: ExtensionContext) => {
 
 ### 所有事件类别
 
-| 事件类别 | 事件名称 | 说明 |
-|----------|----------|------|
-| 会话 | `session:start` | 会话开始 |
-| 会话 | `session:end` | 会话结束 |
-| 消息 | `message:beforeSend` | 消息发送前 |
-| 消息 | `message:afterResponse` | 收到响应后 |
-| 工具 | `tool:beforeExecute` | 工具执行前 |
-| 工具 | `tool:afterExecute` | 工具执行后 |
-| 压缩 | `compaction:before` | 上下文压缩前 |
-| 压缩 | `compaction:after` | 上下文压缩后 |
-| 通知 | `notification:received` | 收到通知 |
+| 事件类别 | 事件名称                | 说明         |
+| -------- | ----------------------- | ------------ |
+| 会话     | `session:start`         | 会话开始     |
+| 会话     | `session:end`           | 会话结束     |
+| 消息     | `message:beforeSend`    | 消息发送前   |
+| 消息     | `message:afterResponse` | 收到响应后   |
+| 工具     | `tool:beforeExecute`    | 工具执行前   |
+| 工具     | `tool:afterExecute`     | 工具执行后   |
+| 压缩     | `compaction:before`     | 上下文压缩前 |
+| 压缩     | `compaction:after`      | 上下文压缩后 |
+| 通知     | `notification:received` | 收到通知     |
 
 ## 自定义工具
 
@@ -116,12 +116,12 @@ export default (ctx: ExtensionContext) => {
         Type.Union([Type.Literal("celsius"), Type.Literal("fahrenheit")], {
           description: "Temperature units",
           default: "celsius",
-        })
+        }),
       ),
     }),
     async execute({ location, units }) {
       const response = await fetch(
-        `https://api.weather.example.com/current?q=${encodeURIComponent(location)}&units=${units}`
+        `https://api.weather.example.com/current?q=${encodeURIComponent(location)}&units=${units}`,
       );
       const data = await response.json();
       return {
@@ -194,7 +194,7 @@ export default (ctx: ExtensionContext) => {
   ctx.on("message:beforeSend", (event) => {
     // 注入系统消息
     event.addSystemMessage(
-      "Always respond in formal English when discussing technical topics."
+      "Always respond in formal English when discussing technical topics.",
     );
   });
 };
@@ -282,11 +282,11 @@ export default (ctx: ExtensionContext) => {
 
 扩展应考虑 Pi 的不同运行模式：
 
-| 模式 | 说明 | 注意事项 |
-|------|------|----------|
-| 交互模式 | 标准对话模式 | 所有功能可用 |
-| 非交互模式 | 管道/脚本模式 | UI 交互不可用 |
-| 无头模式 | 无终端界面 | 仅工具和消息事件有效 |
+| 模式       | 说明          | 注意事项             |
+| ---------- | ------------- | -------------------- |
+| 交互模式   | 标准对话模式  | 所有功能可用         |
+| 非交互模式 | 管道/脚本模式 | UI 交互不可用        |
+| 无头模式   | 无终端界面    | 仅工具和消息事件有效 |
 
 ```typescript
 export default (ctx: ExtensionContext) => {

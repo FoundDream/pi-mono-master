@@ -122,16 +122,16 @@ export default function (pi: ExtensionAPI) {
 
 The `api` field specifies which wire protocol to use:
 
-| API Type | Description |
-|----------|-------------|
-| `anthropic-messages` | Anthropic Messages API |
-| `openai-completions` | OpenAI Chat Completions API |
-| `openai-responses` | OpenAI Responses API |
-| `azure-openai-responses` | Azure OpenAI Responses API |
-| `openai-codex-responses` | OpenAI Codex Responses API |
-| `google-generative-ai` | Google AI Studio (Generative AI) |
-| `google-gemini-cli` | Google Gemini CLI API |
-| `google-vertex` | Google Vertex AI |
+| API Type                  | Description                        |
+| ------------------------- | ---------------------------------- |
+| `anthropic-messages`      | Anthropic Messages API             |
+| `openai-completions`      | OpenAI Chat Completions API        |
+| `openai-responses`        | OpenAI Responses API               |
+| `azure-openai-responses`  | Azure OpenAI Responses API         |
+| `openai-codex-responses`  | OpenAI Codex Responses API         |
+| `google-generative-ai`    | Google AI Studio (Generative AI)   |
+| `google-gemini-cli`       | Google Gemini CLI API              |
+| `google-vertex`           | Google Vertex AI                   |
 | `bedrock-converse-stream` | Amazon Bedrock Converse Stream API |
 
 ## Compat Options
@@ -144,13 +144,13 @@ pi.registerProvider({
   baseUrl: "https://api.example.com/v1",
   api: "openai-completions",
   compat: {
-    disableStreaming: false,       // Fall back to non-streaming
-    disableTools: false,           // Strip tool definitions
-    disableSystemMessages: false,  // Convert system to user messages
-    disableVision: false,          // Strip image content
-    forceSimpleToolResults: true,  // Simplify tool result format
-    skipProviderMetadata: false,   // Skip provider metadata parsing
-    forceMaxTokens: false,         // Always include max_tokens
+    disableStreaming: false, // Fall back to non-streaming
+    disableTools: false, // Strip tool definitions
+    disableSystemMessages: false, // Convert system to user messages
+    disableVision: false, // Strip image content
+    forceSimpleToolResults: true, // Simplify tool result format
+    skipProviderMetadata: false, // Skip provider metadata parsing
+    forceMaxTokens: false, // Always include max_tokens
   },
   models: [{ id: "model-v1" }],
 });
@@ -166,7 +166,7 @@ pi.registerProvider({
   baseUrl: "https://api.example.com",
   api: "openai-completions",
   apiKey: "my-key",
-  authHeader: "X-Api-Key",  // Sends: X-Api-Key: my-key
+  authHeader: "X-Api-Key", // Sends: X-Api-Key: my-key
   models: [{ id: "model-v1" }],
 });
 ```
@@ -182,9 +182,12 @@ export default function (pi: ExtensionAPI) {
     baseUrl: "https://api.provider.com/v1",
     api: "openai-completions",
     oauth: {
-      login: async (callbacks: OAuthLoginCallbacks): Promise<OAuthCredentials> => {
+      login: async (
+        callbacks: OAuthLoginCallbacks,
+      ): Promise<OAuthCredentials> => {
         // Start OAuth flow
-        const authUrl = "https://provider.com/oauth/authorize?client_id=xxx&redirect_uri=...";
+        const authUrl =
+          "https://provider.com/oauth/authorize?client_id=xxx&redirect_uri=...";
 
         // Open browser for user authentication
         callbacks.openUrl(authUrl);
@@ -210,7 +213,9 @@ export default function (pi: ExtensionAPI) {
         };
       },
 
-      refreshToken: async (credentials: OAuthCredentials): Promise<OAuthCredentials> => {
+      refreshToken: async (
+        credentials: OAuthCredentials,
+      ): Promise<OAuthCredentials> => {
         const response = await fetch("https://provider.com/oauth/token", {
           method: "POST",
           body: JSON.stringify({
@@ -363,22 +368,22 @@ export default function (pi: ExtensionAPI) {
 
 The `streamSimple` generator yields events of these types:
 
-| Event Type | Fields | Description |
-|------------|--------|-------------|
-| `content` | `content: { type: "text", text }` | Text content delta |
-| `content` | `content: { type: "tool-call", id, name, arguments }` | Tool call request |
-| `usage` | `usage: { inputTokens, outputTokens }`, `cost?: { input, output }` | Token usage and cost |
+| Event Type | Fields                                                             | Description          |
+| ---------- | ------------------------------------------------------------------ | -------------------- |
+| `content`  | `content: { type: "text", text }`                                  | Text content delta   |
+| `content`  | `content: { type: "tool-call", id, name, arguments }`              | Tool call request    |
+| `usage`    | `usage: { inputTokens, outputTokens }`, `cost?: { input, output }` | Token usage and cost |
 
 ## Testing
 
 Custom providers can be tested using the test utilities in the pi-coding-agent package:
 
-| Test File | Purpose |
-|-----------|---------|
+| Test File                                | Purpose                        |
+| ---------------------------------------- | ------------------------------ |
 | `test/providers/custom-provider.test.ts` | Registration and configuration |
-| `test/providers/oauth.test.ts` | OAuth flow |
-| `test/providers/streaming.test.ts` | Custom streaming |
-| `test/providers/compat.test.ts` | Compatibility flags |
+| `test/providers/oauth.test.ts`           | OAuth flow                     |
+| `test/providers/streaming.test.ts`       | Custom streaming               |
+| `test/providers/compat.test.ts`          | Compatibility flags            |
 
 ## ProviderConfig Reference
 
@@ -391,10 +396,16 @@ interface ProviderConfig {
   /** API base URL */
   baseUrl?: string;
   /** API type */
-  api?: "anthropic-messages" | "openai-completions" | "openai-responses"
-    | "azure-openai-responses" | "openai-codex-responses"
-    | "google-generative-ai" | "google-gemini-cli"
-    | "google-vertex" | "bedrock-converse-stream";
+  api?:
+    | "anthropic-messages"
+    | "openai-completions"
+    | "openai-responses"
+    | "azure-openai-responses"
+    | "openai-codex-responses"
+    | "google-generative-ai"
+    | "google-gemini-cli"
+    | "google-vertex"
+    | "bedrock-converse-stream";
   /** API key for authentication */
   apiKey?: string;
   /** Custom authorization header name */

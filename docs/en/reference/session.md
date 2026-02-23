@@ -18,11 +18,11 @@ The `<encoded-cwd>` is the working directory path with path separators replaced 
 
 ## Session Versions
 
-| Version | Description |
-|---------|-------------|
-| v1 | Original format (no `id`/`parentId` fields) |
-| v2 | Added tree structure with `id`/`parentId` |
-| v3 | Current version, adds `custom_message` and `label` entry types |
+| Version | Description                                                    |
+| ------- | -------------------------------------------------------------- |
+| v1      | Original format (no `id`/`parentId` fields)                    |
+| v2      | Added tree structure with `id`/`parentId`                      |
+| v3      | Current version, adds `custom_message` and `label` entry types |
 
 The current version is exported as `CURRENT_SESSION_VERSION` (value: `3`). Old sessions are automatically migrated when loaded.
 
@@ -45,8 +45,8 @@ interface TextContent {
 ```typescript
 interface ImageContent {
   type: "image";
-  data: string;       // base64-encoded image data
-  mimeType: string;   // e.g., "image/png", "image/jpeg"
+  data: string; // base64-encoded image data
+  mimeType: string; // e.g., "image/png", "image/jpeg"
 }
 ```
 
@@ -92,9 +92,9 @@ interface UserMessage {
 interface AssistantMessage {
   role: "assistant";
   content: (TextContent | ThinkingContent | ToolCall)[];
-  api: string;          // e.g., "anthropic-messages", "openai-completions"
-  provider: string;      // e.g., "anthropic", "openai"
-  model: string;         // e.g., "claude-sonnet-4-20250514"
+  api: string; // e.g., "anthropic-messages", "openai-completions"
+  provider: string; // e.g., "anthropic", "openai"
+  model: string; // e.g., "claude-sonnet-4-20250514"
   usage: Usage;
   stopReason: "stop" | "length" | "toolUse" | "error" | "aborted";
   errorMessage?: string;
@@ -163,7 +163,7 @@ interface CustomMessage<T = unknown> {
   role: "custom";
   customType: string;
   content: string | (TextContent | ImageContent)[];
-  display: boolean;     // true = rendered in TUI, false = hidden
+  display: boolean; // true = rendered in TUI, false = hidden
   details?: T;
   timestamp: number;
 }
@@ -202,7 +202,12 @@ The full message union type:
 ```typescript
 type Message = UserMessage | AssistantMessage | ToolResultMessage;
 
-type AgentMessage = Message | BashExecutionMessage | CustomMessage | BranchSummaryMessage | CompactionSummaryMessage;
+type AgentMessage =
+  | Message
+  | BashExecutionMessage
+  | CustomMessage
+  | BranchSummaryMessage
+  | CompactionSummaryMessage;
 ```
 
 ## Session Entry Types
@@ -212,9 +217,9 @@ Every session entry (except the header) extends `SessionEntryBase`:
 ```typescript
 interface SessionEntryBase {
   type: string;
-  id: string;              // UUID for this entry
+  id: string; // UUID for this entry
   parentId: string | null; // UUID of parent entry (null for root)
-  timestamp: string;       // ISO 8601 timestamp
+  timestamp: string; // ISO 8601 timestamp
 }
 ```
 
@@ -225,17 +230,24 @@ The first line of every session file. Not a session entry (no `id`/`parentId`).
 ```typescript
 interface SessionHeader {
   type: "session";
-  version?: number;       // Current: 3
-  id: string;             // Session UUID
+  version?: number; // Current: 3
+  id: string; // Session UUID
   timestamp: string;
-  cwd: string;            // Working directory
+  cwd: string; // Working directory
   parentSession?: string; // Path to parent session (for forks)
 }
 ```
 
 Example:
+
 ```json
-{"type":"session","version":3,"id":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","timestamp":"2025-01-15T10:30:00.000Z","cwd":"/home/user/project"}
+{
+  "type": "session",
+  "version": 3,
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "cwd": "/home/user/project"
+}
 ```
 
 ### SessionMessageEntry
@@ -250,18 +262,85 @@ interface SessionMessageEntry extends SessionEntryBase {
 ```
 
 Example (user message):
+
 ```json
-{"type":"message","id":"uuid-1","parentId":null,"timestamp":"2025-01-15T10:30:01.000Z","message":{"role":"user","content":"What files are in the current directory?","timestamp":1705312201000}}
+{
+  "type": "message",
+  "id": "uuid-1",
+  "parentId": null,
+  "timestamp": "2025-01-15T10:30:01.000Z",
+  "message": {
+    "role": "user",
+    "content": "What files are in the current directory?",
+    "timestamp": 1705312201000
+  }
+}
 ```
 
 Example (assistant message):
+
 ```json
-{"type":"message","id":"uuid-2","parentId":"uuid-1","timestamp":"2025-01-15T10:30:02.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Let me check..."},{"type":"toolCall","id":"tc-1","name":"bash","arguments":{"command":"ls -la"}}],"api":"anthropic-messages","provider":"anthropic","model":"claude-sonnet-4-20250514","usage":{"input":100,"output":50,"cacheRead":0,"cacheWrite":0,"totalTokens":150,"cost":{"input":0.001,"output":0.0005,"cacheRead":0,"cacheWrite":0,"total":0.0015}},"stopReason":"toolUse","timestamp":1705312202000}}
+{
+  "type": "message",
+  "id": "uuid-2",
+  "parentId": "uuid-1",
+  "timestamp": "2025-01-15T10:30:02.000Z",
+  "message": {
+    "role": "assistant",
+    "content": [
+      { "type": "text", "text": "Let me check..." },
+      {
+        "type": "toolCall",
+        "id": "tc-1",
+        "name": "bash",
+        "arguments": { "command": "ls -la" }
+      }
+    ],
+    "api": "anthropic-messages",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "usage": {
+      "input": 100,
+      "output": 50,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "totalTokens": 150,
+      "cost": {
+        "input": 0.001,
+        "output": 0.0005,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "total": 0.0015
+      }
+    },
+    "stopReason": "toolUse",
+    "timestamp": 1705312202000
+  }
+}
 ```
 
 Example (tool result):
+
 ```json
-{"type":"message","id":"uuid-3","parentId":"uuid-2","timestamp":"2025-01-15T10:30:03.000Z","message":{"role":"toolResult","toolCallId":"tc-1","toolName":"bash","content":[{"type":"text","text":"total 42\ndrwxr-xr-x  5 user user 4096 Jan 15 10:00 .\n..."}],"isError":false,"timestamp":1705312203000}}
+{
+  "type": "message",
+  "id": "uuid-3",
+  "parentId": "uuid-2",
+  "timestamp": "2025-01-15T10:30:03.000Z",
+  "message": {
+    "role": "toolResult",
+    "toolCallId": "tc-1",
+    "toolName": "bash",
+    "content": [
+      {
+        "type": "text",
+        "text": "total 42\ndrwxr-xr-x  5 user user 4096 Jan 15 10:00 .\n..."
+      }
+    ],
+    "isError": false,
+    "timestamp": 1705312203000
+  }
+}
 ```
 
 ### ModelChangeEntry
@@ -277,8 +356,16 @@ interface ModelChangeEntry extends SessionEntryBase {
 ```
 
 Example:
+
 ```json
-{"type":"model_change","id":"uuid-4","parentId":"uuid-3","timestamp":"2025-01-15T10:31:00.000Z","provider":"openai","modelId":"gpt-4o"}
+{
+  "type": "model_change",
+  "id": "uuid-4",
+  "parentId": "uuid-3",
+  "timestamp": "2025-01-15T10:31:00.000Z",
+  "provider": "openai",
+  "modelId": "gpt-4o"
+}
 ```
 
 ### ThinkingLevelChangeEntry
@@ -293,8 +380,15 @@ interface ThinkingLevelChangeEntry extends SessionEntryBase {
 ```
 
 Example:
+
 ```json
-{"type":"thinking_level_change","id":"uuid-5","parentId":"uuid-4","timestamp":"2025-01-15T10:31:01.000Z","thinkingLevel":"high"}
+{
+  "type": "thinking_level_change",
+  "id": "uuid-5",
+  "parentId": "uuid-4",
+  "timestamp": "2025-01-15T10:31:01.000Z",
+  "thinkingLevel": "high"
+}
 ```
 
 ### CompactionEntry
@@ -305,8 +399,8 @@ Created when context compaction occurs. Stores the summary and metadata.
 interface CompactionEntry<T = unknown> extends SessionEntryBase {
   type: "compaction";
   summary: string;
-  firstKeptEntryId: string;  // UUID of first entry kept after compaction
-  tokensBefore: number;      // Token count before compaction
+  firstKeptEntryId: string; // UUID of first entry kept after compaction
+  tokensBefore: number; // Token count before compaction
   /** Extension-specific data (e.g., file tracking) */
   details?: T;
   /** True if generated by an extension, undefined/false if pi-generated */
@@ -324,8 +418,21 @@ interface CompactionDetails {
 ```
 
 Example:
+
 ```json
-{"type":"compaction","id":"uuid-10","parentId":"uuid-9","timestamp":"2025-01-15T11:00:00.000Z","summary":"## Goal\nImplement user authentication...\n## Progress\n- Created login form...","firstKeptEntryId":"uuid-8","tokensBefore":50000,"details":{"readFiles":["src/auth.ts"],"modifiedFiles":["src/login.tsx","src/api/auth.ts"]}}
+{
+  "type": "compaction",
+  "id": "uuid-10",
+  "parentId": "uuid-9",
+  "timestamp": "2025-01-15T11:00:00.000Z",
+  "summary": "## Goal\nImplement user authentication...\n## Progress\n- Created login form...",
+  "firstKeptEntryId": "uuid-8",
+  "tokensBefore": 50000,
+  "details": {
+    "readFiles": ["src/auth.ts"],
+    "modifiedFiles": ["src/login.tsx", "src/api/auth.ts"]
+  }
+}
 ```
 
 ### BranchSummaryEntry
@@ -335,7 +442,7 @@ Created when navigating the session tree with summarization enabled. Captures co
 ```typescript
 interface BranchSummaryEntry<T = unknown> extends SessionEntryBase {
   type: "branch_summary";
-  fromId: string;       // Entry ID where the branch was abandoned
+  fromId: string; // Entry ID where the branch was abandoned
   summary: string;
   /** Extension-specific data (not sent to LLM) */
   details?: T;
@@ -354,8 +461,17 @@ interface BranchSummaryDetails {
 ```
 
 Example:
+
 ```json
-{"type":"branch_summary","id":"uuid-15","parentId":"uuid-5","timestamp":"2025-01-15T11:30:00.000Z","fromId":"uuid-14","summary":"## Goal\nRefactor database layer...\n## Progress\n- Extracted repository pattern...","details":{"readFiles":["src/db.ts"],"modifiedFiles":["src/repo.ts"]}}
+{
+  "type": "branch_summary",
+  "id": "uuid-15",
+  "parentId": "uuid-5",
+  "timestamp": "2025-01-15T11:30:00.000Z",
+  "fromId": "uuid-14",
+  "summary": "## Goal\nRefactor database layer...\n## Progress\n- Extracted repository pattern...",
+  "details": { "readFiles": ["src/db.ts"], "modifiedFiles": ["src/repo.ts"] }
+}
 ```
 
 ### CustomEntry
@@ -365,14 +481,22 @@ Extension-specific data storage. Does NOT participate in LLM context. Used to pe
 ```typescript
 interface CustomEntry<T = unknown> extends SessionEntryBase {
   type: "custom";
-  customType: string;   // Extension identifier
+  customType: string; // Extension identifier
   data?: T;
 }
 ```
 
 Example:
+
 ```json
-{"type":"custom","id":"uuid-20","parentId":"uuid-19","timestamp":"2025-01-15T12:00:00.000Z","customType":"git-checkpoint","data":{"commitHash":"abc123","branch":"feature/auth"}}
+{
+  "type": "custom",
+  "id": "uuid-20",
+  "parentId": "uuid-19",
+  "timestamp": "2025-01-15T12:00:00.000Z",
+  "customType": "git-checkpoint",
+  "data": { "commitHash": "abc123", "branch": "feature/auth" }
+}
 ```
 
 ### CustomMessageEntry
@@ -384,14 +508,23 @@ interface CustomMessageEntry<T = unknown> extends SessionEntryBase {
   type: "custom_message";
   customType: string;
   content: string | (TextContent | ImageContent)[];
-  details?: T;          // Extension-specific metadata (not sent to LLM)
-  display: boolean;     // true = styled display in TUI, false = hidden
+  details?: T; // Extension-specific metadata (not sent to LLM)
+  display: boolean; // true = styled display in TUI, false = hidden
 }
 ```
 
 Example:
+
 ```json
-{"type":"custom_message","id":"uuid-21","parentId":"uuid-20","timestamp":"2025-01-15T12:01:00.000Z","customType":"context-inject","content":"The user prefers functional programming patterns.","display":false}
+{
+  "type": "custom_message",
+  "id": "uuid-21",
+  "parentId": "uuid-20",
+  "timestamp": "2025-01-15T12:01:00.000Z",
+  "customType": "context-inject",
+  "content": "The user prefers functional programming patterns.",
+  "display": false
+}
 ```
 
 ### LabelEntry
@@ -401,14 +534,22 @@ User-defined bookmark or marker on an entry.
 ```typescript
 interface LabelEntry extends SessionEntryBase {
   type: "label";
-  targetId: string;           // Entry being labeled
-  label: string | undefined;  // Label text, or undefined to clear
+  targetId: string; // Entry being labeled
+  label: string | undefined; // Label text, or undefined to clear
 }
 ```
 
 Example:
+
 ```json
-{"type":"label","id":"uuid-22","parentId":"uuid-21","timestamp":"2025-01-15T12:02:00.000Z","targetId":"uuid-10","label":"checkpoint-before-refactor"}
+{
+  "type": "label",
+  "id": "uuid-22",
+  "parentId": "uuid-21",
+  "timestamp": "2025-01-15T12:02:00.000Z",
+  "targetId": "uuid-10",
+  "label": "checkpoint-before-refactor"
+}
 ```
 
 ### SessionInfoEntry
@@ -423,8 +564,15 @@ interface SessionInfoEntry extends SessionEntryBase {
 ```
 
 Example:
+
 ```json
-{"type":"session_info","id":"uuid-23","parentId":"uuid-22","timestamp":"2025-01-15T12:03:00.000Z","name":"Auth feature implementation"}
+{
+  "type": "session_info",
+  "id": "uuid-23",
+  "parentId": "uuid-22",
+  "timestamp": "2025-01-15T12:03:00.000Z",
+  "name": "Auth feature implementation"
+}
 ```
 
 ## SessionEntry Union
@@ -515,7 +663,9 @@ const sessionEntries = entries.slice(1) as SessionEntry[];
 for (const entry of sessionEntries) {
   switch (entry.type) {
     case "message":
-      console.log(`${entry.message.role}: ${JSON.stringify(entry.message.content).slice(0, 100)}`);
+      console.log(
+        `${entry.message.role}: ${JSON.stringify(entry.message.content).slice(0, 100)}`,
+      );
       break;
     case "compaction":
       console.log(`Compaction: ${entry.tokensBefore} tokens summarized`);
@@ -564,9 +714,9 @@ const allSessions: SessionInfo[] = await SessionManager.listAll(onProgress?);
 interface SessionInfo {
   path: string;
   id: string;
-  cwd: string;                   // Working directory
-  name?: string;                 // User-defined display name
-  parentSessionPath?: string;    // Parent session (if forked)
+  cwd: string; // Working directory
+  name?: string; // User-defined display name
+  parentSessionPath?: string; // Parent session (if forked)
   created: Date;
   modified: Date;
   messageCount: number;
@@ -623,7 +773,7 @@ sm.createBranchedSession(leafId: string): string | undefined;
 interface SessionTreeNode {
   entry: SessionEntry;
   children: SessionTreeNode[];
-  label?: string;        // Resolved label, if any
+  label?: string; // Resolved label, if any
 }
 ```
 

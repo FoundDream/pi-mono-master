@@ -5,31 +5,31 @@
 ## 接口
 
 ```typescript
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 ```
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `name` | `string` | LLM 工具调用中使用的名称（使用 `snake_case`） |
-| `label` | `string` | 人类可读的标签 |
-| `description` | `string` | 给 LLM 的描述，帮助它决定何时使用该工具 |
-| `parameters` | `TObject` | 定义接受参数的 TypeBox Schema |
-| `execute` | `Function` | LLM 调用工具时执行的异步函数 |
+| 字段          | 类型       | 说明                                          |
+| ------------- | ---------- | --------------------------------------------- |
+| `name`        | `string`   | LLM 工具调用中使用的名称（使用 `snake_case`） |
+| `label`       | `string`   | 人类可读的标签                                |
+| `description` | `string`   | 给 LLM 的描述，帮助它决定何时使用该工具       |
+| `parameters`  | `TObject`  | 定义接受参数的 TypeBox Schema                 |
+| `execute`     | `Function` | LLM 调用工具时执行的异步函数                  |
 
 ## Execute 签名
 
 ```typescript
 execute: async (
-  toolCallId: string,          // 此次工具调用的唯一 ID
+  toolCallId: string, // 此次工具调用的唯一 ID
   params: Record<string, any>, // 匹配 Schema 的已解析参数
-  signal?: AbortSignal,        // 用于取消的中止信号
-  onUpdate?: Function,         // 进度更新回调
+  signal?: AbortSignal, // 用于取消的中止信号
+  onUpdate?: Function, // 进度更新回调
 ) => {
   return {
-    content: [{ type: 'text', text: '...' }],
+    content: [{ type: "text", text: "..." }],
     details: {},
-  }
-}
+  };
+};
 ```
 
 ### 返回值
@@ -46,51 +46,52 @@ execute: async (
 工具使用 `@sinclair/typebox`（不是 Zod）定义参数：
 
 ```typescript
-import { Type } from '@sinclair/typebox'
+import { Type } from "@sinclair/typebox";
 
 // 字符串参数
-Type.String({ description: 'City name' })
+Type.String({ description: "City name" });
 
 // 数字参数
-Type.Number({ description: 'Temperature in Celsius' })
+Type.Number({ description: "Temperature in Celsius" });
 
 // 枚举参数
-Type.Union([
-  Type.Literal('celsius'),
-  Type.Literal('fahrenheit'),
-], { description: 'Temperature unit' })
+Type.Union([Type.Literal("celsius"), Type.Literal("fahrenheit")], {
+  description: "Temperature unit",
+});
 
 // 可选参数
-Type.Optional(Type.String({ description: 'Optional note' }))
+Type.Optional(Type.String({ description: "Optional note" }));
 
 // 多字段对象
 Type.Object({
-  city: Type.String({ description: 'City name' }),
-  unit: Type.Optional(Type.String({ description: 'Unit (celsius/fahrenheit)' })),
-})
+  city: Type.String({ description: "City name" }),
+  unit: Type.Optional(
+    Type.String({ description: "Unit (celsius/fahrenheit)" }),
+  ),
+});
 ```
 
 ## 最简示例
 
 ```typescript
-import { Type } from '@sinclair/typebox'
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import { Type } from "@sinclair/typebox";
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 
 const greetTool: ToolDefinition = {
-  name: 'greet',
-  label: 'Greet',
-  description: 'Greet a person by name.',
+  name: "greet",
+  label: "Greet",
+  description: "Greet a person by name.",
   parameters: Type.Object({
-    name: Type.String({ description: 'Person name' }),
+    name: Type.String({ description: "Person name" }),
   }),
   execute: async (_toolCallId, params) => {
-    const { name } = params as { name: string }
+    const { name } = params as { name: string };
     return {
-      content: [{ type: 'text' as const, text: `Hello, ${name}!` }],
+      content: [{ type: "text" as const, text: `Hello, ${name}!` }],
       details: {},
-    }
+    };
   },
-}
+};
 ```
 
 ## 带确认的工具
@@ -99,34 +100,34 @@ const greetTool: ToolDefinition = {
 
 ```typescript
 function createDangerousTool(
-  waitForConfirmation: () => Promise<{ confirmed: boolean }>
+  waitForConfirmation: () => Promise<{ confirmed: boolean }>,
 ): ToolDefinition {
   return {
-    name: 'dangerous_action',
-    label: 'Dangerous Action',
-    description: 'Requires user confirmation before executing.',
+    name: "dangerous_action",
+    label: "Dangerous Action",
+    description: "Requires user confirmation before executing.",
     parameters: Type.Object({
-      action: Type.String({ description: 'Action to perform' }),
+      action: Type.String({ description: "Action to perform" }),
     }),
     execute: async (_toolCallId, params) => {
-      const { action } = params as { action: string }
+      const { action } = params as { action: string };
 
-      console.log(`⚠️  确认: ${action} [y/N]`)
-      const { confirmed } = await waitForConfirmation()
+      console.log(`⚠️  确认: ${action} [y/N]`);
+      const { confirmed } = await waitForConfirmation();
 
       if (!confirmed) {
         return {
-          content: [{ type: 'text' as const, text: 'Cancelled by user.' }],
+          content: [{ type: "text" as const, text: "Cancelled by user." }],
           details: {},
-        }
+        };
       }
 
       return {
-        content: [{ type: 'text' as const, text: `Done: ${action}` }],
+        content: [{ type: "text" as const, text: `Done: ${action}` }],
         details: {},
-      }
+      };
     },
-  }
+  };
 }
 ```
 
@@ -152,13 +153,13 @@ const { session } = await createAgentSession({
 
 ```typescript
 session.subscribe((event) => {
-  if (event.type === 'tool_execution_start') {
-    console.log(`🔧 ${event.toolName}(${JSON.stringify(event.args)})`)
+  if (event.type === "tool_execution_start") {
+    console.log(`🔧 ${event.toolName}(${JSON.stringify(event.args)})`);
   }
-  if (event.type === 'tool_execution_end') {
-    console.log(`✅ 结果: ${JSON.stringify(event.result)}`)
+  if (event.type === "tool_execution_end") {
+    console.log(`✅ 结果: ${JSON.stringify(event.result)}`);
   }
-})
+});
 ```
 
 详见 [第 03 章：自定义工具](/zh/guide/03-custom-tools)。

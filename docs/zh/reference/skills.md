@@ -8,11 +8,11 @@
 
 ## 加载位置
 
-| 位置 | 作用域 | 说明 |
-|------|--------|------|
-| `~/.pi/agent/skills/` | 全局 | 所有项目可用 |
-| `.pi/skills/` | 项目级 | 仅当前项目可用 |
-| 包中的技能 | 依赖包 | 通过 `pi install` 安装的包 |
+| 位置                  | 作用域 | 说明                       |
+| --------------------- | ------ | -------------------------- |
+| `~/.pi/agent/skills/` | 全局   | 所有项目可用               |
+| `.pi/skills/`         | 项目级 | 仅当前项目可用             |
+| 包中的技能            | 依赖包 | 通过 `pi install` 安装的包 |
 
 ## 渐进式披露
 
@@ -62,16 +62,16 @@ When asked to review code, follow these guidelines:
 2. Verify error handling
 3. Review naming conventions
 4. Assess test coverage
-...
+   ...
 ```
 
 ### Frontmatter 字段
 
-| 字段 | 类型 | 必需 | 说明 |
-|------|------|------|------|
-| `name` | string | 否 | 技能名称（默认使用文件名或目录名） |
-| `description` | string | 是 | 技能的简要描述，用于发现阶段 |
-| `triggers` | string[] | 否 | 触发词列表，帮助 Pi 判断何时激活该技能 |
+| 字段          | 类型     | 必需 | 说明                                   |
+| ------------- | -------- | ---- | -------------------------------------- |
+| `name`        | string   | 否   | 技能名称（默认使用文件名或目录名）     |
+| `description` | string   | 是   | 技能的简要描述，用于发现阶段           |
+| `triggers`    | string[] | 否   | 触发词列表，帮助 Pi 判断何时激活该技能 |
 
 ## 访问方式
 

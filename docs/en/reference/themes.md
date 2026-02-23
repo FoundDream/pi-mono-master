@@ -6,13 +6,13 @@ Pi supports fully customizable color themes. Themes control every color in the t
 
 Themes are loaded from multiple locations, in order of precedence (later wins):
 
-| Source | Location | Description |
-|--------|----------|-------------|
-| Built-in | Bundled with Pi | Default `dark` and `light` themes |
-| Global | `~/.pi/agent/themes/` | User-wide custom themes |
-| Project | `.pi/themes/` | Project-specific themes |
-| Packages | `themes` field in package | Themes from installed packages |
-| CLI | `--theme <path>` | Load a theme file from any path |
+| Source   | Location                  | Description                       |
+| -------- | ------------------------- | --------------------------------- |
+| Built-in | Bundled with Pi           | Default `dark` and `light` themes |
+| Global   | `~/.pi/agent/themes/`     | User-wide custom themes           |
+| Project  | `.pi/themes/`             | Project-specific themes           |
+| Packages | `themes` field in package | Themes from installed packages    |
+| CLI      | `--theme <path>`          | Load a theme file from any path   |
 
 Set the active theme in settings:
 
@@ -49,100 +49,100 @@ The `vars` object defines reusable color variables. The `colors` object maps col
 
 ### Core UI (11 tokens)
 
-| Token | Description |
-|-------|-------------|
-| `text` | Primary text color |
-| `textMuted` | Secondary/dimmed text |
-| `textInverse` | Text on inverted backgrounds |
-| `border` | Default border color |
-| `borderFocused` | Focused element border |
-| `background` | Main background |
-| `backgroundHover` | Hovered element background |
-| `backgroundSelected` | Selected element background |
-| `primary` | Primary accent color |
-| `primaryHover` | Primary accent hover state |
-| `error` | Error text and indicators |
+| Token                | Description                  |
+| -------------------- | ---------------------------- |
+| `text`               | Primary text color           |
+| `textMuted`          | Secondary/dimmed text        |
+| `textInverse`        | Text on inverted backgrounds |
+| `border`             | Default border color         |
+| `borderFocused`      | Focused element border       |
+| `background`         | Main background              |
+| `backgroundHover`    | Hovered element background   |
+| `backgroundSelected` | Selected element background  |
+| `primary`            | Primary accent color         |
+| `primaryHover`       | Primary accent hover state   |
+| `error`              | Error text and indicators    |
 
 ### Backgrounds & Content (11 tokens)
 
-| Token | Description |
-|-------|-------------|
-| `headerText` | Header text color |
-| `headerBorder` | Header border color |
-| `inputText` | Input field text |
-| `inputPlaceholder` | Input placeholder text |
-| `inputBorder` | Input field border |
-| `inputBackground` | Input field background |
-| `autocompleteText` | Autocomplete suggestion text |
-| `autocompleteSelected` | Selected autocomplete item |
-| `scrollbarThumb` | Scrollbar thumb color |
-| `scrollbarTrack` | Scrollbar track color |
-| `badge` | Badge/tag color |
+| Token                  | Description                  |
+| ---------------------- | ---------------------------- |
+| `headerText`           | Header text color            |
+| `headerBorder`         | Header border color          |
+| `inputText`            | Input field text             |
+| `inputPlaceholder`     | Input placeholder text       |
+| `inputBorder`          | Input field border           |
+| `inputBackground`      | Input field background       |
+| `autocompleteText`     | Autocomplete suggestion text |
+| `autocompleteSelected` | Selected autocomplete item   |
+| `scrollbarThumb`       | Scrollbar thumb color        |
+| `scrollbarTrack`       | Scrollbar track color        |
+| `badge`                | Badge/tag color              |
 
 ### Markdown (10 tokens)
 
-| Token | Description |
-|-------|-------------|
-| `markdownHeading` | Heading text |
-| `markdownBold` | Bold text |
-| `markdownItalic` | Italic text |
-| `markdownCode` | Inline code |
-| `markdownCodeBackground` | Code block background |
-| `markdownLink` | Link text |
-| `markdownLinkHover` | Link hover state |
-| `markdownBlockquote` | Blockquote text |
-| `markdownBlockquoteBorder` | Blockquote border |
-| `markdownListMarker` | List bullet/number |
+| Token                      | Description           |
+| -------------------------- | --------------------- |
+| `markdownHeading`          | Heading text          |
+| `markdownBold`             | Bold text             |
+| `markdownItalic`           | Italic text           |
+| `markdownCode`             | Inline code           |
+| `markdownCodeBackground`   | Code block background |
+| `markdownLink`             | Link text             |
+| `markdownLinkHover`        | Link hover state      |
+| `markdownBlockquote`       | Blockquote text       |
+| `markdownBlockquoteBorder` | Blockquote border     |
+| `markdownListMarker`       | List bullet/number    |
 
 ### Tool Diffs (3 tokens)
 
-| Token | Description |
-|-------|-------------|
-| `diffAdded` | Added line background |
+| Token         | Description             |
+| ------------- | ----------------------- |
+| `diffAdded`   | Added line background   |
 | `diffRemoved` | Removed line background |
 | `diffContext` | Context line background |
 
 ### Syntax Highlighting (9 tokens)
 
-| Token | Description |
-|-------|-------------|
-| `syntaxKeyword` | Keywords (`if`, `return`, `function`) |
-| `syntaxString` | String literals |
-| `syntaxNumber` | Number literals |
-| `syntaxComment` | Comments |
-| `syntaxFunction` | Function names |
-| `syntaxVariable` | Variable names |
-| `syntaxOperator` | Operators |
-| `syntaxType` | Type names |
-| `syntaxPunctuation` | Punctuation and brackets |
+| Token               | Description                           |
+| ------------------- | ------------------------------------- |
+| `syntaxKeyword`     | Keywords (`if`, `return`, `function`) |
+| `syntaxString`      | String literals                       |
+| `syntaxNumber`      | Number literals                       |
+| `syntaxComment`     | Comments                              |
+| `syntaxFunction`    | Function names                        |
+| `syntaxVariable`    | Variable names                        |
+| `syntaxOperator`    | Operators                             |
+| `syntaxType`        | Type names                            |
+| `syntaxPunctuation` | Punctuation and brackets              |
 
 ### Thinking Levels (6 tokens)
 
-| Token | Description |
-|-------|-------------|
-| `thinkingOff` | Thinking off indicator |
-| `thinkingMinimal` | Minimal thinking indicator |
-| `thinkingLow` | Low thinking indicator |
-| `thinkingMedium` | Medium thinking indicator |
-| `thinkingHigh` | High thinking indicator |
-| `thinkingXhigh` | Extra-high thinking indicator |
+| Token             | Description                   |
+| ----------------- | ----------------------------- |
+| `thinkingOff`     | Thinking off indicator        |
+| `thinkingMinimal` | Minimal thinking indicator    |
+| `thinkingLow`     | Low thinking indicator        |
+| `thinkingMedium`  | Medium thinking indicator     |
+| `thinkingHigh`    | High thinking indicator       |
+| `thinkingXhigh`   | Extra-high thinking indicator |
 
 ### Bash Mode (1 token)
 
-| Token | Description |
-|-------|-------------|
+| Token               | Description                |
+| ------------------- | -------------------------- |
 | `bashModeIndicator` | Bash mode active indicator |
 
 ## Color Formats
 
 Color values support four formats:
 
-| Format | Example | Description |
-|--------|---------|-------------|
-| Hex | `"#7c3aed"` | Standard hex color (3, 6, or 8 digits) |
-| Xterm 256 | `"141"` | Xterm 256-color palette index (as string) |
-| Variable reference | `"$primary"` | References a `vars` value |
-| Empty string | `""` | Inherit / use terminal default |
+| Format             | Example      | Description                               |
+| ------------------ | ------------ | ----------------------------------------- |
+| Hex                | `"#7c3aed"`  | Standard hex color (3, 6, or 8 digits)    |
+| Xterm 256          | `"141"`      | Xterm 256-color palette index (as string) |
+| Variable reference | `"$primary"` | References a `vars` value                 |
+| Empty string       | `""`         | Inherit / use terminal default            |
 
 Variable references allow you to define a color once in `vars` and reuse it across multiple tokens:
 

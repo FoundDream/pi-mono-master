@@ -21,11 +21,11 @@ interface Component {
 
 ### 方法说明
 
-| 方法 | 说明 |
-|------|------|
-| `render(width)` | 接收可用宽度，返回渲染后的行数组 |
-| `handleInput(input)` | 处理键盘事件，返回是否已消费该事件 |
-| `invalidate()` | 标记组件为脏状态，触发下一帧重新渲染 |
+| 方法                 | 说明                                 |
+| -------------------- | ------------------------------------ |
+| `render(width)`      | 接收可用宽度，返回渲染后的行数组     |
+| `handleInput(input)` | 处理键盘事件，返回是否已消费该事件   |
+| `invalidate()`       | 标记组件为脏状态，触发下一帧重新渲染 |
 
 ## 行宽要求
 
@@ -51,20 +51,20 @@ Pi 的 TUI 支持输入法编辑器 (IME)，可以正确处理中文、日文、
 
 Pi 提供以下内置 TUI 组件：
 
-| 组件 | 说明 |
-|------|------|
-| `TextInput` | 单行文本输入，支持光标移动和编辑 |
-| `TextArea` | 多行文本编辑器，支持滚动 |
-| `Select` | 单选下拉菜单 |
-| `MultiSelect` | 多选列表 |
-| `Confirm` | 确认对话框（是/否） |
-| `Spinner` | 加载动画指示器 |
-| `Progress` | 进度条 |
-| `Table` | 表格展示 |
-| `Tree` | 树形结构展示 |
-| `Markdown` | Markdown 渲染 |
-| `Diff` | 差异对比展示 |
-| `CodeBlock` | 代码块，支持语法高亮 |
+| 组件          | 说明                             |
+| ------------- | -------------------------------- |
+| `TextInput`   | 单行文本输入，支持光标移动和编辑 |
+| `TextArea`    | 多行文本编辑器，支持滚动         |
+| `Select`      | 单选下拉菜单                     |
+| `MultiSelect` | 多选列表                         |
+| `Confirm`     | 确认对话框（是/否）              |
+| `Spinner`     | 加载动画指示器                   |
+| `Progress`    | 进度条                           |
+| `Table`       | 表格展示                         |
+| `Tree`        | 树形结构展示                     |
+| `Markdown`    | Markdown 渲染                    |
+| `Diff`        | 差异对比展示                     |
+| `CodeBlock`   | 代码块，支持语法高亮             |
 
 ## 在扩展和工具中使用
 
@@ -89,9 +89,7 @@ ctx.registerTool({
     });
 
     return {
-      content: [
-        { type: "text", text: `Created ${name} with ${framework}` },
-      ],
+      content: [{ type: "text", text: `Created ${name} with ${framework}` }],
     };
   },
 });
@@ -143,12 +141,12 @@ handleInput(input: InputEvent): InputResult {
 
 ### 修饰键
 
-| 修饰键 | 属性 |
-|--------|------|
-| Shift | `input.shift` |
-| Ctrl | `input.ctrl` |
-| Alt/Option | `input.alt` |
-| Meta/Cmd | `input.meta` |
+| 修饰键     | 属性          |
+| ---------- | ------------- |
+| Shift      | `input.shift` |
+| Ctrl       | `input.ctrl`  |
+| Alt/Option | `input.alt`   |
+| Meta/Cmd   | `input.meta`  |
 
 ## 性能
 

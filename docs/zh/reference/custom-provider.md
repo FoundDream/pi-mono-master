@@ -68,11 +68,11 @@
 
 `apiKey` 和 `headers` 的值支持三种格式：
 
-| 格式 | 示例 | 说明 |
-|------|------|------|
+| 格式       | 示例                        | 说明                                      |
+| ---------- | --------------------------- | ----------------------------------------- |
 | Shell 命令 | `"!op read op://vault/key"` | 执行命令，使用 stdout 输出（以 `!` 前缀） |
-| 环境变量 | `"$MY_API_KEY"` | 从环境变量读取（以 `$` 前缀） |
-| 字面值 | `"sk-abc123"` | 直接使用 |
+| 环境变量   | `"$MY_API_KEY"`             | 从环境变量读取（以 `$` 前缀）             |
+| 字面值     | `"sk-abc123"`               | 直接使用                                  |
 
 ## 注册新 Provider
 
@@ -117,18 +117,18 @@
 
 Pi 支持以下 API 类型：
 
-| API 类型 | 说明 |
-|----------|------|
-| `openai-completions` | OpenAI Chat Completions API |
-| `openai-responses` | OpenAI Responses API |
-| `anthropic-messages` | Anthropic Messages API |
+| API 类型               | 说明                             |
+| ---------------------- | -------------------------------- |
+| `openai-completions`   | OpenAI Chat Completions API      |
+| `openai-responses`     | OpenAI Responses API             |
+| `anthropic-messages`   | Anthropic Messages API           |
 | `google-generative-ai` | Google Generative AI (AI Studio) |
-| `bedrock-anthropic` | AWS Bedrock Anthropic |
-| `bedrock-openai` | AWS Bedrock OpenAI 兼容 |
-| `vertex-anthropic` | Google Vertex AI Anthropic |
-| `vertex-google` | Google Vertex AI 原生 |
-| `azure-openai` | Azure OpenAI Service |
-| `mistral` | Mistral AI API |
+| `bedrock-anthropic`    | AWS Bedrock Anthropic            |
+| `bedrock-openai`       | AWS Bedrock OpenAI 兼容          |
+| `vertex-anthropic`     | Google Vertex AI Anthropic       |
+| `vertex-google`        | Google Vertex AI 原生            |
+| `azure-openai`         | Azure OpenAI Service             |
+| `mistral`              | Mistral AI API                   |
 
 ## Compat 选项
 
@@ -160,15 +160,15 @@ Pi 支持以下 API 类型：
 
 ### Compat 标志
 
-| 标志 | 默认值 | 说明 |
-|------|--------|------|
-| `disableStreaming` | `false` | 回退到非流式请求 |
-| `disableTools` | `false` | 从请求中移除工具定义 |
-| `disableSystemMessages` | `false` | 将系统消息转换为用户消息 |
-| `disableVision` | `false` | 从消息中剥离图片内容 |
-| `forceSimpleToolResults` | `false` | 简化工具结果格式以增强兼容性 |
-| `skipProviderMetadata` | `false` | 跳过解析 Provider 特有的元数据 |
-| `forceMaxTokens` | `false` | 在请求中始终包含 `max_tokens` |
+| 标志                     | 默认值  | 说明                           |
+| ------------------------ | ------- | ------------------------------ |
+| `disableStreaming`       | `false` | 回退到非流式请求               |
+| `disableTools`           | `false` | 从请求中移除工具定义           |
+| `disableSystemMessages`  | `false` | 将系统消息转换为用户消息       |
+| `disableVision`          | `false` | 从消息中剥离图片内容           |
+| `forceSimpleToolResults` | `false` | 简化工具结果格式以增强兼容性   |
+| `skipProviderMetadata`   | `false` | 跳过解析 Provider 特有的元数据 |
+| `forceMaxTokens`         | `false` | 在请求中始终包含 `max_tokens`  |
 
 ## OAuth 支持
 

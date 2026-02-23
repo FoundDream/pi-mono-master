@@ -10,13 +10,13 @@ A skill teaches Pi how to perform a specific task or work with a specific techno
 
 Skills are discovered from multiple locations:
 
-| Location | Scope | Description |
-|----------|-------|-------------|
-| `~/.pi/agent/skills/` | Global | Available in all projects |
-| `.pi/skills/` | Project | Project-specific skills |
-| npm packages | Any | Skills from installed packages |
-| Settings `skills` array | Any | Paths specified in settings |
-| CLI `--skill` flag | Session | Load a skill for the current session |
+| Location                | Scope   | Description                          |
+| ----------------------- | ------- | ------------------------------------ |
+| `~/.pi/agent/skills/`   | Global  | Available in all projects            |
+| `.pi/skills/`           | Project | Project-specific skills              |
+| npm packages            | Any     | Skills from installed packages       |
+| Settings `skills` array | Any     | Paths specified in settings          |
+| CLI `--skill` flag      | Session | Load a skill for the current session |
 
 ## Progressive Disclosure
 
@@ -39,22 +39,26 @@ description: Build, run, and manage Docker containers and Compose stacks
 # Docker Skill
 
 ## When to Use
+
 Use this skill when the user asks about Docker containers, images, Compose files, or container orchestration.
 
 ## Instructions
 
 ### Building Images
+
 - Always use multi-stage builds for production images
 - Pin base image versions (e.g., `node:20-slim`, not `node:latest`)
 - Place frequently changing layers last for better caching
-...
+  ...
 
 ### Docker Compose
+
 - Use `docker compose` (v2), not `docker-compose` (v1)
 - Define health checks for all services
-...
+  ...
 
 ### Common Patterns
+
 \`\`\`dockerfile
 FROM node:20-slim AS builder
 WORKDIR /app
@@ -72,10 +76,10 @@ CMD ["node", "dist/index.js"]
 
 ### Frontmatter Requirements
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Unique skill identifier (used in commands and references) |
-| `description` | Yes | Short description (1-2 sentences) shown in skill list |
+| Field         | Required | Description                                               |
+| ------------- | -------- | --------------------------------------------------------- |
+| `name`        | Yes      | Unique skill identifier (used in commands and references) |
+| `description` | Yes      | Short description (1-2 sentences) shown in skill list     |
 
 The `name` field must be unique across all loaded skills. The `description` is always present in the model's context as part of the available skills list.
 
@@ -107,10 +111,7 @@ Pre-load skills via settings:
 
 ```json
 {
-  "skills": [
-    "~/.pi/agent/skills/docker",
-    "./project-skills/api-guidelines"
-  ]
+  "skills": ["~/.pi/agent/skills/docker", "./project-skills/api-guidelines"]
 }
 ```
 

@@ -21,11 +21,13 @@ pi install /absolute/path/to/package
 By default, installs go to global settings. Use `-l` for project-level (`.pi/settings.json`).
 
 **Temporary testing:**
+
 ```bash
 pi -e npm:@foo/bar
 ```
 
 **Management:**
+
 ```bash
 pi remove npm:@foo/bar
 pi list
@@ -35,12 +37,15 @@ pi update
 ## Package Sources
 
 ### npm
+
 Format: `npm:@scope/pkg@1.2.3`. Versioned specs prevent updates. Global installs use `-g`, project installs go to `.pi/npm/`.
 
 ### Git
+
 Formats: `git:github.com/user/repo@v1`, HTTPS, SSH, `git://`. Cloned to `~/.pi/agent/git/<host>/<path>` (global) or `.pi/git/<host>/<path>` (project).
 
 ### Local Paths
+
 Reference disk files directly. No copying.
 
 ## Creating Packages
@@ -60,12 +65,14 @@ Reference disk files directly. No copying.
 Paths support glob patterns and `!exclusions`. Include `pi-package` keyword for gallery visibility.
 
 Gallery metadata:
+
 - `video`: MP4
 - `image`: PNG, JPEG, GIF, WebP
 
 ## Auto-Discovery
 
 Without explicit manifest:
+
 - `extensions/` → `.ts` and `.js` files
 - `skills/` → `SKILL.md` folders and top-level `.md` files
 - `prompts/` → `.md` files

@@ -51,24 +51,24 @@ export ANTHROPIC_API_KEY=sk-ant-...
 pi
 ```
 
-| Provider | 环境变量 | `auth.json` 键名 |
-|----------|---------|-------------------|
-| Anthropic | `ANTHROPIC_API_KEY` | `anthropic` |
+| Provider               | 环境变量               | `auth.json` 键名         |
+| ---------------------- | ---------------------- | ------------------------ |
+| Anthropic              | `ANTHROPIC_API_KEY`    | `anthropic`              |
 | Azure OpenAI Responses | `AZURE_OPENAI_API_KEY` | `azure-openai-responses` |
-| OpenAI | `OPENAI_API_KEY` | `openai` |
-| Google Gemini | `GEMINI_API_KEY` | `google` |
-| Mistral | `MISTRAL_API_KEY` | `mistral` |
-| Groq | `GROQ_API_KEY` | `groq` |
-| Cerebras | `CEREBRAS_API_KEY` | `cerebras` |
-| xAI | `XAI_API_KEY` | `xai` |
-| OpenRouter | `OPENROUTER_API_KEY` | `openrouter` |
-| Vercel AI Gateway | `AI_GATEWAY_API_KEY` | `vercel-ai-gateway` |
-| ZAI | `ZAI_API_KEY` | `zai` |
-| OpenCode Zen | `OPENCODE_API_KEY` | `opencode` |
-| Hugging Face | `HF_TOKEN` | `huggingface` |
-| Kimi For Coding | `KIMI_API_KEY` | `kimi-coding` |
-| MiniMax | `MINIMAX_API_KEY` | `minimax` |
-| MiniMax（中国区） | `MINIMAX_CN_API_KEY` | `minimax-cn` |
+| OpenAI                 | `OPENAI_API_KEY`       | `openai`                 |
+| Google Gemini          | `GEMINI_API_KEY`       | `google`                 |
+| Mistral                | `MISTRAL_API_KEY`      | `mistral`                |
+| Groq                   | `GROQ_API_KEY`         | `groq`                   |
+| Cerebras               | `CEREBRAS_API_KEY`     | `cerebras`               |
+| xAI                    | `XAI_API_KEY`          | `xai`                    |
+| OpenRouter             | `OPENROUTER_API_KEY`   | `openrouter`             |
+| Vercel AI Gateway      | `AI_GATEWAY_API_KEY`   | `vercel-ai-gateway`      |
+| ZAI                    | `ZAI_API_KEY`          | `zai`                    |
+| OpenCode Zen           | `OPENCODE_API_KEY`     | `opencode`               |
+| Hugging Face           | `HF_TOKEN`             | `huggingface`            |
+| Kimi For Coding        | `KIMI_API_KEY`         | `kimi-coding`            |
+| MiniMax                | `MINIMAX_API_KEY`      | `minimax`                |
+| MiniMax（中国区）      | `MINIMAX_CN_API_KEY`   | `minimax-cn`             |
 
 ### 认证文件
 

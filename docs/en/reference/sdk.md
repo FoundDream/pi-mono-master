@@ -15,7 +15,12 @@ npm install @mariozechner/pi-coding-agent
 ## Quick Start
 
 ```typescript
-import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "@mariozechner/pi-coding-agent";
+import {
+  AuthStorage,
+  createAgentSession,
+  ModelRegistry,
+  SessionManager,
+} from "@mariozechner/pi-coding-agent";
 
 const authStorage = AuthStorage.create();
 const modelRegistry = new ModelRegistry(authStorage);
@@ -27,7 +32,10 @@ const { session } = await createAgentSession({
 });
 
 session.subscribe((event) => {
-  if (event.type === "message_update" && event.assistantMessageEvent.type === "text_delta") {
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
     process.stdout.write(event.assistantMessageEvent.delta);
   }
 });
@@ -83,19 +91,19 @@ interface CreateAgentSessionResult {
 
 Core capabilities:
 
-| Category | Methods | Description |
-|----------|---------|-------------|
-| Messaging | `prompt()`, `steer()`, `followUp()` | Send instructions to the agent |
-| Custom Messages | `sendCustomMessage()`, `sendUserMessage()` | Inject custom or user messages |
-| Events | `subscribe()` | Receive streaming output and lifecycle notifications |
-| Model Control | `setModel()`, `cycleModel()`, `setThinkingLevel()`, `cycleThinkingLevel()` | Switch models and thinking |
-| State | `state`, `messages`, `isStreaming`, `model`, `thinkingLevel` | Access conversation data |
-| Tools | `getActiveToolNames()`, `getAllTools()`, `setActiveToolsByName()` | Manage active tools |
-| Queue | `clearQueue()`, `pendingMessageCount`, `getSteeringMessages()`, `getFollowUpMessages()` | Manage message queues |
-| Session | `newSession()`, `switchSession()`, `fork()`, `navigateTree()` | Manage session lifecycle |
-| Compaction | `compact()`, `abortCompaction()`, `setAutoCompactionEnabled()` | Context compaction |
-| Bash | `executeBash()`, `abortBash()` | Execute shell commands |
-| Lifecycle | `abort()`, `dispose()`, `reload()` | Control agent lifecycle |
+| Category        | Methods                                                                                 | Description                                          |
+| --------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Messaging       | `prompt()`, `steer()`, `followUp()`                                                     | Send instructions to the agent                       |
+| Custom Messages | `sendCustomMessage()`, `sendUserMessage()`                                              | Inject custom or user messages                       |
+| Events          | `subscribe()`                                                                           | Receive streaming output and lifecycle notifications |
+| Model Control   | `setModel()`, `cycleModel()`, `setThinkingLevel()`, `cycleThinkingLevel()`              | Switch models and thinking                           |
+| State           | `state`, `messages`, `isStreaming`, `model`, `thinkingLevel`                            | Access conversation data                             |
+| Tools           | `getActiveToolNames()`, `getAllTools()`, `setActiveToolsByName()`                       | Manage active tools                                  |
+| Queue           | `clearQueue()`, `pendingMessageCount`, `getSteeringMessages()`, `getFollowUpMessages()` | Manage message queues                                |
+| Session         | `newSession()`, `switchSession()`, `fork()`, `navigateTree()`                           | Manage session lifecycle                             |
+| Compaction      | `compact()`, `abortCompaction()`, `setAutoCompactionEnabled()`                          | Context compaction                                   |
+| Bash            | `executeBash()`, `abortBash()`                                                          | Execute shell commands                               |
+| Lifecycle       | `abort()`, `dispose()`, `reload()`                                                      | Control agent lifecycle                              |
 
 ### Prompting Behavior
 
@@ -129,30 +137,72 @@ type AgentSessionEvent =
   | { type: "agent_start" }
   | { type: "agent_end"; messages: AgentMessage[] }
   | { type: "turn_start" }
-  | { type: "turn_end"; message: AgentMessage; toolResults: ToolResultMessage[] }
+  | {
+      type: "turn_end";
+      message: AgentMessage;
+      toolResults: ToolResultMessage[];
+    }
   | { type: "message_start"; message: AgentMessage }
-  | { type: "message_update"; message: AgentMessage; assistantMessageEvent: AssistantMessageEvent }
+  | {
+      type: "message_update";
+      message: AgentMessage;
+      assistantMessageEvent: AssistantMessageEvent;
+    }
   | { type: "message_end"; message: AgentMessage }
-  | { type: "tool_execution_start"; toolCallId: string; toolName: string; args: any }
-  | { type: "tool_execution_update"; toolCallId: string; toolName: string; args: any; partialResult: any }
-  | { type: "tool_execution_end"; toolCallId: string; toolName: string; result: any; isError: boolean }
+  | {
+      type: "tool_execution_start";
+      toolCallId: string;
+      toolName: string;
+      args: any;
+    }
+  | {
+      type: "tool_execution_update";
+      toolCallId: string;
+      toolName: string;
+      args: any;
+      partialResult: any;
+    }
+  | {
+      type: "tool_execution_end";
+      toolCallId: string;
+      toolName: string;
+      result: any;
+      isError: boolean;
+    }
   // Session-specific events
   | { type: "auto_compaction_start"; reason: "threshold" | "overflow" }
-  | { type: "auto_compaction_end"; result: CompactionResult | undefined; aborted: boolean; willRetry: boolean; errorMessage?: string }
-  | { type: "auto_retry_start"; attempt: number; maxAttempts: number; delayMs: number; errorMessage: string }
-  | { type: "auto_retry_end"; success: boolean; attempt: number; finalError?: string };
+  | {
+      type: "auto_compaction_end";
+      result: CompactionResult | undefined;
+      aborted: boolean;
+      willRetry: boolean;
+      errorMessage?: string;
+    }
+  | {
+      type: "auto_retry_start";
+      attempt: number;
+      maxAttempts: number;
+      delayMs: number;
+      errorMessage: string;
+    }
+  | {
+      type: "auto_retry_end";
+      success: boolean;
+      attempt: number;
+      finalError?: string;
+    };
 ```
 
 The `AssistantMessageEvent` provides fine-grained streaming deltas:
 
-| Event Type | Description |
-|-----------|-------------|
-| `start` | Assistant message streaming begins |
-| `text_start` / `text_delta` / `text_end` | Text content streaming |
-| `thinking_start` / `thinking_delta` / `thinking_end` | Thinking/reasoning streaming |
-| `toolcall_start` / `toolcall_delta` / `toolcall_end` | Tool call streaming |
-| `done` | Message complete (stop reason: `stop`, `length`, or `toolUse`) |
-| `error` | Message errored (stop reason: `aborted` or `error`) |
+| Event Type                                           | Description                                                    |
+| ---------------------------------------------------- | -------------------------------------------------------------- |
+| `start`                                              | Assistant message streaming begins                             |
+| `text_start` / `text_delta` / `text_end`             | Text content streaming                                         |
+| `thinking_start` / `thinking_delta` / `thinking_end` | Thinking/reasoning streaming                                   |
+| `toolcall_start` / `toolcall_delta` / `toolcall_end` | Tool call streaming                                            |
+| `done`                                               | Message complete (stop reason: `stop`, `length`, or `toolUse`) |
+| `error`                                              | Message errored (stop reason: `aborted` or `error`)            |
 
 ## Configuration
 
@@ -187,7 +237,12 @@ session.setThinkingLevel("high");
 Use factory functions when specifying custom `cwd` with explicit tools:
 
 ```typescript
-import { createCodingTools, createReadOnlyTools, createReadTool, createBashTool } from "@mariozechner/pi-coding-agent";
+import {
+  createCodingTools,
+  createReadOnlyTools,
+  createReadTool,
+  createBashTool,
+} from "@mariozechner/pi-coding-agent";
 
 const cwd = "/path/to/project";
 
@@ -206,19 +261,19 @@ const { session: readOnlySession } = await createAgentSession({
 
 Available tool sets and factory functions:
 
-| Export | Tools Included | Description |
-|--------|---------------|-------------|
-| `codingTools` | read, bash, edit, write | Default tool set |
-| `readOnlyTools` | read, grep, find, ls | Safe read-only access |
-| `createCodingTools(cwd)` | read, bash, edit, write | With custom working directory |
-| `createReadOnlyTools(cwd)` | read, grep, find, ls | With custom working directory |
-| `createReadTool(cwd)` | read | Individual tool factory |
-| `createBashTool(cwd)` | bash | Individual tool factory |
-| `createEditTool(cwd)` | edit | Individual tool factory |
-| `createWriteTool(cwd)` | write | Individual tool factory |
-| `createGrepTool(cwd)` | grep | Individual tool factory |
-| `createFindTool(cwd)` | find | Individual tool factory |
-| `createLsTool(cwd)` | ls | Individual tool factory |
+| Export                     | Tools Included          | Description                   |
+| -------------------------- | ----------------------- | ----------------------------- |
+| `codingTools`              | read, bash, edit, write | Default tool set              |
+| `readOnlyTools`            | read, grep, find, ls    | Safe read-only access         |
+| `createCodingTools(cwd)`   | read, bash, edit, write | With custom working directory |
+| `createReadOnlyTools(cwd)` | read, grep, find, ls    | With custom working directory |
+| `createReadTool(cwd)`      | read                    | Individual tool factory       |
+| `createBashTool(cwd)`      | bash                    | Individual tool factory       |
+| `createEditTool(cwd)`      | edit                    | Individual tool factory       |
+| `createWriteTool(cwd)`     | write                   | Individual tool factory       |
+| `createGrepTool(cwd)`      | grep                    | Individual tool factory       |
+| `createFindTool(cwd)`      | find                    | Individual tool factory       |
+| `createLsTool(cwd)`        | ls                      | Individual tool factory       |
 
 ### Custom Tools
 
@@ -245,12 +300,18 @@ const { session } = await createAgentSession({
 ```typescript
 const loader = new DefaultResourceLoader({
   additionalExtensionPaths: ["/path/to/extension.ts"],
-  extensionFactories: [(pi) => {
-    pi.on("agent_start", () => console.log("Agent starting"));
-    pi.on("turn_end", (event) => {
-      console.log("Turn ended with", event.toolResults.length, "tool results");
-    });
-  }],
+  extensionFactories: [
+    (pi) => {
+      pi.on("agent_start", () => console.log("Agent starting"));
+      pi.on("turn_end", (event) => {
+        console.log(
+          "Turn ended with",
+          event.toolResults.length,
+          "tool results",
+        );
+      });
+    },
+  ],
 });
 ```
 
@@ -283,6 +344,7 @@ const allSessions = await SessionManager.listAll();
 ### Authentication
 
 Priority order:
+
 1. Runtime overrides via `authStorage.setRuntimeApiKey()`
 2. Stored credentials in `auth.json`
 3. Environment variables

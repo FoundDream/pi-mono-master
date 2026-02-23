@@ -42,8 +42,8 @@ interface TextContent {
 
 interface ImageContent {
   type: "image";
-  data: string;      // base64 编码
-  mimeType: string;  // 例如 "image/jpeg"、"image/png"
+  data: string; // base64 编码
+  mimeType: string; // 例如 "image/jpeg"、"image/png"
 }
 
 interface ThinkingContent {
@@ -65,7 +65,7 @@ interface ToolCall {
 interface UserMessage {
   role: "user";
   content: string | (TextContent | ImageContent)[];
-  timestamp: number;  // Unix 毫秒
+  timestamp: number; // Unix 毫秒
 }
 
 interface AssistantMessage {
@@ -85,7 +85,7 @@ interface ToolResultMessage {
   toolCallId: string;
   toolName: string;
   content: (TextContent | ImageContent)[];
-  details?: any;      // 工具特定的元数据
+  details?: any; // 工具特定的元数据
   isError: boolean;
   timestamp: number;
 }
@@ -117,23 +117,23 @@ interface BashExecutionMessage {
   cancelled: boolean;
   truncated: boolean;
   fullOutputPath?: string;
-  excludeFromContext?: boolean;  // !! 前缀命令为 true
+  excludeFromContext?: boolean; // !! 前缀命令为 true
   timestamp: number;
 }
 
 interface CustomMessage {
   role: "custom";
-  customType: string;            // 扩展标识符
+  customType: string; // 扩展标识符
   content: string | (TextContent | ImageContent)[];
-  display: boolean;              // 在 TUI 中显示
-  details?: any;                 // 扩展特定的元数据
+  display: boolean; // 在 TUI 中显示
+  details?: any; // 扩展特定的元数据
   timestamp: number;
 }
 
 interface BranchSummaryMessage {
   role: "branchSummary";
   summary: string;
-  fromId: string;                // 分支来源的条目
+  fromId: string; // 分支来源的条目
   timestamp: number;
 }
 
@@ -165,9 +165,9 @@ type AgentMessage =
 ```typescript
 interface SessionEntryBase {
   type: string;
-  id: string;           // 8 字符十六进制 ID
-  parentId: string | null;  // 父条目 ID（首条目为 null）
-  timestamp: string;    // ISO 时间戳
+  id: string; // 8 字符十六进制 ID
+  parentId: string | null; // 父条目 ID（首条目为 null）
+  timestamp: string; // ISO 时间戳
 }
 ```
 
@@ -178,13 +178,26 @@ interface SessionEntryBase {
 文件的第一行。仅包含元数据，不属于树的一部分（无 `id`/`parentId`）。
 
 ```json
-{"type":"session","version":3,"id":"uuid","timestamp":"2024-12-03T14:00:00.000Z","cwd":"/path/to/project"}
+{
+  "type": "session",
+  "version": 3,
+  "id": "uuid",
+  "timestamp": "2024-12-03T14:00:00.000Z",
+  "cwd": "/path/to/project"
+}
 ```
 
 对于有父会话的会话（通过 `/fork` 或 `newSession({ parentSession })` 创建）：
 
 ```json
-{"type":"session","version":3,"id":"uuid","timestamp":"2024-12-03T14:00:00.000Z","cwd":"/path/to/project","parentSession":"/path/to/original/session.jsonl"}
+{
+  "type": "session",
+  "version": 3,
+  "id": "uuid",
+  "timestamp": "2024-12-03T14:00:00.000Z",
+  "cwd": "/path/to/project",
+  "parentSession": "/path/to/original/session.jsonl"
+}
 ```
 
 ### SessionMessageEntry
@@ -202,7 +215,14 @@ interface SessionEntryBase {
 用户在会话中切换模型时发出。
 
 ```json
-{"type":"model_change","id":"d4e5f6g7","parentId":"c3d4e5f6","timestamp":"2024-12-03T14:05:00.000Z","provider":"openai","modelId":"gpt-4o"}
+{
+  "type": "model_change",
+  "id": "d4e5f6g7",
+  "parentId": "c3d4e5f6",
+  "timestamp": "2024-12-03T14:05:00.000Z",
+  "provider": "openai",
+  "modelId": "gpt-4o"
+}
 ```
 
 ### ThinkingLevelChangeEntry
@@ -210,7 +230,13 @@ interface SessionEntryBase {
 用户更改思考/推理级别时发出。
 
 ```json
-{"type":"thinking_level_change","id":"e5f6g7h8","parentId":"d4e5f6g7","timestamp":"2024-12-03T14:06:00.000Z","thinkingLevel":"high"}
+{
+  "type": "thinking_level_change",
+  "id": "e5f6g7h8",
+  "parentId": "d4e5f6g7",
+  "timestamp": "2024-12-03T14:06:00.000Z",
+  "thinkingLevel": "high"
+}
 ```
 
 ### CompactionEntry
@@ -218,10 +244,19 @@ interface SessionEntryBase {
 上下文被压缩时创建。存储较早消息的摘要。
 
 ```json
-{"type":"compaction","id":"f6g7h8i9","parentId":"e5f6g7h8","timestamp":"2024-12-03T14:10:00.000Z","summary":"User discussed X, Y, Z...","firstKeptEntryId":"c3d4e5f6","tokensBefore":50000}
+{
+  "type": "compaction",
+  "id": "f6g7h8i9",
+  "parentId": "e5f6g7h8",
+  "timestamp": "2024-12-03T14:10:00.000Z",
+  "summary": "User discussed X, Y, Z...",
+  "firstKeptEntryId": "c3d4e5f6",
+  "tokensBefore": 50000
+}
 ```
 
 可选字段：
+
 - `details`：实现特定的数据（例如，默认值为 `{ readFiles: string[], modifiedFiles: string[] }`，或扩展的自定义数据）
 - `fromHook`：`true` 表示由扩展生成，`false`/`undefined` 表示 Pi 生成（遗留字段名）
 
@@ -230,10 +265,18 @@ interface SessionEntryBase {
 通过 `/tree` 切换分支时创建，由 LLM 生成到公共祖先的左侧分支摘要。捕获被放弃路径的上下文。
 
 ```json
-{"type":"branch_summary","id":"g7h8i9j0","parentId":"a1b2c3d4","timestamp":"2024-12-03T14:15:00.000Z","fromId":"f6g7h8i9","summary":"Branch explored approach A..."}
+{
+  "type": "branch_summary",
+  "id": "g7h8i9j0",
+  "parentId": "a1b2c3d4",
+  "timestamp": "2024-12-03T14:15:00.000Z",
+  "fromId": "f6g7h8i9",
+  "summary": "Branch explored approach A..."
+}
 ```
 
 可选字段：
+
 - `details`：文件追踪数据（默认为 `{ readFiles: string[], modifiedFiles: string[] }`），或扩展的自定义数据
 - `fromHook`：`true` 表示由扩展生成，`false`/`undefined` 表示 Pi 生成（遗留字段名）
 
@@ -242,7 +285,14 @@ interface SessionEntryBase {
 扩展状态持久化。不参与 LLM 上下文。
 
 ```json
-{"type":"custom","id":"h8i9j0k1","parentId":"g7h8i9j0","timestamp":"2024-12-03T14:20:00.000Z","customType":"my-extension","data":{"count":42}}
+{
+  "type": "custom",
+  "id": "h8i9j0k1",
+  "parentId": "g7h8i9j0",
+  "timestamp": "2024-12-03T14:20:00.000Z",
+  "customType": "my-extension",
+  "data": { "count": 42 }
+}
 ```
 
 使用 `customType` 在重新加载时识别你的扩展条目。
@@ -252,10 +302,19 @@ interface SessionEntryBase {
 扩展注入的消息，参与 LLM 上下文。
 
 ```json
-{"type":"custom_message","id":"i9j0k1l2","parentId":"h8i9j0k1","timestamp":"2024-12-03T14:25:00.000Z","customType":"my-extension","content":"Injected context...","display":true}
+{
+  "type": "custom_message",
+  "id": "i9j0k1l2",
+  "parentId": "h8i9j0k1",
+  "timestamp": "2024-12-03T14:25:00.000Z",
+  "customType": "my-extension",
+  "content": "Injected context...",
+  "display": true
+}
 ```
 
 字段说明：
+
 - `content`：字符串或 `(TextContent | ImageContent)[]`（与 UserMessage 相同）
 - `display`：`true` = 在 TUI 中以特殊样式显示，`false` = 隐藏
 - `details`：可选的扩展特定元数据（不发送给 LLM）
@@ -265,7 +324,14 @@ interface SessionEntryBase {
 用户在条目上定义的书签/标记。
 
 ```json
-{"type":"label","id":"j0k1l2m3","parentId":"i9j0k1l2","timestamp":"2024-12-03T14:30:00.000Z","targetId":"a1b2c3d4","label":"checkpoint-1"}
+{
+  "type": "label",
+  "id": "j0k1l2m3",
+  "parentId": "i9j0k1l2",
+  "timestamp": "2024-12-03T14:30:00.000Z",
+  "targetId": "a1b2c3d4",
+  "label": "checkpoint-1"
+}
 ```
 
 将 `label` 设为 `undefined` 可清除标签。
@@ -275,7 +341,13 @@ interface SessionEntryBase {
 会话元数据（例如用户定义的显示名称）。通过 `/name` 命令或扩展中的 `pi.setSessionName()` 设置。
 
 ```json
-{"type":"session_info","id":"k1l2m3n4","parentId":"j0k1l2m3","timestamp":"2024-12-03T14:35:00.000Z","name":"Refactor auth module"}
+{
+  "type": "session_info",
+  "id": "k1l2m3n4",
+  "parentId": "j0k1l2m3",
+  "timestamp": "2024-12-03T14:35:00.000Z",
+  "name": "Refactor auth module"
+}
 ```
 
 设置后，会话名称会在会话选择器（`/resume`）中替代第一条消息显示。
@@ -283,6 +355,7 @@ interface SessionEntryBase {
 ## 树形结构
 
 条目形成一棵树：
+
 - 第一个条目的 `parentId` 为 `null`
 - 每个后续条目通过 `parentId` 指向其父节点
 - 分支从较早的条目创建新的子节点
@@ -321,19 +394,27 @@ for (const line of lines) {
       console.log(`Session v${entry.version ?? 1}: ${entry.id}`);
       break;
     case "message":
-      console.log(`[${entry.id}] ${entry.message.role}: ${JSON.stringify(entry.message.content)}`);
+      console.log(
+        `[${entry.id}] ${entry.message.role}: ${JSON.stringify(entry.message.content)}`,
+      );
       break;
     case "compaction":
-      console.log(`[${entry.id}] Compaction: ${entry.tokensBefore} tokens summarized`);
+      console.log(
+        `[${entry.id}] Compaction: ${entry.tokensBefore} tokens summarized`,
+      );
       break;
     case "branch_summary":
       console.log(`[${entry.id}] Branch from ${entry.fromId}`);
       break;
     case "custom":
-      console.log(`[${entry.id}] Custom (${entry.customType}): ${JSON.stringify(entry.data)}`);
+      console.log(
+        `[${entry.id}] Custom (${entry.customType}): ${JSON.stringify(entry.data)}`,
+      );
       break;
     case "custom_message":
-      console.log(`[${entry.id}] Extension message (${entry.customType}): ${entry.content}`);
+      console.log(
+        `[${entry.id}] Extension message (${entry.customType}): ${entry.content}`,
+      );
       break;
     case "label":
       console.log(`[${entry.id}] Label "${entry.label}" on ${entry.targetId}`);
@@ -353,6 +434,7 @@ for (const line of lines) {
 以编程方式处理会话的关键方法。
 
 ### 静态创建方法
+
 - `SessionManager.create(cwd, sessionDir?)` - 新建会话
 - `SessionManager.open(path, sessionDir?)` - 打开现有会话文件
 - `SessionManager.continueRecent(cwd, sessionDir?)` - 继续最近的会话或创建新会话
@@ -360,15 +442,18 @@ for (const line of lines) {
 - `SessionManager.forkFrom(sourcePath, targetCwd, sessionDir?)` - 从另一个项目分支会话
 
 ### 静态列表方法
+
 - `SessionManager.list(cwd, sessionDir?, onProgress?)` - 列出目录的会话
 - `SessionManager.listAll(onProgress?)` - 列出所有项目的全部会话
 
 ### 实例方法 - 会话管理
+
 - `newSession(options?)` - 开始新会话（选项：`{ parentSession?: string }`）
 - `setSessionFile(path)` - 切换到不同的会话文件
 - `createBranchedSession(leafId)` - 将分支提取到新的会话文件
 
 ### 实例方法 - 追加（全部返回条目 ID）
+
 - `appendMessage(message)` - 添加消息
 - `appendThinkingLevelChange(level)` - 记录思考级别变更
 - `appendModelChange(provider, modelId)` - 记录模型变更
@@ -379,6 +464,7 @@ for (const line of lines) {
 - `appendLabelChange(targetId, label)` - 设置/清除标签
 
 ### 实例方法 - 树导航
+
 - `getLeafId()` - 当前位置
 - `getLeafEntry()` - 获取当前叶子条目
 - `getEntry(id)` - 按 ID 获取条目
@@ -391,6 +477,7 @@ for (const line of lines) {
 - `branchWithSummary(entryId, summary, details?, fromHook?)` - 带上下文摘要分支
 
 ### 实例方法 - 上下文与信息
+
 - `buildSessionContext()` - 获取用于 LLM 的消息、思考级别和模型
 - `getEntries()` - 所有条目（不含头部）
 - `getHeader()` - 会话头部元数据

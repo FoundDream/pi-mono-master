@@ -14,9 +14,26 @@ pi --mode json "Your prompt"
 type AgentSessionEvent =
   | AgentEvent
   | { type: "auto_compaction_start"; reason: "threshold" | "overflow" }
-  | { type: "auto_compaction_end"; result: CompactionResult | undefined; aborted: boolean; willRetry: boolean; errorMessage?: string }
-  | { type: "auto_retry_start"; attempt: number; maxAttempts: number; delayMs: number; errorMessage: string }
-  | { type: "auto_retry_end"; success: boolean; attempt: number; finalError?: string };
+  | {
+      type: "auto_compaction_end";
+      result: CompactionResult | undefined;
+      aborted: boolean;
+      willRetry: boolean;
+      errorMessage?: string;
+    }
+  | {
+      type: "auto_retry_start";
+      attempt: number;
+      maxAttempts: number;
+      delayMs: number;
+      errorMessage: string;
+    }
+  | {
+      type: "auto_retry_end";
+      success: boolean;
+      attempt: number;
+      finalError?: string;
+    };
 ```
 
 基础事件来自 `AgentEvent`：
@@ -28,25 +45,52 @@ type AgentEvent =
   | { type: "agent_end"; messages: AgentMessage[] }
   // 轮次生命周期
   | { type: "turn_start" }
-  | { type: "turn_end"; message: AgentMessage; toolResults: ToolResultMessage[] }
+  | {
+      type: "turn_end";
+      message: AgentMessage;
+      toolResults: ToolResultMessage[];
+    }
   // 消息生命周期
   | { type: "message_start"; message: AgentMessage }
-  | { type: "message_update"; message: AgentMessage; assistantMessageEvent: AssistantMessageEvent }
+  | {
+      type: "message_update";
+      message: AgentMessage;
+      assistantMessageEvent: AssistantMessageEvent;
+    }
   | { type: "message_end"; message: AgentMessage }
   // 工具执行
-  | { type: "tool_execution_start"; toolCallId: string; toolName: string; args: any }
-  | { type: "tool_execution_update"; toolCallId: string; toolName: string; args: any; partialResult: any }
-  | { type: "tool_execution_end"; toolCallId: string; toolName: string; result: any; isError: boolean };
+  | {
+      type: "tool_execution_start";
+      toolCallId: string;
+      toolName: string;
+      args: any;
+    }
+  | {
+      type: "tool_execution_update";
+      toolCallId: string;
+      toolName: string;
+      args: any;
+      partialResult: any;
+    }
+  | {
+      type: "tool_execution_end";
+      toolCallId: string;
+      toolName: string;
+      result: any;
+      isError: boolean;
+    };
 ```
 
 ## 消息类型
 
 基础消息类型：
+
 - `UserMessage` - 用户消息
 - `AssistantMessage` - 助手消息
 - `ToolResultMessage` - 工具结果消息
 
 扩展消息类型：
+
 - `BashExecutionMessage` - Bash 执行消息
 - `CustomMessage` - 自定义消息
 - `BranchSummaryMessage` - 分支摘要消息
@@ -57,7 +101,13 @@ type AgentEvent =
 每行是一个 JSON 对象。第一行是会话头部：
 
 ```json
-{"type":"session","version":3,"id":"uuid","timestamp":"...","cwd":"/path"}
+{
+  "type": "session",
+  "version": 3,
+  "id": "uuid",
+  "timestamp": "...",
+  "cwd": "/path"
+}
 ```
 
 随后是事件，按发生顺序输出：

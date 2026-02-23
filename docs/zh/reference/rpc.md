@@ -11,6 +11,7 @@ pi --mode rpc [options]
 ```
 
 常用选项：
+
 - `--provider <name>`：设置 LLM Provider（anthropic、openai、google 等）
 - `--model <pattern>`：模型模式或 ID（支持 `provider/id` 和可选的 `:<thinking>`）
 - `--no-session`：禁用会话持久化
@@ -33,18 +34,25 @@ pi --mode rpc [options]
 向智能体发送用户提示。立即返回；事件异步流式传输。
 
 ```json
-{"id": "req-1", "type": "prompt", "message": "Hello, world!"}
+{ "id": "req-1", "type": "prompt", "message": "Hello, world!" }
 ```
 
 带图片：
+
 ```json
-{"type": "prompt", "message": "What's in this image?", "images": [{"type": "image", "data": "base64-encoded-data", "mimeType": "image/png"}]}
+{
+  "type": "prompt",
+  "message": "What's in this image?",
+  "images": [
+    { "type": "image", "data": "base64-encoded-data", "mimeType": "image/png" }
+  ]
+}
 ```
 
 **流式传输期间**：如果智能体已在流式传输，必须指定 `streamingBehavior` 来排队消息：
 
 ```json
-{"type": "prompt", "message": "New instruction", "streamingBehavior": "steer"}
+{ "type": "prompt", "message": "New instruction", "streamingBehavior": "steer" }
 ```
 
 - `"steer"`：中断智能体。消息在当前工具执行后送达，跳过剩余工具。
@@ -57,8 +65,9 @@ pi --mode rpc [options]
 **输入展开**：技能命令（`/skill:name`）和提示模板（`/template`）在发送/排队前展开。
 
 响应：
+
 ```json
-{"id": "req-1", "type": "response", "command": "prompt", "success": true}
+{ "id": "req-1", "type": "response", "command": "prompt", "success": true }
 ```
 
 #### steer
@@ -66,17 +75,25 @@ pi --mode rpc [options]
 排队一条引导消息以中断智能体。在当前工具执行后送达，跳过剩余工具。
 
 ```json
-{"type": "steer", "message": "Stop and do this instead"}
+{ "type": "steer", "message": "Stop and do this instead" }
 ```
 
 带图片：
+
 ```json
-{"type": "steer", "message": "Look at this instead", "images": [{"type": "image", "data": "base64-encoded-data", "mimeType": "image/png"}]}
+{
+  "type": "steer",
+  "message": "Look at this instead",
+  "images": [
+    { "type": "image", "data": "base64-encoded-data", "mimeType": "image/png" }
+  ]
+}
 ```
 
 响应：
+
 ```json
-{"type": "response", "command": "steer", "success": true}
+{ "type": "response", "command": "steer", "success": true }
 ```
 
 #### follow_up
@@ -84,12 +101,13 @@ pi --mode rpc [options]
 排队一条后续消息，在智能体完成后处理。
 
 ```json
-{"type": "follow_up", "message": "After you're done, also do this"}
+{ "type": "follow_up", "message": "After you're done, also do this" }
 ```
 
 响应：
+
 ```json
-{"type": "response", "command": "follow_up", "success": true}
+{ "type": "response", "command": "follow_up", "success": true }
 ```
 
 #### abort
@@ -97,12 +115,13 @@ pi --mode rpc [options]
 中止当前智能体操作。
 
 ```json
-{"type": "abort"}
+{ "type": "abort" }
 ```
 
 响应：
+
 ```json
-{"type": "response", "command": "abort", "success": true}
+{ "type": "response", "command": "abort", "success": true }
 ```
 
 #### new_session
@@ -110,17 +129,24 @@ pi --mode rpc [options]
 开始新的会话。可被 `session_before_switch` 扩展事件处理程序取消。
 
 ```json
-{"type": "new_session"}
+{ "type": "new_session" }
 ```
 
 带可选父会话追踪：
+
 ```json
-{"type": "new_session", "parentSession": "/path/to/parent-session.jsonl"}
+{ "type": "new_session", "parentSession": "/path/to/parent-session.jsonl" }
 ```
 
 响应：
+
 ```json
-{"type": "response", "command": "new_session", "success": true, "data": {"cancelled": false}}
+{
+  "type": "response",
+  "command": "new_session",
+  "success": true,
+  "data": { "cancelled": false }
+}
 ```
 
 ### 状态相关
@@ -130,10 +156,11 @@ pi --mode rpc [options]
 获取当前会话状态。
 
 ```json
-{"type": "get_state"}
+{ "type": "get_state" }
 ```
 
 响应：
+
 ```json
 {
   "type": "response",
@@ -163,10 +190,11 @@ pi --mode rpc [options]
 获取对话中的所有消息。
 
 ```json
-{"type": "get_messages"}
+{ "type": "get_messages" }
 ```
 
 响应：
+
 ```json
 {
   "type": "response",
@@ -183,7 +211,11 @@ pi --mode rpc [options]
 切换到特定模型。
 
 ```json
-{"type": "set_model", "provider": "anthropic", "modelId": "claude-sonnet-4-20250514"}
+{
+  "type": "set_model",
+  "provider": "anthropic",
+  "modelId": "claude-sonnet-4-20250514"
+}
 ```
 
 #### cycle_model
@@ -191,7 +223,7 @@ pi --mode rpc [options]
 循环切换到下一个可用模型。如果只有一个模型可用，返回 `null`。
 
 ```json
-{"type": "cycle_model"}
+{ "type": "cycle_model" }
 ```
 
 #### get_available_models
@@ -199,7 +231,7 @@ pi --mode rpc [options]
 列出所有已配置的模型。
 
 ```json
-{"type": "get_available_models"}
+{ "type": "get_available_models" }
 ```
 
 ### 思考相关
@@ -209,7 +241,7 @@ pi --mode rpc [options]
 设置推理/思考级别。
 
 ```json
-{"type": "set_thinking_level", "level": "high"}
+{ "type": "set_thinking_level", "level": "high" }
 ```
 
 级别：`"off"`、`"minimal"`、`"low"`、`"medium"`、`"high"`、`"xhigh"`
@@ -221,7 +253,7 @@ pi --mode rpc [options]
 循环切换思考级别。如果模型不支持思考，返回 `null`。
 
 ```json
-{"type": "cycle_thinking_level"}
+{ "type": "cycle_thinking_level" }
 ```
 
 ### 队列模式
@@ -231,10 +263,11 @@ pi --mode rpc [options]
 控制引导消息（来自 `steer`）的送达方式。
 
 ```json
-{"type": "set_steering_mode", "mode": "one-at-a-time"}
+{ "type": "set_steering_mode", "mode": "one-at-a-time" }
 ```
 
 模式：
+
 - `"all"`：在下一个中断点送达所有引导消息
 - `"one-at-a-time"`：每次中断送达一条引导消息（默认）
 
@@ -243,10 +276,11 @@ pi --mode rpc [options]
 控制后续消息（来自 `follow_up`）的送达方式。
 
 ```json
-{"type": "set_follow_up_mode", "mode": "one-at-a-time"}
+{ "type": "set_follow_up_mode", "mode": "one-at-a-time" }
 ```
 
 模式：
+
 - `"all"`：智能体完成时送达所有后续消息
 - `"one-at-a-time"`：每次完成送达一条后续消息（默认）
 
@@ -257,15 +291,17 @@ pi --mode rpc [options]
 手动压缩对话上下文以减少 token 使用。
 
 ```json
-{"type": "compact"}
+{ "type": "compact" }
 ```
 
 带自定义指令：
+
 ```json
-{"type": "compact", "customInstructions": "Focus on code changes"}
+{ "type": "compact", "customInstructions": "Focus on code changes" }
 ```
 
 响应：
+
 ```json
 {
   "type": "response",
@@ -285,7 +321,7 @@ pi --mode rpc [options]
 启用或禁用上下文接近满时的自动压缩。
 
 ```json
-{"type": "set_auto_compaction", "enabled": true}
+{ "type": "set_auto_compaction", "enabled": true }
 ```
 
 ### 重试相关
@@ -295,7 +331,7 @@ pi --mode rpc [options]
 启用或禁用临时错误（过载、速率限制、5xx）时的自动重试。
 
 ```json
-{"type": "set_auto_retry", "enabled": true}
+{ "type": "set_auto_retry", "enabled": true }
 ```
 
 #### abort_retry
@@ -303,7 +339,7 @@ pi --mode rpc [options]
 中止正在进行的重试（取消延迟并停止重试）。
 
 ```json
-{"type": "abort_retry"}
+{ "type": "abort_retry" }
 ```
 
 ### Bash
@@ -313,10 +349,11 @@ pi --mode rpc [options]
 执行 shell 命令并将输出添加到对话上下文。
 
 ```json
-{"type": "bash", "command": "ls -la"}
+{ "type": "bash", "command": "ls -la" }
 ```
 
 响应：
+
 ```json
 {
   "type": "response",
@@ -336,6 +373,7 @@ pi --mode rpc [options]
 `bash` 命令立即执行并返回 `BashResult`。内部创建的 `BashExecutionMessage` 存储在智能体的消息状态中。此消息不会发出事件。
 
 当下一个 `prompt` 命令发送时，所有消息（包括 `BashExecutionMessage`）在发送给 LLM 之前会被转换。这意味着：
+
 1. Bash 输出包含在**下一个提示**的 LLM 上下文中，而非立即
 2. 可以在一个提示之前执行多个 bash 命令；所有输出都将被包含
 3. `BashExecutionMessage` 本身不会发出事件
@@ -345,7 +383,7 @@ pi --mode rpc [options]
 中止正在运行的 bash 命令。
 
 ```json
-{"type": "abort_bash"}
+{ "type": "abort_bash" }
 ```
 
 ### 会话相关
@@ -355,10 +393,11 @@ pi --mode rpc [options]
 获取 token 使用和费用统计。
 
 ```json
-{"type": "get_session_stats"}
+{ "type": "get_session_stats" }
 ```
 
 响应：
+
 ```json
 {
   "type": "response",
@@ -389,12 +428,13 @@ pi --mode rpc [options]
 将会话导出为 HTML 文件。
 
 ```json
-{"type": "export_html"}
+{ "type": "export_html" }
 ```
 
 带自定义路径：
+
 ```json
-{"type": "export_html", "outputPath": "/tmp/session.html"}
+{ "type": "export_html", "outputPath": "/tmp/session.html" }
 ```
 
 #### switch_session
@@ -402,7 +442,7 @@ pi --mode rpc [options]
 加载不同的会话文件。可被 `session_before_switch` 扩展事件处理程序取消。
 
 ```json
-{"type": "switch_session", "sessionPath": "/path/to/session.jsonl"}
+{ "type": "switch_session", "sessionPath": "/path/to/session.jsonl" }
 ```
 
 #### fork
@@ -410,16 +450,17 @@ pi --mode rpc [options]
 从之前的用户消息创建新的分支。
 
 ```json
-{"type": "fork", "entryId": "abc123"}
+{ "type": "fork", "entryId": "abc123" }
 ```
 
 响应：
+
 ```json
 {
   "type": "response",
   "command": "fork",
   "success": true,
-  "data": {"text": "The original prompt text...", "cancelled": false}
+  "data": { "text": "The original prompt text...", "cancelled": false }
 }
 ```
 
@@ -428,7 +469,7 @@ pi --mode rpc [options]
 获取可用于分支的用户消息。
 
 ```json
-{"type": "get_fork_messages"}
+{ "type": "get_fork_messages" }
 ```
 
 #### get_last_assistant_text
@@ -436,7 +477,7 @@ pi --mode rpc [options]
 获取最后一条助手消息的文本内容。
 
 ```json
-{"type": "get_last_assistant_text"}
+{ "type": "get_last_assistant_text" }
 ```
 
 #### set_session_name
@@ -444,7 +485,7 @@ pi --mode rpc [options]
 设置当前会话的显示名称。
 
 ```json
-{"type": "set_session_name", "name": "my-feature-work"}
+{ "type": "set_session_name", "name": "my-feature-work" }
 ```
 
 ### 命令查询
@@ -454,10 +495,11 @@ pi --mode rpc [options]
 获取可用命令（扩展命令、提示模板和技能）。这些可以通过在 `prompt` 命令中加 `/` 前缀来调用。
 
 ```json
-{"type": "get_commands"}
+{ "type": "get_commands" }
 ```
 
 响应：
+
 ```json
 {
   "type": "response",
@@ -465,15 +507,33 @@ pi --mode rpc [options]
   "success": true,
   "data": {
     "commands": [
-      {"name": "session-name", "description": "Set or clear session name", "source": "extension", "path": "/home/user/.pi/agent/extensions/session.ts"},
-      {"name": "fix-tests", "description": "Fix failing tests", "source": "prompt", "location": "project", "path": "/home/user/myproject/.pi/agent/prompts/fix-tests.md"},
-      {"name": "skill:brave-search", "description": "Web search via Brave API", "source": "skill", "location": "user", "path": "/home/user/.pi/agent/skills/brave-search/SKILL.md"}
+      {
+        "name": "session-name",
+        "description": "Set or clear session name",
+        "source": "extension",
+        "path": "/home/user/.pi/agent/extensions/session.ts"
+      },
+      {
+        "name": "fix-tests",
+        "description": "Fix failing tests",
+        "source": "prompt",
+        "location": "project",
+        "path": "/home/user/myproject/.pi/agent/prompts/fix-tests.md"
+      },
+      {
+        "name": "skill:brave-search",
+        "description": "Web search via Brave API",
+        "source": "skill",
+        "location": "user",
+        "path": "/home/user/.pi/agent/skills/brave-search/SKILL.md"
+      }
     ]
   }
 }
 ```
 
 每个命令包含：
+
 - `name`：命令名称（通过 `/name` 调用）
 - `description`：人类可读的描述（扩展命令为可选）
 - `source`：命令类型 - `"extension"`、`"prompt"` 或 `"skill"`
@@ -486,23 +546,23 @@ pi --mode rpc [options]
 
 ### 事件类型
 
-| 事件 | 说明 |
-|------|------|
-| `agent_start` | 智能体开始处理 |
-| `agent_end` | 智能体完成（包含所有生成的消息） |
-| `turn_start` | 新轮次开始 |
-| `turn_end` | 轮次完成（包含助手消息和工具结果） |
-| `message_start` | 消息开始 |
-| `message_update` | 流式更新（text/thinking/toolcall 增量） |
-| `message_end` | 消息完成 |
-| `tool_execution_start` | 工具开始执行 |
-| `tool_execution_update` | 工具执行进度（流式输出） |
-| `tool_execution_end` | 工具完成 |
-| `auto_compaction_start` | 自动压缩开始 |
-| `auto_compaction_end` | 自动压缩完成 |
-| `auto_retry_start` | 自动重试开始（临时错误后） |
-| `auto_retry_end` | 自动重试完成（成功或最终失败） |
-| `extension_error` | 扩展抛出错误 |
+| 事件                    | 说明                                    |
+| ----------------------- | --------------------------------------- |
+| `agent_start`           | 智能体开始处理                          |
+| `agent_end`             | 智能体完成（包含所有生成的消息）        |
+| `turn_start`            | 新轮次开始                              |
+| `turn_end`              | 轮次完成（包含助手消息和工具结果）      |
+| `message_start`         | 消息开始                                |
+| `message_update`        | 流式更新（text/thinking/toolcall 增量） |
+| `message_end`           | 消息完成                                |
+| `tool_execution_start`  | 工具开始执行                            |
+| `tool_execution_update` | 工具执行进度（流式输出）                |
+| `tool_execution_end`    | 工具完成                                |
+| `auto_compaction_start` | 自动压缩开始                            |
+| `auto_compaction_end`   | 自动压缩完成                            |
+| `auto_retry_start`      | 自动重试开始（临时错误后）              |
+| `auto_retry_end`        | 自动重试完成（成功或最终失败）          |
+| `extension_error`       | 扩展抛出错误                            |
 
 ### message_update（流式传输）
 
@@ -523,27 +583,27 @@ pi --mode rpc [options]
 
 `assistantMessageEvent` 字段包含以下增量类型之一：
 
-| 类型 | 说明 |
-|------|------|
-| `start` | 消息生成开始 |
-| `text_start` | 文本内容块开始 |
-| `text_delta` | 文本内容片段 |
-| `text_end` | 文本内容块结束 |
-| `thinking_start` | 思考块开始 |
-| `thinking_delta` | 思考内容片段 |
-| `thinking_end` | 思考块结束 |
-| `toolcall_start` | 工具调用开始 |
-| `toolcall_delta` | 工具调用参数片段 |
-| `toolcall_end` | 工具调用结束（包含完整 `toolCall` 对象） |
-| `done` | 消息完成（reason: `"stop"`、`"length"`、`"toolUse"`） |
-| `error` | 发生错误（reason: `"aborted"`、`"error"`） |
+| 类型             | 说明                                                  |
+| ---------------- | ----------------------------------------------------- |
+| `start`          | 消息生成开始                                          |
+| `text_start`     | 文本内容块开始                                        |
+| `text_delta`     | 文本内容片段                                          |
+| `text_end`       | 文本内容块结束                                        |
+| `thinking_start` | 思考块开始                                            |
+| `thinking_delta` | 思考内容片段                                          |
+| `thinking_end`   | 思考块结束                                            |
+| `toolcall_start` | 工具调用开始                                          |
+| `toolcall_delta` | 工具调用参数片段                                      |
+| `toolcall_end`   | 工具调用结束（包含完整 `toolCall` 对象）              |
+| `done`           | 消息完成（reason: `"stop"`、`"length"`、`"toolUse"`） |
+| `error`          | 发生错误（reason: `"aborted"`、`"error"`）            |
 
 ### 图像支持
 
 `prompt`、`steer`、`follow_up` 命令的 `images` 字段是可选的。每个图像使用 `ImageContent` 格式：
 
 ```json
-{"type": "image", "data": "base64-encoded-data", "mimeType": "image/png"}
+{ "type": "image", "data": "base64-encoded-data", "mimeType": "image/png" }
 ```
 
 ### tool_execution 事件
@@ -553,7 +613,7 @@ pi --mode rpc [options]
   "type": "tool_execution_start",
   "toolCallId": "call_abc123",
   "toolName": "bash",
-  "args": {"command": "ls -la"}
+  "args": { "command": "ls -la" }
 }
 ```
 
@@ -564,10 +624,10 @@ pi --mode rpc [options]
   "type": "tool_execution_update",
   "toolCallId": "call_abc123",
   "toolName": "bash",
-  "args": {"command": "ls -la"},
+  "args": { "command": "ls -la" },
   "partialResult": {
-    "content": [{"type": "text", "text": "partial output so far..."}],
-    "details": {"truncation": null, "fullOutputPath": null}
+    "content": [{ "type": "text", "text": "partial output so far..." }],
+    "details": { "truncation": null, "fullOutputPath": null }
   }
 }
 ```
@@ -715,19 +775,19 @@ pi --mode rpc [options]
 #### 值响应（select、input、editor）
 
 ```json
-{"type": "extension_ui_response", "id": "uuid-1", "value": "Allow"}
+{ "type": "extension_ui_response", "id": "uuid-1", "value": "Allow" }
 ```
 
 #### 确认响应（confirm）
 
 ```json
-{"type": "extension_ui_response", "id": "uuid-2", "confirmed": true}
+{ "type": "extension_ui_response", "id": "uuid-2", "confirmed": true }
 ```
 
 #### 取消响应（任意对话方法）
 
 ```json
-{"type": "extension_ui_response", "id": "uuid-3", "cancelled": true}
+{ "type": "extension_ui_response", "id": "uuid-3", "cancelled": true }
 ```
 
 ## 错误响应
@@ -799,14 +859,14 @@ const readline = require("readline");
 const agent = spawn("pi", ["--mode", "rpc", "--no-session"]);
 
 readline.createInterface({ input: agent.stdout }).on("line", (line) => {
-    const event = JSON.parse(line);
+  const event = JSON.parse(line);
 
-    if (event.type === "message_update") {
-        const { assistantMessageEvent } = event;
-        if (assistantMessageEvent.type === "text_delta") {
-            process.stdout.write(assistantMessageEvent.delta);
-        }
+  if (event.type === "message_update") {
+    const { assistantMessageEvent } = event;
+    if (assistantMessageEvent.type === "text_delta") {
+      process.stdout.write(assistantMessageEvent.delta);
     }
+  }
 });
 
 // 发送提示
@@ -814,6 +874,6 @@ agent.stdin.write(JSON.stringify({ type: "prompt", message: "Hello" }) + "\n");
 
 // Ctrl+C 时中止
 process.on("SIGINT", () => {
-    agent.stdin.write(JSON.stringify({ type: "abort" }) + "\n");
+  agent.stdin.write(JSON.stringify({ type: "abort" }) + "\n");
 });
 ```

@@ -62,14 +62,14 @@
 └─────────────────────────────────────────────────────┘
 ```
 
-| 概念 | 类比 | 说明 |
-|------|------|------|
-| `Model` | 大脑 | 决定使用哪个 AI 模型（Claude、GPT-4、Gemini 等）|
+| 概念                    | 类比          | 说明                                                      |
+| ----------------------- | ------------- | --------------------------------------------------------- |
+| `Model`                 | 大脑          | 决定使用哪个 AI 模型（Claude、GPT-4、Gemini 等）          |
 | `DefaultResourceLoader` | 人格/技能配置 | 控制系统提示词、技能、扩展。定义 Agent "是谁"、"能做什么" |
-| `SessionManager` | 记忆系统 | 管理对话历史的存储方式 —— 内存中还是持久化到文件 |
-| `createAgentSession()` | 组装工厂 | 将以上组件组装成一个可用的 Agent 会话 |
-| `session.subscribe()` | 订阅通知 | 注册事件监听器，接收 Agent 产生的各种事件 |
-| `session.prompt()` | 交谈 | 发送用户消息；返回一个在 Agent 完成后 resolve 的 Promise |
+| `SessionManager`        | 记忆系统      | 管理对话历史的存储方式 —— 内存中还是持久化到文件          |
+| `createAgentSession()`  | 组装工厂      | 将以上组件组装成一个可用的 Agent 会话                     |
+| `session.subscribe()`   | 订阅通知      | 注册事件监听器，接收 Agent 产生的各种事件                 |
+| `session.prompt()`      | 交谈          | 发送用户消息；返回一个在 Agent 完成后 resolve 的 Promise  |
 
 ## 完整代码
 
@@ -78,44 +78,47 @@ import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const model = createModel()
+const model = createModel();
 
 // ResourceLoader 控制系统提示词、技能、扩展等
 // 这里我们禁用所有功能，只设置一个简单的系统提示词
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => 'You are a helpful assistant. Be concise.',
+  systemPromptOverride: () => "You are a helpful assistant. Be concise.",
   noExtensions: true,
   noSkills: true,
   noPromptTemplates: true,
   noThemes: true,
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 
 // 创建内存会话（不做文件持久化）
 const { session } = await createAgentSession({
   model,
-  tools: [],          // 不使用编码工具（read、write、bash、edit）
-  customTools: [],    // 不使用自定义工具
+  tools: [], // 不使用编码工具（read、write、bash、edit）
+  customTools: [], // 不使用自定义工具
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 
 // 订阅事件并收集完整响应
-let response = ''
+let response = "";
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    response += event.assistantMessageEvent.delta
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    response += event.assistantMessageEvent.delta;
   }
-})
+});
 
 // 发送一条提示并等待完成
-await session.prompt('What is the Fibonacci sequence? Explain in 2 sentences.')
+await session.prompt("What is the Fibonacci sequence? Explain in 2 sentences.");
 
-console.log('Agent:', response)
-process.exit(0)
+console.log("Agent:", response);
+process.exit(0);
 ```
 
 ## 逐步解析
@@ -123,7 +126,7 @@ process.exit(0)
 ### 1. 创建模型 —— 连接 AI 的大脑
 
 ```typescript
-const model = createModel()
+const model = createModel();
 ```
 
 `createModel()` 从 `.env` 文件读取 `AI_PROVIDER` 和 `AI_MODEL`，返回一个 `Model<Api>` 对象。
@@ -131,20 +134,20 @@ const model = createModel()
 这个对象并不直接调用 API —— 它更像是一份"说明书"，描述了你要使用的模型的元信息（ID、提供商、上下文窗口大小、最大输出 token 数等）。`pi-coding-agent` 框架会在需要时根据这份"说明书"来实际发起 API 请求。
 
 :::tip 提示
-如果你切换模型（比如从 Claude 换成 GPT-4o），**只需修改 `.env` 文件**，代码完全不用改。这就是模型抽象层的威力。
+如果你切换模型（比如从 Claude 换成 gpt-5.2），**只需修改 `.env` 文件**，代码完全不用改。这就是模型抽象层的威力。
 :::
 
 ### 2. 配置资源加载器 —— 定义 Agent 的人格
 
 ```typescript
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => 'You are a helpful assistant. Be concise.',
+  systemPromptOverride: () => "You are a helpful assistant. Be concise.",
   noExtensions: true,
   noSkills: true,
   noPromptTemplates: true,
   noThemes: true,
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 ```
 
 `DefaultResourceLoader` 是 Agent 行为的核心配置点。你可以把它想象成 Agent 的"性格设定"和"技能背包"：
@@ -165,7 +168,7 @@ const { session } = await createAgentSession({
   customTools: [],
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 ```
 
 `createAgentSession()` 是将所有组件连接在一起的"组装工厂"。它接收模型、工具列表、会话管理器和资源加载器，返回一个可用的 `session` 对象。
@@ -181,12 +184,15 @@ const { session } = await createAgentSession({
 
 ```typescript
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    response += event.assistantMessageEvent.delta
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    response += event.assistantMessageEvent.delta;
   }
-})
+});
 
-await session.prompt('What is the Fibonacci sequence? Explain in 2 sentences.')
+await session.prompt("What is the Fibonacci sequence? Explain in 2 sentences.");
 ```
 
 这里体现了 `pi-coding-agent` 的**事件驱动模型**。与直接 `await` 一个 API 响应不同，Agent 的响应是通过**事件流**传递的：

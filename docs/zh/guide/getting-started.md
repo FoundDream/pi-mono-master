@@ -67,12 +67,12 @@ ANTHROPIC_API_KEY=sk-ant-xxx   # 你的 API Key
 
 ### 支持的提供商
 
-| 提供商    | `AI_PROVIDER` | API Key 环境变量    | 示例模型                   |
-| --------- | ------------- | ------------------- | -------------------------- |
-| Anthropic | `anthropic`   | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6`  |
+| 提供商    | `AI_PROVIDER` | API Key 环境变量    | 示例模型            |
+| --------- | ------------- | ------------------- | ------------------- |
+| Anthropic | `anthropic`   | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
 | OpenAI    | `openai`      | `OPENAI_API_KEY`    | `gpt-5.2`           |
-| Google    | `google`      | `GOOGLE_API_KEY`    | `gemini-2.5-flash`   |
-| DeepSeek  | `deepseek`    | `OPENAI_API_KEY`    | `deepseek-chat`      |
+| Google    | `google`      | `GOOGLE_API_KEY`    | `gemini-2.5-flash`  |
+| DeepSeek  | `deepseek`    | `OPENAI_API_KEY`    | `deepseek-chat`     |
 
 :::tip 提示
 不确定选哪个模型？如果你刚开始学习，推荐使用 **Anthropic Claude Sonnet** —— 它在工具调用和指令遵循方面表现优秀，非常适合 Agent 开发。DeepSeek 是性价比较高的选择，适合快速实验。

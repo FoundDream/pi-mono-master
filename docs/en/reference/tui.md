@@ -8,9 +8,9 @@ Every TUI component implements the following interface:
 
 ```typescript
 interface Component {
-  render(rc: RenderContext): ReactNode
-  handleInput?(input: KeyInput): boolean
-  invalidate?(): void
+  render(rc: RenderContext): ReactNode;
+  handleInput?(input: KeyInput): boolean;
+  invalidate?(): void;
 }
 ```
 
@@ -28,10 +28,10 @@ Components that accept text input should implement the `Focusable` interface:
 
 ```typescript
 interface Focusable {
-  isFocused(): boolean
-  onFocus(): void
-  onBlur(): void
-  getCursorPosition(): { x: number; y: number } | null
+  isFocused(): boolean;
+  onFocus(): void;
+  onBlur(): void;
+  getCursorPosition(): { x: number; y: number } | null;
 }
 ```
 
@@ -44,7 +44,7 @@ This enables proper input method editor (IME) support for CJK and other complex 
 Renders styled text with optional formatting.
 
 ```typescript
-Text({ content: "Hello", bold: true, color: "green" })
+Text({ content: "Hello", bold: true, color: "green" });
 ```
 
 ### Box
@@ -68,7 +68,7 @@ Container({ direction: "horizontal", gap: 1, children: [...] })
 Inserts empty space. Useful for layout alignment.
 
 ```typescript
-Spacer({ height: 1 })
+Spacer({ height: 1 });
 ```
 
 ### Markdown
@@ -76,7 +76,7 @@ Spacer({ height: 1 })
 Renders Markdown content with syntax highlighting for code blocks, bold, italic, links, and lists.
 
 ```typescript
-Markdown({ content: "# Title\n\nBody text with **bold**." })
+Markdown({ content: "# Title\n\nBody text with **bold**." });
 ```
 
 ### Image
@@ -84,7 +84,7 @@ Markdown({ content: "# Title\n\nBody text with **bold**." })
 Displays an image in the terminal using Kitty or iTerm2 image protocols.
 
 ```typescript
-Image({ src: "/path/to/image.png", width: 40 })
+Image({ src: "/path/to/image.png", width: 40 });
 ```
 
 Falls back to a placeholder on unsupported terminals.
@@ -99,8 +99,10 @@ SelectList({
     { label: "Option A", value: "a" },
     { label: "Option B", value: "b" },
   ],
-  onSelect: (item) => { /* handle selection */ }
-})
+  onSelect: (item) => {
+    /* handle selection */
+  },
+});
 ```
 
 ### SettingsList
@@ -113,8 +115,10 @@ SettingsList({
     { key: "model", value: "opus", editable: true },
     { key: "theme", value: "dark", editable: true },
   ],
-  onChange: (key, value) => { /* handle change */ }
-})
+  onChange: (key, value) => {
+    /* handle change */
+  },
+});
 ```
 
 ### BorderedLoader
@@ -122,7 +126,7 @@ SettingsList({
 A loading indicator with a bordered frame and optional message.
 
 ```typescript
-BorderedLoader({ message: "Processing..." })
+BorderedLoader({ message: "Processing..." });
 ```
 
 ## Usage in Extensions
@@ -135,18 +139,18 @@ export default (ctx: ExtensionContext) => {
     render(rc) {
       return Box({
         border: true,
-        children: [Text({ content: "Extension UI" })]
-      })
+        children: [Text({ content: "Extension UI" })],
+      });
     },
     handleInput(input) {
       if (matchesKey(input, Key.Escape)) {
-        ctx.ui.close()
-        return true
+        ctx.ui.close();
+        return true;
       }
-      return false
-    }
-  })
-}
+      return false;
+    },
+  });
+};
 ```
 
 ## Usage in Tools
@@ -160,11 +164,11 @@ pi.ui.custom({
       children: [
         Text({ content: "Tool output", bold: true }),
         Spacer({ height: 1 }),
-        Text({ content: "Details here" })
-      ]
-    })
-  }
-})
+        Text({ content: "Details here" }),
+      ],
+    });
+  },
+});
 ```
 
 ## Overlay Components
@@ -175,22 +179,22 @@ Overlays render above the main content as floating panels.
 
 ```typescript
 overlay({
-  width: 60,        // Fixed column width
-  height: 20,       // Fixed row height
-  maxWidth: "80%",  // Percentage of terminal width
+  width: 60, // Fixed column width
+  height: 20, // Fixed row height
+  maxWidth: "80%", // Percentage of terminal width
   maxHeight: "50%", // Percentage of terminal height
-})
+});
 ```
 
 ### Positioning
 
 ```typescript
 overlay({
-  position: "center",    // Center of screen
-  position: "top",       // Top edge, horizontally centered
-  position: "bottom",    // Bottom edge, horizontally centered
+  position: "center", // Center of screen
+  position: "top", // Top edge, horizontally centered
+  position: "bottom", // Bottom edge, horizontally centered
   anchor: { x: 10, y: 5 }, // Absolute position
-})
+});
 ```
 
 ### Responsive
@@ -243,15 +247,15 @@ Call `invalidate()` when internal state changes to schedule a re-render. Do not 
 
 ```typescript
 class Counter implements Component {
-  private count = 0
+  private count = 0;
 
   increment() {
-    this.count++
-    this.invalidate?.()
+    this.count++;
+    this.invalidate?.();
   }
 
   render(rc: RenderContext) {
-    return Text({ content: `Count: ${this.count}` })
+    return Text({ content: `Count: ${this.count}` });
   }
 }
 ```
@@ -280,36 +284,36 @@ This ensures components adapt to the user's selected theme.
 ### SelectList with filtering
 
 ```typescript
-const filteredItems = items.filter(i =>
-  i.label.toLowerCase().includes(query.toLowerCase())
-)
-SelectList({ items: filteredItems, onSelect: handleSelect })
+const filteredItems = items.filter((i) =>
+  i.label.toLowerCase().includes(query.toLowerCase()),
+);
+SelectList({ items: filteredItems, onSelect: handleSelect });
 ```
 
 ### Async data loading
 
 ```typescript
 class AsyncLoader implements Component {
-  private data: string | null = null
-  private error: string | null = null
+  private data: string | null = null;
+  private error: string | null = null;
 
   constructor() {
-    this.loadData()
+    this.loadData();
   }
 
   async loadData() {
     try {
-      this.data = await fetchData()
+      this.data = await fetchData();
     } catch (e) {
-      this.error = e.message
+      this.error = e.message;
     }
-    this.invalidate?.()
+    this.invalidate?.();
   }
 
   render(rc) {
-    if (this.error) return Text({ content: this.error, color: "red" })
-    if (!this.data) return BorderedLoader({ message: "Loading..." })
-    return Text({ content: this.data })
+    if (this.error) return Text({ content: this.error, color: "red" });
+    if (!this.data) return BorderedLoader({ message: "Loading..." });
+    return Text({ content: this.data });
   }
 }
 ```
@@ -321,12 +325,12 @@ SettingsList({
   settings: Object.entries(config).map(([key, value]) => ({
     key,
     value: String(value),
-    editable: true
+    editable: true,
   })),
   onChange(key, newValue) {
-    updateConfig(key, newValue)
-  }
-})
+    updateConfig(key, newValue);
+  },
+});
 ```
 
 ### Status indicator
@@ -336,46 +340,57 @@ Container({
   direction: "horizontal",
   gap: 1,
   children: [
-    Text({ content: isConnected ? "+" : "x", color: isConnected ? "green" : "red" }),
-    Text({ content: isConnected ? "Connected" : "Disconnected" })
-  ]
-})
+    Text({
+      content: isConnected ? "+" : "x",
+      color: isConnected ? "green" : "red",
+    }),
+    Text({ content: isConnected ? "Connected" : "Disconnected" }),
+  ],
+});
 ```
 
 ### Custom editor with keyboard handling
 
 ```typescript
 class TextEditor implements Component, Focusable {
-  private buffer = ""
-  private cursor = 0
+  private buffer = "";
+  private cursor = 0;
 
   handleInput(input: KeyInput): boolean {
     if (matchesKey(input, Key.Backspace)) {
-      this.buffer = this.buffer.slice(0, this.cursor - 1) + this.buffer.slice(this.cursor)
-      this.cursor = Math.max(0, this.cursor - 1)
-      this.invalidate?.()
-      return true
+      this.buffer =
+        this.buffer.slice(0, this.cursor - 1) + this.buffer.slice(this.cursor);
+      this.cursor = Math.max(0, this.cursor - 1);
+      this.invalidate?.();
+      return true;
     }
     if (input.char) {
-      this.buffer = this.buffer.slice(0, this.cursor) + input.char + this.buffer.slice(this.cursor)
-      this.cursor++
-      this.invalidate?.()
-      return true
+      this.buffer =
+        this.buffer.slice(0, this.cursor) +
+        input.char +
+        this.buffer.slice(this.cursor);
+      this.cursor++;
+      this.invalidate?.();
+      return true;
     }
-    return false
+    return false;
   }
 
   render(rc) {
     return Box({
       border: true,
-      children: [Text({ content: this.buffer || "Type here..." })]
-    })
+      children: [Text({ content: this.buffer || "Type here..." })],
+    });
   }
 
-  isFocused() { return true }
+  isFocused() {
+    return true;
+  }
   onFocus() {}
   onBlur() {}
-  getCursorPosition() { return { x: this.cursor, y: 0 } }
+  getCursorPosition() {
+    return { x: this.cursor, y: 0 };
+  }
 }
 ```
 

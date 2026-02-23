@@ -31,11 +31,11 @@ This rebuilds packages on change, allowing you to test modifications without man
 
 If you are building a custom version or fork, update the following fields in `package.json`:
 
-| Field | Purpose |
-|-------|---------|
-| `name` | Package name on npm |
+| Field       | Purpose                                  |
+| ----------- | ---------------------------------------- |
+| `name`      | Package name on npm                      |
 | `configDir` | Settings directory name (default: `.pi`) |
-| `bin` | CLI command name |
+| `bin`       | CLI command name                         |
 
 These fields control where Pi stores configuration, how it registers the CLI binary, and the published package identity.
 
@@ -50,6 +50,7 @@ These fields control where Pi stores configuration, how it registers the CLI bin
 ### The `/debug` command
 
 Inside a running Pi session, type `/debug` to display diagnostic information including:
+
 - Current model and provider
 - Active extensions and skills
 - Session configuration
@@ -59,11 +60,11 @@ Inside a running Pi session, type `/debug` to display diagnostic information inc
 
 Pi writes debug logs to:
 
-| Platform | Path |
-|----------|------|
-| macOS | `~/Library/Logs/Pi/` |
-| Linux | `~/.local/share/pi/logs/` |
-| Windows | `%APPDATA%\Pi\logs\` |
+| Platform | Path                      |
+| -------- | ------------------------- |
+| macOS    | `~/Library/Logs/Pi/`      |
+| Linux    | `~/.local/share/pi/logs/` |
+| Windows  | `%APPDATA%\Pi\logs\`      |
 
 Set the `PI_DEBUG=1` environment variable for verbose logging output.
 

@@ -2,13 +2,13 @@
 
 ## Why Streaming Matters
 
-Imagine visiting a website where you click "Submit" and stare at a blank screen for 10 seconds before the entire response appears at once. Now imagine the same website, but text starts appearing within 200 milliseconds, flowing onto the screen word by word. The total wait time for the *complete* response is identical in both cases, but the second experience **feels** dramatically faster.
+Imagine visiting a website where you click "Submit" and stare at a blank screen for 10 seconds before the entire response appears at once. Now imagine the same website, but text starts appearing within 200 milliseconds, flowing onto the screen word by word. The total wait time for the _complete_ response is identical in both cases, but the second experience **feels** dramatically faster.
 
 This is the power of streaming, and it's the single most impactful UX improvement you can make to any LLM-powered application.
 
 There are two fundamental reasons streaming matters:
 
-1. **Perceived latency** -- Users judge responsiveness by *time to first token*, not time to last token. A streaming response that starts in 200ms and takes 5 seconds to complete feels fast. A buffered response that arrives all at once after 5 seconds feels slow. Same total time, completely different user experience.
+1. **Perceived latency** -- Users judge responsiveness by _time to first token_, not time to last token. A streaming response that starts in 200ms and takes 5 seconds to complete feels fast. A buffered response that arrives all at once after 5 seconds feels slow. Same total time, completely different user experience.
 
 2. **Progressive consumption** -- Users can start reading (and making decisions) while the response is still being generated. In a coding agent, this means a developer can spot a mistake in the agent's approach early and abort, rather than waiting for a full incorrect response.
 
@@ -29,25 +29,31 @@ To understand what changes in this chapter, compare the two approaches side by s
 **Buffered (Chapter 01)** -- collect everything, print at the end:
 
 ```typescript
-let response = ''
+let response = "";
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    response += event.assistantMessageEvent.delta  // Accumulate
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    response += event.assistantMessageEvent.delta; // Accumulate
   }
-})
-await session.prompt('...')
-console.log(response)  // Print all at once
+});
+await session.prompt("...");
+console.log(response); // Print all at once
 ```
 
 **Streaming (Chapter 02)** -- print each chunk as it arrives:
 
 ```typescript
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    process.stdout.write(event.assistantMessageEvent.delta)  // Print immediately
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    process.stdout.write(event.assistantMessageEvent.delta); // Print immediately
   }
-})
-await session.prompt('...')
+});
+await session.prompt("...");
 ```
 
 The difference is subtle in code but dramatic in user experience. Instead of `console.log()` at the end, we use `process.stdout.write()` inside the event handler to emit each chunk the instant it arrives.
@@ -99,14 +105,14 @@ session.prompt("Explain how a CPU works")
 
 ### Key Event Types
 
-| Event | When It Fires | What It Contains |
-|-------|---------------|------------------|
-| `agent_start` | Agent begins processing a prompt | No payload -- it's a lifecycle signal |
+| Event            | When It Fires                         | What It Contains                                             |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------ |
+| `agent_start`    | Agent begins processing a prompt      | No payload -- it's a lifecycle signal                        |
 | `message_update` | A piece of response data is available | Nested `assistantMessageEvent` with the specific update type |
-| `text_delta` | A chunk of text has been generated | `delta` -- the text string for this chunk |
-| `agent_end` | Agent has finished all processing | No payload -- signals completion |
+| `text_delta`     | A chunk of text has been generated    | `delta` -- the text string for this chunk                    |
+| `agent_end`      | Agent has finished all processing     | No payload -- signals completion                             |
 
-The `message_update` event is a wrapper. Inside it, the `assistantMessageEvent` field tells you *what kind* of update it is. In this chapter, we only encounter `text_delta`, but in later chapters you'll also see tool-related events nested inside `message_update`.
+The `message_update` event is a wrapper. Inside it, the `assistantMessageEvent` field tells you _what kind_ of update it is. In this chapter, we only encounter `text_delta`, but in later chapters you'll also see tool-related events nested inside `message_update`.
 
 ## Full Code
 
@@ -115,19 +121,19 @@ import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const model = createModel()
+const model = createModel();
 
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => 'You are a helpful assistant. Respond in detail.',
+  systemPromptOverride: () => "You are a helpful assistant. Respond in detail.",
   noExtensions: true,
   noSkills: true,
   noPromptTemplates: true,
   noThemes: true,
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 
 const { session } = await createAgentSession({
   model,
@@ -135,36 +141,37 @@ const { session } = await createAgentSession({
   customTools: [],
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 
 // Subscribe to events — write deltas to stdout as they arrive (typewriter effect)
 session.subscribe((event) => {
-  if (event.type === 'message_update') {
-    const { assistantMessageEvent } = event
+  if (event.type === "message_update") {
+    const { assistantMessageEvent } = event;
     switch (assistantMessageEvent.type) {
-      case 'text_delta':
+      case "text_delta":
         // Stream each text chunk directly to stdout (no newline)
-        process.stdout.write(assistantMessageEvent.delta)
-        break
+        process.stdout.write(assistantMessageEvent.delta);
+        break;
     }
   }
 
   // You can also observe agent lifecycle events
-  if (event.type === 'agent_start') {
-    console.log('[Agent started thinking...]\n')
+  if (event.type === "agent_start") {
+    console.log("[Agent started thinking...]\n");
   }
-  if (event.type === 'agent_end') {
-    console.log('\n\n[Agent finished]')
+  if (event.type === "agent_end") {
+    console.log("\n\n[Agent finished]");
   }
-})
+});
 
-const question = process.argv[2] || 'Explain how a CPU executes instructions, step by step.'
-console.log(`You: ${question}\n`)
+const question =
+  process.argv[2] || "Explain how a CPU executes instructions, step by step.";
+console.log(`You: ${question}\n`);
 
-await session.prompt(question)
+await session.prompt(question);
 
-console.log()
-process.exit(0)
+console.log();
+process.exit(0);
 ```
 
 ## How It Works
@@ -178,7 +185,7 @@ The outer check `event.type === 'message_update'` filters for response content e
 Inside the `message_update`, we switch on `assistantMessageEvent.type`. In this chapter, only `text_delta` is relevant. The `delta` field contains the actual text chunk -- typically a few characters to a few words.
 
 ```typescript
-process.stdout.write(assistantMessageEvent.delta)
+process.stdout.write(assistantMessageEvent.delta);
 ```
 
 This line is the heart of streaming. Each delta is written to stdout immediately, creating the typewriter effect. The chunks appear in the terminal as fast as the LLM generates them.
@@ -192,18 +199,19 @@ The `agent_start` and `agent_end` events are **lifecycle bookends**. They tell y
 - Cleaning up resources after the agent finishes
 
 ```typescript
-if (event.type === 'agent_start') {
-  console.log('[Agent started thinking...]\n')
+if (event.type === "agent_start") {
+  console.log("[Agent started thinking...]\n");
 }
-if (event.type === 'agent_end') {
-  console.log('\n\n[Agent finished]')
+if (event.type === "agent_end") {
+  console.log("\n\n[Agent finished]");
 }
 ```
 
 ### Custom prompts from the command line
 
 ```typescript
-const question = process.argv[2] || 'Explain how a CPU executes instructions, step by step.'
+const question =
+  process.argv[2] || "Explain how a CPU executes instructions, step by step.";
 ```
 
 This line reads an optional command-line argument, so you can test with different prompts without modifying the code. If no argument is provided, it falls back to a default question.
@@ -217,9 +225,9 @@ Always consider error handling in production streaming code. If the LLM API retu
 
 ```typescript
 try {
-  await session.prompt(question)
+  await session.prompt(question);
 } catch (error) {
-  console.error('\nStream interrupted:', error.message)
+  console.error("\nStream interrupted:", error.message);
 }
 ```
 

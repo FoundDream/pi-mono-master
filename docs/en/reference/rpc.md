@@ -14,12 +14,12 @@ pi --mode rpc [options]
 
 Options:
 
-| Flag | Description |
-|------|-------------|
+| Flag                | Description                                   |
+| ------------------- | --------------------------------------------- |
 | `--provider <name>` | Provider to use (e.g., `anthropic`, `openai`) |
-| `--model <id>` | Model ID to use |
-| `--continue` | Resume the most recent session |
-| `--session <path>` | Open a specific session file |
+| `--model <id>`      | Model ID to use                               |
+| `--continue`        | Resume the most recent session                |
+| `--session <path>`  | Open a specific session file                  |
 
 ## Core Protocol
 
@@ -41,16 +41,22 @@ All messages are newline-delimited JSON (one JSON object per line).
 Send a message to the agent.
 
 ```json
-{"type": "prompt", "message": "What files are in this directory?", "id": "req-1"}
+{
+  "type": "prompt",
+  "message": "What files are in this directory?",
+  "id": "req-1"
+}
 ```
 
 Optional fields:
+
 - `images`: Array of `ImageContent` objects to attach
 - `streamingBehavior`: `"steer"` or `"followUp"` (required when agent is already streaming)
 
 Response:
+
 ```json
-{"type": "response", "command": "prompt", "success": true, "id": "req-1"}
+{ "type": "response", "command": "prompt", "success": true, "id": "req-1" }
 ```
 
 #### steer
@@ -58,10 +64,15 @@ Response:
 Queue a steering message to interrupt the agent mid-run. Delivered after current tool execution completes; remaining tool calls are skipped.
 
 ```json
-{"type": "steer", "message": "Actually, focus on the src/ directory only", "id": "req-2"}
+{
+  "type": "steer",
+  "message": "Actually, focus on the src/ directory only",
+  "id": "req-2"
+}
 ```
 
 Optional fields:
+
 - `images`: Array of `ImageContent` objects
 
 #### follow_up
@@ -69,10 +80,15 @@ Optional fields:
 Queue a follow-up message to be processed after the agent finishes. Delivered only when the agent has no more tool calls or steering messages.
 
 ```json
-{"type": "follow_up", "message": "Now explain the architecture", "id": "req-3"}
+{
+  "type": "follow_up",
+  "message": "Now explain the architecture",
+  "id": "req-3"
+}
 ```
 
 Optional fields:
+
 - `images`: Array of `ImageContent` objects
 
 #### abort
@@ -80,7 +96,7 @@ Optional fields:
 Abort the current operation and wait for the agent to become idle.
 
 ```json
-{"type": "abort", "id": "req-4"}
+{ "type": "abort", "id": "req-4" }
 ```
 
 #### new_session
@@ -88,15 +104,23 @@ Abort the current operation and wait for the agent to become idle.
 Start a new session. Clears all messages and creates a fresh session.
 
 ```json
-{"type": "new_session", "id": "req-5"}
+{ "type": "new_session", "id": "req-5" }
 ```
 
 Optional fields:
+
 - `parentSession`: Path to parent session for lineage tracking
 
 Response:
+
 ```json
-{"type": "response", "command": "new_session", "success": true, "data": {"cancelled": false}, "id": "req-5"}
+{
+  "type": "response",
+  "command": "new_session",
+  "success": true,
+  "data": { "cancelled": false },
+  "id": "req-5"
+}
 ```
 
 ### State
@@ -106,17 +130,23 @@ Response:
 Get the current session state.
 
 ```json
-{"type": "get_state", "id": "req-6"}
+{ "type": "get_state", "id": "req-6" }
 ```
 
 Response:
+
 ```json
 {
   "type": "response",
   "command": "get_state",
   "success": true,
   "data": {
-    "model": {"id": "claude-sonnet-4-20250514", "name": "Claude Sonnet 4", "provider": "anthropic", "...": "..."},
+    "model": {
+      "id": "claude-sonnet-4-20250514",
+      "name": "Claude Sonnet 4",
+      "provider": "anthropic",
+      "...": "..."
+    },
     "thinkingLevel": "medium",
     "isStreaming": false,
     "isCompacting": false,
@@ -138,10 +168,11 @@ Response:
 Get all messages in the current session.
 
 ```json
-{"type": "get_messages", "id": "req-7"}
+{ "type": "get_messages", "id": "req-7" }
 ```
 
 Response:
+
 ```json
 {"type": "response", "command": "get_messages", "success": true, "data": {"messages": [...]}, "id": "req-7"}
 ```
@@ -153,10 +184,16 @@ Response:
 Set the model by provider and ID.
 
 ```json
-{"type": "set_model", "provider": "anthropic", "modelId": "claude-opus-4-5", "id": "req-8"}
+{
+  "type": "set_model",
+  "provider": "anthropic",
+  "modelId": "claude-opus-4-5",
+  "id": "req-8"
+}
 ```
 
 Response includes the full model object:
+
 ```json
 {"type": "response", "command": "set_model", "success": true, "data": {"id": "claude-opus-4-5", "provider": "anthropic", "..."}, "id": "req-8"}
 ```
@@ -166,12 +203,23 @@ Response includes the full model object:
 Cycle to the next model. Uses scoped models if configured (via `--models` flag), otherwise cycles through all available models.
 
 ```json
-{"type": "cycle_model", "id": "req-9"}
+{ "type": "cycle_model", "id": "req-9" }
 ```
 
 Response:
+
 ```json
-{"type": "response", "command": "cycle_model", "success": true, "data": {"model": {"provider": "openai", "id": "gpt-4o"}, "thinkingLevel": "medium", "isScoped": false}, "id": "req-9"}
+{
+  "type": "response",
+  "command": "cycle_model",
+  "success": true,
+  "data": {
+    "model": { "provider": "openai", "id": "gpt-4o" },
+    "thinkingLevel": "medium",
+    "isScoped": false
+  },
+  "id": "req-9"
+}
 ```
 
 Returns `null` data if only one model is available.
@@ -181,10 +229,11 @@ Returns `null` data if only one model is available.
 Get a list of all available models.
 
 ```json
-{"type": "get_available_models", "id": "req-10"}
+{ "type": "get_available_models", "id": "req-10" }
 ```
 
 Response:
+
 ```json
 {"type": "response", "command": "get_available_models", "success": true, "data": {"models": [...]}, "id": "req-10"}
 ```
@@ -196,7 +245,7 @@ Response:
 Set the thinking/reasoning level.
 
 ```json
-{"type": "set_thinking_level", "level": "high", "id": "req-11"}
+{ "type": "set_thinking_level", "level": "high", "id": "req-11" }
 ```
 
 Valid levels: `"off"`, `"minimal"`, `"low"`, `"medium"`, `"high"`, `"xhigh"` (xhigh only for specific models).
@@ -206,12 +255,19 @@ Valid levels: `"off"`, `"minimal"`, `"low"`, `"medium"`, `"high"`, `"xhigh"` (xh
 Cycle to the next thinking level.
 
 ```json
-{"type": "cycle_thinking_level", "id": "req-12"}
+{ "type": "cycle_thinking_level", "id": "req-12" }
 ```
 
 Response:
+
 ```json
-{"type": "response", "command": "cycle_thinking_level", "success": true, "data": {"level": "high"}, "id": "req-12"}
+{
+  "type": "response",
+  "command": "cycle_thinking_level",
+  "success": true,
+  "data": { "level": "high" },
+  "id": "req-12"
+}
 ```
 
 Returns `null` data if the model does not support thinking.
@@ -223,10 +279,11 @@ Returns `null` data if the model does not support thinking.
 Control how multiple steering messages are delivered.
 
 ```json
-{"type": "set_steering_mode", "mode": "one-at-a-time", "id": "req-13"}
+{ "type": "set_steering_mode", "mode": "one-at-a-time", "id": "req-13" }
 ```
 
 Modes:
+
 - `"all"` - Deliver all queued steering messages at once
 - `"one-at-a-time"` - Deliver one steering message per turn
 
@@ -235,7 +292,7 @@ Modes:
 Control how multiple follow-up messages are delivered.
 
 ```json
-{"type": "set_follow_up_mode", "mode": "all", "id": "req-14"}
+{ "type": "set_follow_up_mode", "mode": "all", "id": "req-14" }
 ```
 
 Same modes as `set_steering_mode`.
@@ -247,15 +304,27 @@ Same modes as `set_steering_mode`.
 Manually compact the session context.
 
 ```json
-{"type": "compact", "id": "req-15"}
+{ "type": "compact", "id": "req-15" }
 ```
 
 Optional fields:
+
 - `customInstructions`: Custom focus for the compaction summary
 
 Response:
+
 ```json
-{"type": "response", "command": "compact", "success": true, "data": {"summary": "...", "firstKeptEntryId": "uuid", "tokensBefore": 50000}, "id": "req-15"}
+{
+  "type": "response",
+  "command": "compact",
+  "success": true,
+  "data": {
+    "summary": "...",
+    "firstKeptEntryId": "uuid",
+    "tokensBefore": 50000
+  },
+  "id": "req-15"
+}
 ```
 
 #### set_auto_compaction
@@ -263,7 +332,7 @@ Response:
 Enable or disable auto-compaction.
 
 ```json
-{"type": "set_auto_compaction", "enabled": true, "id": "req-16"}
+{ "type": "set_auto_compaction", "enabled": true, "id": "req-16" }
 ```
 
 #### set_auto_retry
@@ -271,7 +340,7 @@ Enable or disable auto-compaction.
 Enable or disable auto-retry for transient errors (rate limits, overloaded, server errors).
 
 ```json
-{"type": "set_auto_retry", "enabled": true, "id": "req-17"}
+{ "type": "set_auto_retry", "enabled": true, "id": "req-17" }
 ```
 
 #### abort_retry
@@ -279,7 +348,7 @@ Enable or disable auto-retry for transient errors (rate limits, overloaded, serv
 Cancel an in-progress retry.
 
 ```json
-{"type": "abort_retry", "id": "req-18"}
+{ "type": "abort_retry", "id": "req-18" }
 ```
 
 ### Execution
@@ -289,12 +358,26 @@ Cancel an in-progress retry.
 Execute a bash command. The result is added to the agent's context.
 
 ```json
-{"type": "bash", "command": "ls -la", "id": "req-19"}
+{ "type": "bash", "command": "ls -la", "id": "req-19" }
 ```
 
 Response:
+
 ```json
-{"type": "response", "command": "bash", "success": true, "data": {"stdout": "...", "stderr": "", "exitCode": 0, "signal": null, "cancelled": false, "truncated": false}, "id": "req-19"}
+{
+  "type": "response",
+  "command": "bash",
+  "success": true,
+  "data": {
+    "stdout": "...",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "cancelled": false,
+    "truncated": false
+  },
+  "id": "req-19"
+}
 ```
 
 #### abort_bash
@@ -302,7 +385,7 @@ Response:
 Cancel a running bash command.
 
 ```json
-{"type": "abort_bash", "id": "req-20"}
+{ "type": "abort_bash", "id": "req-20" }
 ```
 
 ### Session
@@ -312,10 +395,11 @@ Cancel a running bash command.
 Get statistics about the current session.
 
 ```json
-{"type": "get_session_stats", "id": "req-21"}
+{ "type": "get_session_stats", "id": "req-21" }
 ```
 
 Response:
+
 ```json
 {
   "type": "response",
@@ -347,15 +431,23 @@ Response:
 Export the session to an HTML file.
 
 ```json
-{"type": "export_html", "id": "req-22"}
+{ "type": "export_html", "id": "req-22" }
 ```
 
 Optional fields:
+
 - `outputPath`: Custom output path
 
 Response:
+
 ```json
-{"type": "response", "command": "export_html", "success": true, "data": {"path": "/path/to/export.html"}, "id": "req-22"}
+{
+  "type": "response",
+  "command": "export_html",
+  "success": true,
+  "data": { "path": "/path/to/export.html" },
+  "id": "req-22"
+}
 ```
 
 #### switch_session
@@ -363,12 +455,23 @@ Response:
 Switch to a different session file.
 
 ```json
-{"type": "switch_session", "sessionPath": "/path/to/other-session.jsonl", "id": "req-23"}
+{
+  "type": "switch_session",
+  "sessionPath": "/path/to/other-session.jsonl",
+  "id": "req-23"
+}
 ```
 
 Response:
+
 ```json
-{"type": "response", "command": "switch_session", "success": true, "data": {"cancelled": false}, "id": "req-23"}
+{
+  "type": "response",
+  "command": "switch_session",
+  "success": true,
+  "data": { "cancelled": false },
+  "id": "req-23"
+}
 ```
 
 #### fork
@@ -376,12 +479,19 @@ Response:
 Create a fork from a specific entry. Creates a new session file with the path up to that entry.
 
 ```json
-{"type": "fork", "entryId": "uuid-of-entry", "id": "req-24"}
+{ "type": "fork", "entryId": "uuid-of-entry", "id": "req-24" }
 ```
 
 Response:
+
 ```json
-{"type": "response", "command": "fork", "success": true, "data": {"text": "original user message text", "cancelled": false}, "id": "req-24"}
+{
+  "type": "response",
+  "command": "fork",
+  "success": true,
+  "data": { "text": "original user message text", "cancelled": false },
+  "id": "req-24"
+}
 ```
 
 #### get_fork_messages
@@ -389,12 +499,24 @@ Response:
 Get all user messages available for forking.
 
 ```json
-{"type": "get_fork_messages", "id": "req-25"}
+{ "type": "get_fork_messages", "id": "req-25" }
 ```
 
 Response:
+
 ```json
-{"type": "response", "command": "get_fork_messages", "success": true, "data": {"messages": [{"entryId": "uuid-1", "text": "First message"}, {"entryId": "uuid-3", "text": "Second message"}]}, "id": "req-25"}
+{
+  "type": "response",
+  "command": "get_fork_messages",
+  "success": true,
+  "data": {
+    "messages": [
+      { "entryId": "uuid-1", "text": "First message" },
+      { "entryId": "uuid-3", "text": "Second message" }
+    ]
+  },
+  "id": "req-25"
+}
 ```
 
 #### get_last_assistant_text
@@ -402,12 +524,19 @@ Response:
 Get the text content of the last assistant message.
 
 ```json
-{"type": "get_last_assistant_text", "id": "req-26"}
+{ "type": "get_last_assistant_text", "id": "req-26" }
 ```
 
 Response:
+
 ```json
-{"type": "response", "command": "get_last_assistant_text", "success": true, "data": {"text": "Here are the files..."}, "id": "req-26"}
+{
+  "type": "response",
+  "command": "get_last_assistant_text",
+  "success": true,
+  "data": { "text": "Here are the files..." },
+  "id": "req-26"
+}
 ```
 
 #### set_session_name
@@ -415,7 +544,7 @@ Response:
 Set a display name for the current session.
 
 ```json
-{"type": "set_session_name", "name": "Auth Feature", "id": "req-27"}
+{ "type": "set_session_name", "name": "Auth Feature", "id": "req-27" }
 ```
 
 #### get_commands
@@ -423,10 +552,11 @@ Set a display name for the current session.
 Get available commands (extension commands, prompt templates, skills).
 
 ```json
-{"type": "get_commands", "id": "req-28"}
+{ "type": "get_commands", "id": "req-28" }
 ```
 
 Response:
+
 ```json
 {
   "type": "response",
@@ -434,8 +564,20 @@ Response:
   "success": true,
   "data": {
     "commands": [
-      {"name": "review", "description": "Review code changes", "source": "prompt", "location": "project", "path": "/project/.pi/prompts/review.md"},
-      {"name": "deploy", "description": "Deploy to staging", "source": "skill", "location": "user", "path": "~/.pi/agent/skills/deploy.md"}
+      {
+        "name": "review",
+        "description": "Review code changes",
+        "source": "prompt",
+        "location": "project",
+        "path": "/project/.pi/prompts/review.md"
+      },
+      {
+        "name": "deploy",
+        "description": "Deploy to staging",
+        "source": "skill",
+        "location": "user",
+        "path": "~/.pi/agent/skills/deploy.md"
+      }
     ]
   },
   "id": "req-28"
@@ -446,22 +588,22 @@ Response:
 
 While the agent is running, events are emitted as JSON lines on stdout. These are the same `AgentSessionEvent` types described in the [JSON Event Stream](/reference/json) documentation:
 
-| Event Type | Description |
-|-----------|-------------|
-| `agent_start` | Agent begins processing |
-| `agent_end` | Agent finishes (includes all messages) |
-| `turn_start` | New turn begins |
-| `turn_end` | Turn complete (includes message and tool results) |
-| `message_start` | Assistant message streaming begins |
-| `message_update` | Streaming delta (text, thinking, tool call) |
-| `message_end` | Assistant message complete |
-| `tool_execution_start` | Tool begins executing |
-| `tool_execution_update` | Tool progress update |
-| `tool_execution_end` | Tool execution complete |
-| `auto_compaction_start` | Auto-compaction triggered |
-| `auto_compaction_end` | Auto-compaction finished |
-| `auto_retry_start` | Auto-retry triggered (transient error) |
-| `auto_retry_end` | Auto-retry finished |
+| Event Type              | Description                                       |
+| ----------------------- | ------------------------------------------------- |
+| `agent_start`           | Agent begins processing                           |
+| `agent_end`             | Agent finishes (includes all messages)            |
+| `turn_start`            | New turn begins                                   |
+| `turn_end`              | Turn complete (includes message and tool results) |
+| `message_start`         | Assistant message streaming begins                |
+| `message_update`        | Streaming delta (text, thinking, tool call)       |
+| `message_end`           | Assistant message complete                        |
+| `tool_execution_start`  | Tool begins executing                             |
+| `tool_execution_update` | Tool progress update                              |
+| `tool_execution_end`    | Tool execution complete                           |
+| `auto_compaction_start` | Auto-compaction triggered                         |
+| `auto_compaction_end`   | Auto-compaction finished                          |
+| `auto_retry_start`      | Auto-retry triggered (transient error)            |
+| `auto_retry_end`        | Auto-retry finished                               |
 
 ## Image Support
 
@@ -502,29 +644,30 @@ Extensions may need user input during execution. The RPC mode surfaces these req
 
 These methods block the extension until a response is sent:
 
-| Method | Fields | Expected Response |
-|--------|--------|-------------------|
-| `select` | `title`, `options: string[]`, `timeout?` | `{"type": "extension_ui_response", "id": "...", "value": "selected option"}` |
-| `confirm` | `title`, `message`, `timeout?` | `{"type": "extension_ui_response", "id": "...", "confirmed": true}` |
-| `input` | `title`, `placeholder?`, `timeout?` | `{"type": "extension_ui_response", "id": "...", "value": "user input"}` |
-| `editor` | `title`, `prefill?` | `{"type": "extension_ui_response", "id": "...", "value": "editor content"}` |
+| Method    | Fields                                   | Expected Response                                                            |
+| --------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| `select`  | `title`, `options: string[]`, `timeout?` | `{"type": "extension_ui_response", "id": "...", "value": "selected option"}` |
+| `confirm` | `title`, `message`, `timeout?`           | `{"type": "extension_ui_response", "id": "...", "confirmed": true}`          |
+| `input`   | `title`, `placeholder?`, `timeout?`      | `{"type": "extension_ui_response", "id": "...", "value": "user input"}`      |
+| `editor`  | `title`, `prefill?`                      | `{"type": "extension_ui_response", "id": "...", "value": "editor content"}`  |
 
 To cancel any dialog:
+
 ```json
-{"type": "extension_ui_response", "id": "request-id", "cancelled": true}
+{ "type": "extension_ui_response", "id": "request-id", "cancelled": true }
 ```
 
 ### Fire-and-Forget Methods (no response needed)
 
 These methods are informational and do not require a response:
 
-| Method | Fields | Description |
-|--------|--------|-------------|
-| `notify` | `message`, `notifyType?: "info" \| "warning" \| "error"` | Show a notification |
-| `setStatus` | `statusKey`, `statusText: string \| undefined` | Set/clear status text |
-| `setWidget` | `widgetKey`, `widgetLines: string[] \| undefined`, `widgetPlacement?` | Set/clear widget |
-| `setTitle` | `title` | Set terminal title |
-| `set_editor_text` | `text` | Set editor text |
+| Method            | Fields                                                                | Description           |
+| ----------------- | --------------------------------------------------------------------- | --------------------- |
+| `notify`          | `message`, `notifyType?: "info" \| "warning" \| "error"`              | Show a notification   |
+| `setStatus`       | `statusKey`, `statusText: string \| undefined`                        | Set/clear status text |
+| `setWidget`       | `widgetKey`, `widgetLines: string[] \| undefined`, `widgetPlacement?` | Set/clear widget      |
+| `setTitle`        | `title`                                                               | Set terminal title    |
+| `set_editor_text` | `text`                                                                | Set editor text       |
 
 ### Extension UI Request Format
 
@@ -542,7 +685,7 @@ These methods are informational and do not require a response:
 ### Extension UI Response Format
 
 ```json
-{"type": "extension_ui_response", "id": "ext-req-1", "confirmed": true}
+{ "type": "extension_ui_response", "id": "ext-req-1", "confirmed": true }
 ```
 
 ## Error Responses
@@ -578,7 +721,10 @@ await client.start();
 
 // Subscribe to events
 const unsubscribe = client.onEvent((event) => {
-  if (event.type === "message_update" && event.assistantMessageEvent.type === "text_delta") {
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
     process.stdout.write(event.assistantMessageEvent.delta);
   }
 });

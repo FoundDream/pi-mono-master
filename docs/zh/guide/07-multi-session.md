@@ -57,12 +57,12 @@
 
 我们将在 REPL 中实现以下命令：
 
-| 命令 | 说明 |
-|------|------|
+| 命令        | 说明                         |
+| ----------- | ---------------------------- |
 | `/sessions` | 列出所有已保存的会话及消息数 |
-| `/new` | 创建新会话 |
-| `/open <n>` | 打开列表中第 N 个会话 |
-| `/quit` | 退出 |
+| `/new`      | 创建新会话                   |
+| `/open <n>` | 打开列表中第 N 个会话        |
+| `/quit`     | 退出                         |
 
 ## 核心模式
 
@@ -71,13 +71,13 @@
 `SessionManager.list()` 是一个**静态方法**——它不属于任何特定的会话实例，而是扫描指定目录中的所有会话文件：
 
 ```typescript
-const sessions = await SessionManager.list(process.cwd(), SESSION_DIR)
+const sessions = await SessionManager.list(process.cwd(), SESSION_DIR);
 
 sessions.forEach((s, i) => {
-  const name = s.name || s.firstMessage.slice(0, 50) || '(空)'
-  const date = s.modified.toLocaleDateString()
-  console.log(`${i + 1}. [${s.messageCount} 条消息, ${date}] ${name}`)
-})
+  const name = s.name || s.firstMessage.slice(0, 50) || "(空)";
+  const date = s.modified.toLocaleDateString();
+  console.log(`${i + 1}. [${s.messageCount} 条消息, ${date}] ${name}`);
+});
 ```
 
 这里有一个实用的 UX 技巧：我们用 `s.firstMessage.slice(0, 50)` 作为会话的"预览标题"。如果用户没有给会话命名（大多数时候不会），那么第一条消息就是最好的标识——它通常能告诉你这个会话是关于什么的。
@@ -88,14 +88,14 @@ sessions.forEach((s, i) => {
 
 ```typescript
 // 切换到新会话
-session.dispose()
-sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-session = await buildSession(sessionManager)
+session.dispose();
+sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+session = await buildSession(sessionManager);
 
 // 切换到已有会话
-session.dispose()
-sessionManager = SessionManager.open(target.path, SESSION_DIR)
-session = await buildSession(sessionManager)
+session.dispose();
+sessionManager = SessionManager.open(target.path, SESSION_DIR);
+session = await buildSession(sessionManager);
 ```
 
 ### 底层原理：为什么 `dispose()` 是必须的？
@@ -118,13 +118,13 @@ session = await buildSession(sessionManager)
 
 ```typescript
 interface SessionInfo {
-  path: string          // 会话文件完整路径
-  id: string            // 唯一会话 ID
-  name?: string         // 用户定义的名称
-  created: Date
-  modified: Date
-  messageCount: number
-  firstMessage: string  // 第一条用户消息的预览
+  path: string; // 会话文件完整路径
+  id: string; // 唯一会话 ID
+  name?: string; // 用户定义的名称
+  created: Date;
+  modified: Date;
+  messageCount: number;
+  firstMessage: string; // 第一条用户消息的预览
 }
 ```
 
@@ -134,12 +134,12 @@ interface SessionInfo {
 
 在实际应用中，随着会话数量增长，你会需要更好的组织策略：
 
-| 策略 | 适用场景 | 实现方式 |
-|------|---------|---------|
-| **按时间排序** | 通用场景 | 用 `modified` 字段排序（默认行为） |
-| **按主题分组** | 项目管理、客服 | 使用不同的 `SESSION_DIR` |
-| **定期清理** | 长期运行的应用 | 删除超过 N 天的会话文件 |
-| **限制会话数量** | 资源受限环境 | 保留最近 N 个会话，自动删除最旧的 |
+| 策略             | 适用场景       | 实现方式                           |
+| ---------------- | -------------- | ---------------------------------- |
+| **按时间排序**   | 通用场景       | 用 `modified` 字段排序（默认行为） |
+| **按主题分组**   | 项目管理、客服 | 使用不同的 `SESSION_DIR`           |
+| **定期清理**     | 长期运行的应用 | 删除超过 N 天的会话文件            |
+| **限制会话数量** | 资源受限环境   | 保留最近 N 个会话，自动删除最旧的  |
 
 :::tip 提示
 在 AirJelly Desktop 中，每个"任务"（Task）都有自己独立的会话目录。这样，关于项目 A 的对话和关于项目 B 的对话被自然地隔离开来。你也可以采用类似的策略——按项目、按用户、或按功能模块创建不同的会话目录。
@@ -148,104 +148,122 @@ interface SessionInfo {
 ## 完整代码
 
 ```typescript
-import * as path from 'node:path'
-import * as readline from 'node:readline'
+import * as path from "node:path";
+import * as readline from "node:readline";
 import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
   type AgentSession,
   type SessionInfo,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const SESSION_DIR = path.join(import.meta.dirname, '.sessions')
-const model = createModel()
+const SESSION_DIR = path.join(import.meta.dirname, ".sessions");
+const model = createModel();
 
 // --- 辅助函数 ---
 
 async function createResourceLoader() {
   const rl = new DefaultResourceLoader({
-    systemPromptOverride: () => 'You are a helpful assistant. Be concise.',
+    systemPromptOverride: () => "You are a helpful assistant. Be concise.",
     noExtensions: true,
     noSkills: true,
     noPromptTemplates: true,
     noThemes: true,
-  })
-  await rl.reload()
-  return rl
+  });
+  await rl.reload();
+  return rl;
 }
 
 async function buildSession(sm: SessionManager): Promise<AgentSession> {
-  const resourceLoader = await createResourceLoader()
+  const resourceLoader = await createResourceLoader();
   const { session } = await createAgentSession({
     model,
     tools: [],
     customTools: [],
     sessionManager: sm,
     resourceLoader,
-  })
+  });
   session.subscribe((event) => {
-    if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-      process.stdout.write(event.assistantMessageEvent.delta)
+    if (
+      event.type === "message_update" &&
+      event.assistantMessageEvent.type === "text_delta"
+    ) {
+      process.stdout.write(event.assistantMessageEvent.delta);
     }
-  })
-  return session
+  });
+  return session;
 }
 
 // --- 状态 ---
 
-let sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-let session = await buildSession(sessionManager)
-let cachedSessions: SessionInfo[] = []
+let sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+let session = await buildSession(sessionManager);
+let cachedSessions: SessionInfo[] = [];
 
 // --- 带命令的 REPL ---
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 const ask = () => {
-  rl.question('You: ', async (input) => {
-    const trimmed = input.trim()
+  rl.question("You: ", async (input) => {
+    const trimmed = input.trim();
 
-    if (trimmed === '/sessions') {
-      cachedSessions = await SessionManager.list(process.cwd(), SESSION_DIR)
+    if (trimmed === "/sessions") {
+      cachedSessions = await SessionManager.list(process.cwd(), SESSION_DIR);
       cachedSessions.forEach((s, i) => {
-        const name = s.name || s.firstMessage.slice(0, 50) || '(空)'
-        console.log(`  ${i + 1}. [${s.messageCount} 条消息] ${name}`)
-      })
-      ask(); return
+        const name = s.name || s.firstMessage.slice(0, 50) || "(空)";
+        console.log(`  ${i + 1}. [${s.messageCount} 条消息] ${name}`);
+      });
+      ask();
+      return;
     }
 
-    if (trimmed === '/new') {
-      session.dispose()
-      sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-      session = await buildSession(sessionManager)
-      console.log('📝 已创建新会话\n')
-      ask(); return
+    if (trimmed === "/new") {
+      session.dispose();
+      sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+      session = await buildSession(sessionManager);
+      console.log("📝 已创建新会话\n");
+      ask();
+      return;
     }
 
-    if (trimmed.startsWith('/open ')) {
-      const idx = parseInt(trimmed.split(' ')[1]) - 1
+    if (trimmed.startsWith("/open ")) {
+      const idx = parseInt(trimmed.split(" ")[1]) - 1;
       if (cachedSessions[idx]) {
-        session.dispose()
-        sessionManager = SessionManager.open(cachedSessions[idx].path, SESSION_DIR)
-        session = await buildSession(sessionManager)
-        console.log(`📂 已打开会话 ${idx + 1}\n`)
+        session.dispose();
+        sessionManager = SessionManager.open(
+          cachedSessions[idx].path,
+          SESSION_DIR,
+        );
+        session = await buildSession(sessionManager);
+        console.log(`📂 已打开会话 ${idx + 1}\n`);
       }
-      ask(); return
+      ask();
+      return;
     }
 
-    if (trimmed === '/quit') { rl.close(); process.exit(0) }
-    if (!trimmed) { ask(); return }
+    if (trimmed === "/quit") {
+      rl.close();
+      process.exit(0);
+    }
+    if (!trimmed) {
+      ask();
+      return;
+    }
 
-    process.stdout.write('\nAgent: ')
-    await session.prompt(trimmed)
-    console.log('\n')
-    ask()
-  })
-}
+    process.stdout.write("\nAgent: ");
+    await session.prompt(trimmed);
+    console.log("\n");
+    ask();
+  });
+};
 
-ask()
+ask();
 ```
 
 ### 代码解读
@@ -287,13 +305,13 @@ bun run ch07
 
 ```typescript
 // 错误：直接创建新会话，旧会话的资源泄漏
-sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-session = await buildSession(sessionManager)
+sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+session = await buildSession(sessionManager);
 
 // 正确：先 dispose 旧会话
-session.dispose()
-sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-session = await buildSession(sessionManager)
+session.dispose();
+sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+session = await buildSession(sessionManager);
 ```
 
 **2. `/open` 使用了过期的会话列表**
@@ -301,11 +319,11 @@ session = await buildSession(sessionManager)
 ```typescript
 // 潜在问题：如果两次 /open 之间创建了新会话，缓存可能过期
 // 建议：在 /new 之后清空缓存
-if (trimmed === '/new') {
-  session.dispose()
-  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR)
-  session = await buildSession(sessionManager)
-  cachedSessions = []  // 清空缓存，强制用户重新 /sessions
+if (trimmed === "/new") {
+  session.dispose();
+  sessionManager = SessionManager.create(process.cwd(), SESSION_DIR);
+  session = await buildSession(sessionManager);
+  cachedSessions = []; // 清空缓存，强制用户重新 /sessions
 }
 ```
 
@@ -314,8 +332,8 @@ if (trimmed === '/new') {
 ```typescript
 // 危险：如果 prompt 还在执行，dispose 可能导致问题
 // 在 GUI 应用中，应该先 abort() 再 dispose()
-session.abort()
-session.dispose()
+session.abort();
+session.dispose();
 ```
 
 ## 小结

@@ -10,12 +10,12 @@ Extensions run with full system permissions in the main process. Only install ex
 
 Extensions are loaded from multiple locations:
 
-| Location | Scope | Description |
-|----------|-------|-------------|
-| `~/.pi/agent/extensions/` | Global | Available in all projects |
-| `.pi/extensions/` | Project | Project-specific extensions |
-| Settings `extensions` array | Any | Paths specified in settings |
-| Packages | Any | Extensions from installed packages |
+| Location                    | Scope   | Description                        |
+| --------------------------- | ------- | ---------------------------------- |
+| `~/.pi/agent/extensions/`   | Global  | Available in all projects          |
+| `.pi/extensions/`           | Project | Project-specific extensions        |
+| Settings `extensions` array | Any     | Paths specified in settings        |
+| Packages                    | Any     | Extensions from installed packages |
 
 Extensions support hot reload. When you modify an extension file, Pi reloads it automatically without restarting the session.
 
@@ -92,14 +92,14 @@ export default function (pi: ExtensionAPI) {
 
 ### Event Categories
 
-| Category | Events | Description |
-|----------|--------|-------------|
-| Session | `session:start`, `session:end`, `session:fork` | Session lifecycle |
-| Message | `message:user`, `message:assistant`, `message:system` | Message flow |
-| Tool | `tool:start`, `tool:end`, `tool:error` | Tool execution |
-| Generation | `generation:start`, `generation:end`, `generation:stream` | LLM generation |
-| Error | `error` | Error handling |
-| Compaction | `compaction:start`, `compaction:end` | Context compaction |
+| Category   | Events                                                    | Description        |
+| ---------- | --------------------------------------------------------- | ------------------ |
+| Session    | `session:start`, `session:end`, `session:fork`            | Session lifecycle  |
+| Message    | `message:user`, `message:assistant`, `message:system`     | Message flow       |
+| Tool       | `tool:start`, `tool:end`, `tool:error`                    | Tool execution     |
+| Generation | `generation:start`, `generation:end`, `generation:stream` | LLM generation     |
+| Error      | `error`                                                   | Error handling     |
+| Compaction | `compaction:start`, `compaction:end`                      | Context compaction |
 
 ## Custom Tools
 
@@ -118,12 +118,12 @@ export default function (pi: ExtensionAPI) {
         Type.Union([Type.Literal("celsius"), Type.Literal("fahrenheit")], {
           description: "Temperature units",
           default: "celsius",
-        })
+        }),
       ),
     }),
     execute: async (params) => {
       const response = await fetch(
-        `https://api.weather.example.com/current?city=${params.city}&units=${params.units || "celsius"}`
+        `https://api.weather.example.com/current?city=${params.city}&units=${params.units || "celsius"}`,
       );
       const data = await response.json();
       return {
@@ -155,7 +155,7 @@ export default function (pi: ExtensionAPI) {
     execute: async (params, ctx) => {
       // Show a confirmation dialog
       const confirmed = await ctx.ui.confirm(
-        `Deploy ${params.version} to ${params.environment}?`
+        `Deploy ${params.version} to ${params.environment}?`,
       );
       if (!confirmed) {
         return { status: "cancelled" };
@@ -181,12 +181,12 @@ export default function (pi: ExtensionAPI) {
 
 ### UI Methods
 
-| Method | Description |
-|--------|-------------|
-| `ctx.ui.confirm(message)` | Show a yes/no confirmation dialog |
-| `ctx.ui.notify(message)` | Display a notification |
-| `ctx.ui.setStatus(message)` | Set status bar text |
-| `ctx.ui.clearStatus()` | Clear status bar |
+| Method                      | Description                       |
+| --------------------------- | --------------------------------- |
+| `ctx.ui.confirm(message)`   | Show a yes/no confirmation dialog |
+| `ctx.ui.notify(message)`    | Display a notification            |
+| `ctx.ui.setStatus(message)` | Set status bar text               |
+| `ctx.ui.clearStatus()`      | Clear status bar                  |
 
 ## State Management
 
@@ -280,12 +280,12 @@ export default function (pi: ExtensionAPI) {
 
 ### Session Methods
 
-| Method | Description |
-|--------|-------------|
-| `ctx.session.newSession()` | Start a new empty session |
-| `ctx.session.fork()` | Fork the current session at this point |
+| Method                                | Description                                  |
+| ------------------------------------- | -------------------------------------------- |
+| `ctx.session.newSession()`            | Start a new empty session                    |
+| `ctx.session.fork()`                  | Fork the current session at this point       |
 | `ctx.session.navigateTree(direction)` | Navigate: `"parent"`, `"child"`, `"sibling"` |
-| `ctx.session.reload()` | Reload all extensions and configuration |
+| `ctx.session.reload()`                | Reload all extensions and configuration      |
 
 ## Provider Registration
 

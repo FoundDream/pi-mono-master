@@ -66,36 +66,36 @@ A provider definition with all available fields:
 
 ## Supported APIs
 
-| API | Description |
-|-----|-------------|
-| `openai-completions` | OpenAI Chat Completions API |
-| `openai-responses` | OpenAI Responses API |
-| `anthropic-messages` | Anthropic Messages API |
+| API                    | Description                      |
+| ---------------------- | -------------------------------- |
+| `openai-completions`   | OpenAI Chat Completions API      |
+| `openai-responses`     | OpenAI Responses API             |
+| `anthropic-messages`   | Anthropic Messages API           |
 | `google-generative-ai` | Google Generative AI (AI Studio) |
 
 ## Provider Configuration
 
 ### Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `baseUrl` | string | Yes | API base URL |
-| `api` | string | Yes | API type (see table above) |
-| `apiKey` | string | No | API key for authentication |
-| `authHeader` | string | No | Custom auth header name (default: `Authorization` with `Bearer` prefix) |
-| `headers` | object | No | Additional HTTP headers for all requests |
-| `models` | object | No | Map of model ID to model configuration |
-| `modelOverrides` | object | No | Per-model overrides applied to built-in models |
+| Field            | Type   | Required | Description                                                             |
+| ---------------- | ------ | -------- | ----------------------------------------------------------------------- |
+| `baseUrl`        | string | Yes      | API base URL                                                            |
+| `api`            | string | Yes      | API type (see table above)                                              |
+| `apiKey`         | string | No       | API key for authentication                                              |
+| `authHeader`     | string | No       | Custom auth header name (default: `Authorization` with `Bearer` prefix) |
+| `headers`        | object | No       | Additional HTTP headers for all requests                                |
+| `models`         | object | No       | Map of model ID to model configuration                                  |
+| `modelOverrides` | object | No       | Per-model overrides applied to built-in models                          |
 
 ### Value Resolution
 
 The `apiKey` and `headers` values support three formats:
 
-| Format | Example | Description |
-|--------|---------|-------------|
-| Shell command | `"!op read op://vault/key"` | Runs command, uses stdout (prefix with `!`) |
-| Environment variable | `"$MY_API_KEY"` | Reads from environment (prefix with `$`) |
-| Literal | `"sk-abc123"` | Used as-is |
+| Format               | Example                     | Description                                 |
+| -------------------- | --------------------------- | ------------------------------------------- |
+| Shell command        | `"!op read op://vault/key"` | Runs command, uses stdout (prefix with `!`) |
+| Environment variable | `"$MY_API_KEY"`             | Reads from environment (prefix with `$`)    |
+| Literal              | `"sk-abc123"`               | Used as-is                                  |
 
 ### Custom Headers Example
 
@@ -122,24 +122,24 @@ The `apiKey` and `headers` values support three formats:
 
 ### Fields
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `id` | string | (key) | Model identifier (defaults to the object key) |
-| `name` | string | (id) | Human-readable display name |
-| `api` | string | (provider) | Override the provider-level API type |
-| `reasoning` | boolean | `false` | Whether the model supports extended thinking |
-| `input` | string[] | `["text"]` | Supported input types: `"text"`, `"image"` |
-| `contextWindow` | number | `128000` | Maximum context window in tokens |
-| `maxTokens` | number | `8192` | Maximum output tokens per response |
-| `cost` | object | - | Cost per million tokens |
+| Field           | Type     | Default    | Description                                   |
+| --------------- | -------- | ---------- | --------------------------------------------- |
+| `id`            | string   | (key)      | Model identifier (defaults to the object key) |
+| `name`          | string   | (id)       | Human-readable display name                   |
+| `api`           | string   | (provider) | Override the provider-level API type          |
+| `reasoning`     | boolean  | `false`    | Whether the model supports extended thinking  |
+| `input`         | string[] | `["text"]` | Supported input types: `"text"`, `"image"`    |
+| `contextWindow` | number   | `128000`   | Maximum context window in tokens              |
+| `maxTokens`     | number   | `8192`     | Maximum output tokens per response            |
+| `cost`          | object   | -          | Cost per million tokens                       |
 
 ### Cost Object
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `input` | number | Cost per 1M input tokens (USD) |
-| `output` | number | Cost per 1M output tokens (USD) |
-| `cacheRead` | number | Cost per 1M cache-read tokens (USD) |
+| Field        | Type   | Description                          |
+| ------------ | ------ | ------------------------------------ |
+| `input`      | number | Cost per 1M input tokens (USD)       |
+| `output`     | number | Cost per 1M output tokens (USD)      |
+| `cacheRead`  | number | Cost per 1M cache-read tokens (USD)  |
 | `cacheWrite` | number | Cost per 1M cache-write tokens (USD) |
 
 ## Overriding Built-in Providers
@@ -207,15 +207,15 @@ Many providers offer OpenAI-compatible APIs with slight differences. Use the `co
 
 ### Compat Flags
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `disableStreaming` | `false` | Fall back to non-streaming requests |
-| `disableTools` | `false` | Remove tool definitions from requests |
-| `disableSystemMessages` | `false` | Convert system messages to user messages |
-| `disableVision` | `false` | Strip image content from messages |
+| Flag                     | Default | Description                                   |
+| ------------------------ | ------- | --------------------------------------------- |
+| `disableStreaming`       | `false` | Fall back to non-streaming requests           |
+| `disableTools`           | `false` | Remove tool definitions from requests         |
+| `disableSystemMessages`  | `false` | Convert system messages to user messages      |
+| `disableVision`          | `false` | Strip image content from messages             |
 | `forceSimpleToolResults` | `false` | Simplify tool result format for compatibility |
-| `skipProviderMetadata` | `false` | Skip parsing provider-specific metadata |
-| `forceMaxTokens` | `false` | Always include `max_tokens` in requests |
+| `skipProviderMetadata`   | `false` | Skip parsing provider-specific metadata       |
+| `forceMaxTokens`         | `false` | Always include `max_tokens` in requests       |
 
 ## OpenRouter
 

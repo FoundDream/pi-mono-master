@@ -7,6 +7,7 @@
 没有系统提示词的 Agent 就像一个没有岗位说明的员工：它很聪明，但不知道自己的角色是什么，不知道该用什么语气说话，不知道哪些事该做哪些事不该做。结果就是行为不可预测——有时过于啰嗦，有时过于简洁，有时做了不该做的事。
 
 系统提示词和技能系统共同解决了 Agent 行为控制的两个层面：
+
 - **系统提示词**：定义 Agent 的"人格"和全局行为准则（"你是谁"）
 - **技能**：提供可组合的领域知识模块（"你会什么"）
 
@@ -30,13 +31,13 @@
 
 一个好的系统提示词通常包含以下要素：
 
-| 要素 | 作用 | 示例 |
-|------|------|------|
-| **身份定义** | 告诉 AI 它是谁 | "You are WeatherBot, a friendly weather assistant." |
-| **行为准则** | 定义交互风格 | "Always greet the user warmly." |
+| 要素             | 作用                 | 示例                                                        |
+| ---------------- | -------------------- | ----------------------------------------------------------- |
+| **身份定义**     | 告诉 AI 它是谁       | "You are WeatherBot, a friendly weather assistant."         |
+| **行为准则**     | 定义交互风格         | "Always greet the user warmly."                             |
 | **工具使用指导** | 什么时候该用什么工具 | "When asked about weather, use the get_weather tool first." |
-| **限制条件** | 不该做的事 | "Never make up weather data. If unsure, say so." |
-| **输出格式** | 期望的回复结构 | "Structure responses as: conditions, humidity, forecast." |
+| **限制条件**     | 不该做的事           | "Never make up weather data. If unsure, say so."            |
+| **输出格式**     | 期望的回复结构       | "Structure responses as: conditions, humidity, forecast."   |
 
 ## 技能文件格式
 
@@ -62,11 +63,11 @@ Keep the tone professional but friendly, like a TV weather presenter.
 
 ### Frontmatter 字段详解
 
-| 字段 | 必需 | 说明 |
-|------|------|------|
-| `name` | 是 | 技能的唯一标识符，建议使用 kebab-case（如 `weather-expert`） |
-| `description` | 是 | 简短描述技能的功能，帮助框架和开发者理解技能用途 |
-| `disable-model-invocation` | 否 | 设为 `true` 时，该技能不会被模型主动触发，仅在显式调用时生效 |
+| 字段                       | 必需 | 说明                                                         |
+| -------------------------- | ---- | ------------------------------------------------------------ |
+| `name`                     | 是   | 技能的唯一标识符，建议使用 kebab-case（如 `weather-expert`） |
+| `description`              | 是   | 简短描述技能的功能，帮助框架和开发者理解技能用途             |
+| `disable-model-invocation` | 否   | 设为 `true` 时，该技能不会被模型主动触发，仅在显式调用时生效 |
 
 ### 发现规则
 
@@ -86,6 +87,7 @@ skills/
 ```
 
 这种设计允许你用两种方式组织技能：
+
 - **简单技能**：单个 `.md` 文件放在根目录
 - **复杂技能**：独立子目录，`SKILL.md` 是入口，同目录下可以放其他辅助文件
 
@@ -93,13 +95,13 @@ skills/
 
 你可能会问：技能和其他框架中的"插件"有什么区别？
 
-| 维度 | 传统插件 | 技能（Skills） |
-|------|---------|--------------|
-| **形式** | 代码（JavaScript/Python） | 纯文本（Markdown） |
-| **修改方式** | 需要编程能力 | 任何人都能编辑 |
-| **加载时机** | 编译时/启动时 | 运行时动态加载 |
-| **作用机制** | 修改程序行为 | 修改 AI 的理解和响应方式 |
-| **组合方式** | 接口/依赖注入 | 简单拼接到 Prompt 中 |
+| 维度         | 传统插件                  | 技能（Skills）           |
+| ------------ | ------------------------- | ------------------------ |
+| **形式**     | 代码（JavaScript/Python） | 纯文本（Markdown）       |
+| **修改方式** | 需要编程能力              | 任何人都能编辑           |
+| **加载时机** | 编译时/启动时             | 运行时动态加载           |
+| **作用机制** | 修改程序行为              | 修改 AI 的理解和响应方式 |
+| **组合方式** | 接口/依赖注入             | 简单拼接到 Prompt 中     |
 
 技能的核心哲学是：**用自然语言而非代码来"编程" AI 的行为。** 这大大降低了定制 Agent 行为的门槛——产品经理、领域专家甚至终端用户都可以编写技能文件，不需要懂编程。
 
@@ -108,16 +110,16 @@ skills/
 使用 `loadSkillsFromDir()` 函数从目录中加载所有技能：
 
 ```typescript
-import { loadSkillsFromDir } from '@mariozechner/pi-coding-agent'
+import { loadSkillsFromDir } from "@mariozechner/pi-coding-agent";
 
-const SKILLS_DIR = path.join(import.meta.dirname, 'skills')
+const SKILLS_DIR = path.join(import.meta.dirname, "skills");
 const { skills, diagnostics } = loadSkillsFromDir({
   dir: SKILLS_DIR,
-  source: 'tutorial',
-})
+  source: "tutorial",
+});
 
-console.log(`加载了 ${skills.length} 个技能:`)
-skills.forEach((s) => console.log(`  - ${s.name}: ${s.description}`))
+console.log(`加载了 ${skills.length} 个技能:`);
+skills.forEach((s) => console.log(`  - ${s.name}: ${s.description}`));
 ```
 
 `diagnostics` 数组包含加载过程中的警告和错误信息（如 frontmatter 格式不正确、缺少必要字段等）。在开发阶段，建议将诊断信息打印出来，帮助你排查技能文件的问题。
@@ -132,11 +134,12 @@ skills.forEach((s) => console.log(`  - ${s.name}: ${s.description}`))
 
 ```typescript
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => [
-    'You are WeatherBot, a friendly weather assistant.',
-    'Always greet the user warmly.',
-    'When asked about weather, use the get_weather tool first.',
-  ].join('\n'),
+  systemPromptOverride: () =>
+    [
+      "You are WeatherBot, a friendly weather assistant.",
+      "Always greet the user warmly.",
+      "When asked about weather, use the get_weather tool first.",
+    ].join("\n"),
   noExtensions: true,
   noPromptTemplates: true,
   noThemes: true,
@@ -145,8 +148,8 @@ const resourceLoader = new DefaultResourceLoader({
   ...(skills.length > 0 && {
     skillsOverride: () => ({ skills, diagnostics: [] }),
   }),
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 ```
 
 ### 底层原理
@@ -199,6 +202,7 @@ Don't forget to cite your data sources.  ← 差：负面指令
 When asked about weather, respond like this:
 
 **Tokyo Weather Report**
+
 - Current: 22°C, Sunny ☀️
 - Humidity: 45%
 - Forecast: Clear skies expected through tomorrow
@@ -228,55 +232,75 @@ When asked about weather, respond like this:
 ## 完整代码
 
 ```typescript
-import * as path from 'node:path'
-import { Type } from '@sinclair/typebox'
+import * as path from "node:path";
+import { Type } from "@sinclair/typebox";
 import {
   createAgentSession,
   SessionManager,
   DefaultResourceLoader,
   loadSkillsFromDir,
   type ToolDefinition,
-} from '@mariozechner/pi-coding-agent'
-import { createModel } from '../../shared/model'
+} from "@mariozechner/pi-coding-agent";
+import { createModel } from "../../shared/model";
 
-const model = createModel()
+const model = createModel();
 
 // 从 skills/ 目录加载技能
-const SKILLS_DIR = path.join(import.meta.dirname, 'skills')
-const { skills, diagnostics } = loadSkillsFromDir({ dir: SKILLS_DIR, source: 'tutorial' })
+const SKILLS_DIR = path.join(import.meta.dirname, "skills");
+const { skills, diagnostics } = loadSkillsFromDir({
+  dir: SKILLS_DIR,
+  source: "tutorial",
+});
 
-console.log(`📚 加载了 ${skills.length} 个技能:`)
-skills.forEach((s) => console.log(`   - ${s.name}: ${s.description}`))
+console.log(`📚 加载了 ${skills.length} 个技能:`);
+skills.forEach((s) => console.log(`   - ${s.name}: ${s.description}`));
 
 // 天气工具（与第 03 章相同但内联）
 const weatherTool: ToolDefinition = {
-  name: 'get_weather',
-  label: 'Get Weather',
-  description: 'Get current weather for a city.',
+  name: "get_weather",
+  label: "Get Weather",
+  description: "Get current weather for a city.",
   parameters: Type.Object({
-    city: Type.String({ description: 'City name' }),
+    city: Type.String({ description: "City name" }),
   }),
   execute: async (_toolCallId, params) => {
-    const { city } = params as { city: string }
+    const { city } = params as { city: string };
     const data: Record<string, object> = {
-      tokyo: { temp: '22°C', condition: 'Sunny', humidity: '45%', forecast: 'Clear skies' },
-      london: { temp: '14°C', condition: 'Overcast', humidity: '82%', forecast: 'Rain expected' },
-    }
-    const weather = data[city.toLowerCase()] || { temp: '20°C', condition: 'Clear', humidity: '50%' }
+      tokyo: {
+        temp: "22°C",
+        condition: "Sunny",
+        humidity: "45%",
+        forecast: "Clear skies",
+      },
+      london: {
+        temp: "14°C",
+        condition: "Overcast",
+        humidity: "82%",
+        forecast: "Rain expected",
+      },
+    };
+    const weather = data[city.toLowerCase()] || {
+      temp: "20°C",
+      condition: "Clear",
+      humidity: "50%",
+    };
     return {
-      content: [{ type: 'text' as const, text: JSON.stringify({ city, ...weather }) }],
+      content: [
+        { type: "text" as const, text: JSON.stringify({ city, ...weather }) },
+      ],
       details: {},
-    }
+    };
   },
-}
+};
 
 // 带系统提示词 + 技能的资源加载器
 const resourceLoader = new DefaultResourceLoader({
-  systemPromptOverride: () => [
-    'You are WeatherBot, a friendly weather assistant.',
-    'Always greet the user warmly.',
-    'When asked about weather, use the get_weather tool first.',
-  ].join('\n'),
+  systemPromptOverride: () =>
+    [
+      "You are WeatherBot, a friendly weather assistant.",
+      "Always greet the user warmly.",
+      "When asked about weather, use the get_weather tool first.",
+    ].join("\n"),
   noExtensions: true,
   noPromptTemplates: true,
   noThemes: true,
@@ -284,8 +308,8 @@ const resourceLoader = new DefaultResourceLoader({
   ...(skills.length > 0 && {
     skillsOverride: () => ({ skills, diagnostics: [] }),
   }),
-})
-await resourceLoader.reload()
+});
+await resourceLoader.reload();
 
 const { session } = await createAgentSession({
   model,
@@ -293,29 +317,32 @@ const { session } = await createAgentSession({
   customTools: [weatherTool],
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 
 // 流式输出及工具事件
 session.subscribe((event) => {
-  if (event.type === 'message_update' && event.assistantMessageEvent.type === 'text_delta') {
-    process.stdout.write(event.assistantMessageEvent.delta)
+  if (
+    event.type === "message_update" &&
+    event.assistantMessageEvent.type === "text_delta"
+  ) {
+    process.stdout.write(event.assistantMessageEvent.delta);
   }
-  if (event.type === 'tool_execution_start') {
-    console.log(`\n🔧 ${event.toolName}(${JSON.stringify(event.args)})`)
+  if (event.type === "tool_execution_start") {
+    console.log(`\n🔧 ${event.toolName}(${JSON.stringify(event.args)})`);
   }
-  if (event.type === 'tool_execution_end') {
-    console.log(`✅ 完成\n`)
+  if (event.type === "tool_execution_end") {
+    console.log(`✅ 完成\n`);
   }
-})
+});
 
-const question = process.argv[2] || "What's the weather like in London today?"
-console.log(`You: ${question}\n`)
-process.stdout.write('Agent: ')
+const question = process.argv[2] || "What's the weather like in London today?";
+console.log(`You: ${question}\n`);
+process.stdout.write("Agent: ");
 
-await session.prompt(question)
+await session.prompt(question);
 
-console.log()
-process.exit(0)
+console.log();
+process.exit(0);
 ```
 
 ## 运行
@@ -332,6 +359,7 @@ bun run ch06 "How's the weather in Tokyo?"
 Agent 以 "WeatherBot" 身份响应，使用天气工具，并按照 weather-expert 技能的格式（温度、湿度、预报、建议）组织回复。
 
 你会注意到两个层面的效果叠加：
+
 1. **系统提示词的效果**：Agent 自称 WeatherBot，语气友好，会先用工具再回答
 2. **技能的效果**：回复按照天气报告的格式组织（当前状况、湿度、预报、建议）
 
@@ -355,12 +383,14 @@ const { session } = await createAgentSession({ ... })
 
 ```markdown
 <!-- 错误：没有 frontmatter，框架不知道技能名称 -->
+
 When discussing weather, always structure your response...
 
-<!-- 正确：必须有 name 和 description -->
----
+## <!-- 正确：必须有 name 和 description -->
+
 name: weather-expert
 description: Provides weather forecasting expertise
+
 ---
 
 When discussing weather, always structure your response...
@@ -373,13 +403,13 @@ When discussing weather, always structure your response...
 const resourceLoader = new DefaultResourceLoader({
   noSkills: true,
   skillsOverride: () => ({ skills, diagnostics: [] }),
-})
+});
 
 // 正确：要使用技能就必须 noSkills: false
 const resourceLoader = new DefaultResourceLoader({
   noSkills: false,
   skillsOverride: () => ({ skills, diagnostics: [] }),
-})
+});
 ```
 
 ## 小结

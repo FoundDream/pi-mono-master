@@ -12,17 +12,17 @@
 
 ## 功能一览
 
-| 功能 | 来源章节 | 说明 |
-|------|---------|------|
-| 从环境变量创建模型 | 第 01 章 | 支持 Anthropic / OpenAI |
-| 使用 DeltaBatcher 流式输出 | 第 02 章 | 批量处理 delta，终端输出更丝滑 |
-| 自定义工具（天气、时间） | 第 03 章 | 通过 TypeBox 定义的自定义工具 |
-| 会话持久化（JSONL） | 第 04 章 | 对话历史自动保存和恢复 |
-| 工具确认模式 | 第 05 章 | 危险操作需要用户审批 |
-| 系统提示词 + 技能 | 第 06 章 | 系统级行为控制 + 领域知识注入 |
-| 多会话管理 | 第 07 章 | 创建、切换、列表会话 |
-| 编码工具（read、write、edit、bash） | 新增 | Agent 可以读写文件、执行命令 |
-| Ctrl+C 中止 | 新增 | 优雅地中止正在进行的 Agent 回复 |
+| 功能                                | 来源章节 | 说明                            |
+| ----------------------------------- | -------- | ------------------------------- |
+| 从环境变量创建模型                  | 第 01 章 | 支持 Anthropic / OpenAI         |
+| 使用 DeltaBatcher 流式输出          | 第 02 章 | 批量处理 delta，终端输出更丝滑  |
+| 自定义工具（天气、时间）            | 第 03 章 | 通过 TypeBox 定义的自定义工具   |
+| 会话持久化（JSONL）                 | 第 04 章 | 对话历史自动保存和恢复          |
+| 工具确认模式                        | 第 05 章 | 危险操作需要用户审批            |
+| 系统提示词 + 技能                   | 第 06 章 | 系统级行为控制 + 领域知识注入   |
+| 多会话管理                          | 第 07 章 | 创建、切换、列表会话            |
+| 编码工具（read、write、edit、bash） | 新增     | Agent 可以读写文件、执行命令    |
+| Ctrl+C 中止                         | 新增     | 优雅地中止正在进行的 Agent 回复 |
 
 ## 架构概览
 
@@ -137,31 +137,34 @@ DeltaBatcher 的解决方案是：**在内存中累积 delta，然后以固定�
 
 ```typescript
 class DeltaBatcher {
-  private pendingText = ''
-  private flushTimer: ReturnType<typeof setTimeout> | null = null
+  private pendingText = "";
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly onFlush: (text: string) => void,
-    private readonly intervalMs = 32
+    private readonly intervalMs = 32,
   ) {}
 
   push(delta: string): void {
-    this.pendingText += delta
+    this.pendingText += delta;
     if (!this.flushTimer) {
       this.flushTimer = setTimeout(() => {
-        this.flushTimer = null
-        const text = this.pendingText
-        this.pendingText = ''
-        if (text) this.onFlush(text)
-      }, this.intervalMs)
+        this.flushTimer = null;
+        const text = this.pendingText;
+        this.pendingText = "";
+        if (text) this.onFlush(text);
+      }, this.intervalMs);
     }
   }
 
   flush(): void {
-    if (this.flushTimer) { clearTimeout(this.flushTimer); this.flushTimer = null }
-    const text = this.pendingText
-    this.pendingText = ''
-    if (text) this.onFlush(text)
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+    const text = this.pendingText;
+    this.pendingText = "";
+    if (text) this.onFlush(text);
   }
 }
 ```
@@ -228,13 +231,13 @@ export class AgentRuntime {
 
 ```typescript
 interface RuntimeConfig {
-  model: Model<Api>
-  cwd: string
-  sessionDir: string
-  skillsDir?: string
-  systemPrompt: string
-  customTools?: ToolDefinition[]
-  includeCodingTools?: boolean
+  model: Model<Api>;
+  cwd: string;
+  sessionDir: string;
+  skillsDir?: string;
+  systemPrompt: string;
+  customTools?: ToolDefinition[];
+  includeCodingTools?: boolean;
 }
 ```
 
@@ -249,38 +252,41 @@ interface RuntimeConfig {
 在 CLI Agent 中，有时 Agent 的回复太长或走偏了方向，用户需要中途打断。Ctrl+C（SIGINT 信号）是最自然的交互方式。
 
 ```typescript
-import { createModel } from '../../shared/model'
-import { AgentRuntime } from './runtime'
-import { weatherTool, createTimeTool, createDangerousTool } from './tools'
-import { handleCommand } from './commands'
+import { createModel } from "../../shared/model";
+import { AgentRuntime } from "./runtime";
+import { weatherTool, createTimeTool, createDangerousTool } from "./tools";
+import { handleCommand } from "./commands";
 
-const model = createModel()
+const model = createModel();
 
 const runtime = new AgentRuntime({
   model,
   cwd: process.cwd(),
   sessionDir: SESSION_DIR,
   skillsDir: SKILLS_DIR,
-  systemPrompt: 'You are a versatile CLI assistant...',
+  systemPrompt: "You are a versatile CLI assistant...",
   customTools: [weatherTool, createTimeTool(), createDangerousTool(waiter)],
   includeCodingTools: true,
-})
+});
 
 // Ctrl+C 中止
-process.on('SIGINT', () => {
-  runtime.abort()
-  console.log('\n🛑 已中止。')
-})
+process.on("SIGINT", () => {
+  runtime.abort();
+  console.log("\n🛑 已中止。");
+});
 
 // REPL 循环
 const ask = () => {
-  rl.question('You: ', async (input) => {
-    if (await handleCommand(input.trim(), runtime)) { ask(); return }
-    await runtime.prompt(input.trim())
-    ask()
-  })
-}
-ask()
+  rl.question("You: ", async (input) => {
+    if (await handleCommand(input.trim(), runtime)) {
+      ask();
+      return;
+    }
+    await runtime.prompt(input.trim());
+    ask();
+  });
+};
+ask();
 ```
 
 ### 底层原理：abort 是如何工作的？
@@ -300,33 +306,50 @@ ask()
 
 ## 命令
 
-| 命令 | 说明 |
-|------|------|
+| 命令        | 说明                 |
+| ----------- | -------------------- |
 | `/sessions` | 列出所有已保存的会话 |
-| `/new` | 创建新会话 |
-| `/open <n>` | 打开第 N 个会话 |
-| `/continue` | 恢复最近的会话 |
-| `/abort` | 中止当前流式输出 |
-| `/help` | 显示所有命令 |
-| `/quit` | 退出 |
+| `/new`      | 创建新会话           |
+| `/open <n>` | 打开第 N 个会话      |
+| `/continue` | 恢复最近的会话       |
+| `/abort`    | 中止当前流式输出     |
+| `/help`     | 显示所有命令         |
+| `/quit`     | 退出                 |
 
 ## 命令处理器
 
 命令处理器被抽取为独立模块，遵循**命令模式**（Command Pattern）：每个 slash 命令映射到一个具体的操作。`handleCommand` 返回 `true` 表示输入已被处理为命令，`false` 表示它是普通的 Agent 消息。
 
 ```typescript
-export async function handleCommand(input: string, runtime: AgentRuntime): Promise<boolean> {
-  if (!input.startsWith('/')) return false
+export async function handleCommand(
+  input: string,
+  runtime: AgentRuntime,
+): Promise<boolean> {
+  if (!input.startsWith("/")) return false;
 
-  switch (input.split(' ')[0]) {
-    case '/help':     printHelp(); return true
-    case '/sessions': /* 列出会话 */; return true
-    case '/new':      runtime.newSession(); return true
-    case '/open':     /* 按索引打开 */; return true
-    case '/continue': runtime.continueRecentSession(); return true
-    case '/abort':    runtime.abort(); return true
-    case '/quit':     runtime.destroy(); process.exit(0)
-    default:          console.log('未知命令'); return true
+  switch (input.split(" ")[0]) {
+    case "/help":
+      printHelp();
+      return true;
+    case "/sessions" /* 列出会话 */:
+      return true;
+    case "/new":
+      runtime.newSession();
+      return true;
+    case "/open" /* 按索引打开 */:
+      return true;
+    case "/continue":
+      runtime.continueRecentSession();
+      return true;
+    case "/abort":
+      runtime.abort();
+      return true;
+    case "/quit":
+      runtime.destroy();
+      process.exit(0);
+    default:
+      console.log("未知命令");
+      return true;
   }
 }
 ```
@@ -379,17 +402,17 @@ You: /new
 // 如果没有注册 handler，Ctrl+C 会直接杀掉程序
 
 // 正确：注册 handler 来拦截信号
-process.on('SIGINT', () => {
-  runtime.abort()
+process.on("SIGINT", () => {
+  runtime.abort();
   // 不调用 process.exit()，所以 REPL 继续运行
-})
+});
 ```
 
 **2. DeltaBatcher 在会话切换后没有重新初始化**
 
 ```typescript
 // 错误：旧会话的 DeltaBatcher 可能还引用着旧的输出回调
-runtime.newSession()
+runtime.newSession();
 // 如果 DeltaBatcher 没有被正确重置，输出可能混乱
 
 // AgentRuntime 内部应该在 newSession() 中处理这个问题
@@ -400,12 +423,12 @@ runtime.newSession()
 
 ```typescript
 // 错误：destroy 后所有内部状态已被清理
-runtime.destroy()
-await runtime.prompt('Hello')  // 可能抛出异常或行为未定义
+runtime.destroy();
+await runtime.prompt("Hello"); // 可能抛出异常或行为未定义
 
 // 正确：destroy 是终结操作，之后应该退出
-runtime.destroy()
-process.exit(0)
+runtime.destroy();
+process.exit(0);
 ```
 
 ## 下一步：扩展你的 Agent
@@ -414,30 +437,30 @@ process.exit(0)
 
 ### 增强 Agent 能力
 
-| 方向 | 说明 | 难度 |
-|------|------|------|
-| **Web 搜索工具** | 接入搜索 API，让 Agent 能获取实时信息 | 中等 |
+| 方向             | 说明                                   | 难度 |
+| ---------------- | -------------------------------------- | ---- |
+| **Web 搜索工具** | 接入搜索 API，让 Agent 能获取实时信息  | 中等 |
 | **代码执行沙箱** | 用 Docker 容器隔离 bash 工具的执行环境 | 较高 |
-| **多模态输入** | 支持图片输入，让 Agent 能理解截图 | 中等 |
+| **多模态输入**   | 支持图片输入，让 Agent 能理解截图      | 中等 |
 | **MCP 协议集成** | 接入 Model Context Protocol 工具服务器 | 中等 |
 
 ### 改善用户体验
 
-| 方向 | 说明 | 难度 |
-|------|------|------|
+| 方向              | 说明                             | 难度 |
+| ----------------- | -------------------------------- | ---- |
 | **Markdown 渲染** | 在终端中渲染 Markdown 格式的回复 | 简单 |
-| **语法高亮** | 对代码块做语法高亮 | 简单 |
-| **进度指示器** | 工具执行时显示旋转动画 | 简单 |
-| **Tab 补全** | 为 slash 命令添加 Tab 补全 | 中等 |
+| **语法高亮**      | 对代码块做语法高亮               | 简单 |
+| **进度指示器**    | 工具执行时显示旋转动画           | 简单 |
+| **Tab 补全**      | 为 slash 命令添加 Tab 补全       | 中等 |
 
 ### 进阶架构
 
-| 方向 | 说明 | 难度 |
-|------|------|------|
-| **多 Agent 协作** | 多个 Agent 协同处理复杂任务 | 较高 |
-| **向量记忆** | 用向量数据库实现长期记忆 | 较高 |
-| **GUI 迁移** | 将 CLI Agent 迁移到 Electron 桌面应用 | 较高 |
-| **插件系统** | 允许第三方开发者编写工具插件 | 较高 |
+| 方向              | 说明                                  | 难度 |
+| ----------------- | ------------------------------------- | ---- |
+| **多 Agent 协作** | 多个 Agent 协同处理复杂任务           | 较高 |
+| **向量记忆**      | 用向量数据库实现长期记忆              | 较高 |
+| **GUI 迁移**      | 将 CLI Agent 迁移到 Electron 桌面应用 | 较高 |
+| **插件系统**      | 允许第三方开发者编写工具插件          | 较高 |
 
 :::tip 提示
 如果你想看一个将这些进阶方向全部实现的真实项目，可以参考 **AirJelly Desktop**（本教程的"母项目"）。它是一个基于 Electron 的 AI 伙伴应用，实现了向量记忆、多 Agent、GUI 工具确认、技能系统等生产级功能。

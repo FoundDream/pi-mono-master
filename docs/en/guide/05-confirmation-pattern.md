@@ -9,7 +9,7 @@ Every powerful tool is also a dangerous tool. An AI agent that can delete files,
 This is the **human-in-the-loop** problem, and it is one of the most important design challenges in AI agent development. The core tension is:
 
 - **Autonomy** makes agents useful -- they should act on your behalf without requiring you to micromanage every step.
-- **Oversight** makes agents safe -- certain actions are irreversible or have real-world consequences and *must* have human approval.
+- **Oversight** makes agents safe -- certain actions are irreversible or have real-world consequences and _must_ have human approval.
 
 The pattern you will learn in this chapter -- **confirmation gating** -- is how production AI systems solve this tension. It allows the agent to plan and reason freely, but forces it to pause and ask permission before executing actions that cross a safety boundary.
 
@@ -58,25 +58,25 @@ This is the core pattern -- a function factory that creates blocking Promises re
 
 ```typescript
 function createConfirmationWaiter() {
-  let pendingResolve: ((v: { confirmed: boolean }) => void) | null = null
+  let pendingResolve: ((v: { confirmed: boolean }) => void) | null = null;
 
   const waiter = (): Promise<{ confirmed: boolean }> =>
     new Promise((resolve) => {
-      pendingResolve = resolve
-    })
+      pendingResolve = resolve;
+    });
 
   // Listen for stdin input to resolve pending confirmations
   const stdinListener = (data: Buffer) => {
     if (pendingResolve) {
-      const input = data.toString().trim().toLowerCase()
-      const confirmed = input === 'y' || input === 'yes'
-      pendingResolve({ confirmed })
-      pendingResolve = null
+      const input = data.toString().trim().toLowerCase();
+      const confirmed = input === "y" || input === "yes";
+      pendingResolve({ confirmed });
+      pendingResolve = null;
     }
-  }
-  process.stdin.on('data', stdinListener)
+  };
+  process.stdin.on("data", stdinListener);
 
-  return { waiter, cleanup: () => process.stdin.off('data', stdinListener) }
+  return { waiter, cleanup: () => process.stdin.off("data", stdinListener) };
 }
 ```
 
@@ -106,12 +106,12 @@ Notice that `pendingResolve` is set to `null` after each resolution. This is cri
 
 The Promise-based blocking pattern is not the only way to implement human-in-the-loop confirmation. Here is how it compares to alternatives:
 
-| Approach | How It Works | Pros | Cons |
-|----------|-------------|------|------|
-| **Promise blocking** (this chapter) | Tool `execute()` awaits a Promise that blocks until user input | Simple, linear control flow, works in async contexts | Only one pending confirmation at a time |
-| **Two-phase tool calls** | Agent first calls `plan_delete`, then `confirm_delete` | LLM can reason about the plan before confirming | Requires two round-trips, LLM might skip the confirm step |
-| **Approval queue** | All actions go into a queue, user approves/rejects batch | Efficient for bulk operations | More complex UI, user might rubber-stamp |
-| **Allowlists/blocklists** | Pre-configured rules auto-approve or auto-deny | Zero-friction for known-safe operations | Cannot handle novel situations |
+| Approach                            | How It Works                                                   | Pros                                                 | Cons                                                      |
+| ----------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------- |
+| **Promise blocking** (this chapter) | Tool `execute()` awaits a Promise that blocks until user input | Simple, linear control flow, works in async contexts | Only one pending confirmation at a time                   |
+| **Two-phase tool calls**            | Agent first calls `plan_delete`, then `confirm_delete`         | LLM can reason about the plan before confirming      | Requires two round-trips, LLM might skip the confirm step |
+| **Approval queue**                  | All actions go into a queue, user approves/rejects batch       | Efficient for bulk operations                        | More complex UI, user might rubber-stamp                  |
+| **Allowlists/blocklists**           | Pre-configured rules auto-approve or auto-deny                 | Zero-friction for known-safe operations              | Cannot handle novel situations                            |
 
 For a CLI agent, the Promise-based blocking pattern is the best balance of simplicity and safety. In a GUI application, you might combine it with an approval queue for a richer experience.
 
@@ -120,52 +120,57 @@ For a CLI agent, the Promise-based blocking pattern is the best balance of simpl
 Now let's see how to create a tool that uses the confirmation pattern. The key is that the tool receives the `waitForConfirmation` function as a dependency -- it does not create the waiter itself. This separation of concerns makes the tool testable and reusable.
 
 ```typescript
-import { Type } from '@sinclair/typebox'
-import type { ToolDefinition } from '@mariozechner/pi-coding-agent'
+import { Type } from "@sinclair/typebox";
+import type { ToolDefinition } from "@mariozechner/pi-coding-agent";
 
 export function createDeleteFileTool(
-  waitForConfirmation: () => Promise<{ confirmed: boolean }>
+  waitForConfirmation: () => Promise<{ confirmed: boolean }>,
 ): ToolDefinition {
   return {
-    name: 'delete_file',
-    label: 'Delete File',
-    description: 'Delete a file at the given path. This is irreversible and requires user confirmation.',
+    name: "delete_file",
+    label: "Delete File",
+    description:
+      "Delete a file at the given path. This is irreversible and requires user confirmation.",
     parameters: Type.Object({
-      path: Type.String({ description: 'File path to delete' }),
-      reason: Type.String({ description: 'Why this file should be deleted' }),
+      path: Type.String({ description: "File path to delete" }),
+      reason: Type.String({ description: "Why this file should be deleted" }),
     }),
     execute: async (_toolCallId, params) => {
-      const { path, reason } = params as { path: string; reason: string }
+      const { path, reason } = params as { path: string; reason: string };
 
-      console.log(`\n⚠️  Agent wants to delete: ${path}`)
-      console.log(`   Reason: ${reason}`)
-      console.log('   Confirm? [y/N]')
+      console.log(`\n⚠️  Agent wants to delete: ${path}`);
+      console.log(`   Reason: ${reason}`);
+      console.log("   Confirm? [y/N]");
 
       // This blocks until the user responds
-      const { confirmed } = await waitForConfirmation()
+      const { confirmed } = await waitForConfirmation();
 
       if (!confirmed) {
-        console.log('   ❌ Cancelled by user\n')
+        console.log("   ❌ Cancelled by user\n");
         return {
-          content: [{ type: 'text' as const, text: 'User cancelled the deletion.' }],
+          content: [
+            { type: "text" as const, text: "User cancelled the deletion." },
+          ],
           details: {},
-        }
+        };
       }
 
       // In a real app, you'd actually delete the file here
-      console.log(`   ✅ Deleted (simulated)\n`)
+      console.log(`   ✅ Deleted (simulated)\n`);
       return {
-        content: [{ type: 'text' as const, text: `Successfully deleted ${path}` }],
+        content: [
+          { type: "text" as const, text: `Successfully deleted ${path}` },
+        ],
         details: {},
-      }
+      };
     },
-  }
+  };
 }
 ```
 
 ### Design Decisions Worth Noting
 
-**Why `reason` is a required parameter**: By forcing the agent to articulate *why* it wants to delete the file, we accomplish two things. First, the user gets meaningful context for their confirmation decision. Second, the LLM is forced to "think before it acts" -- articulating a reason often prevents impulsive tool calls.
+**Why `reason` is a required parameter**: By forcing the agent to articulate _why_ it wants to delete the file, we accomplish two things. First, the user gets meaningful context for their confirmation decision. Second, the LLM is forced to "think before it acts" -- articulating a reason often prevents impulsive tool calls.
 
 **Why `[y/N]` with capital N**: This is a Unix convention meaning "No is the default." If the user presses Enter without typing anything, the action should be cancelled. Always default to the safe option.
 
@@ -178,11 +183,11 @@ When designing confirmed tools, always include a `reason` or `justification` par
 ## Wiring It Together
 
 ```typescript
-const { waiter, cleanup } = createConfirmationWaiter()
+const { waiter, cleanup } = createConfirmationWaiter();
 
 // Create tools that require confirmation
-const deleteFileTool = createDeleteFileTool(waiter)
-const sendEmailTool = createSendEmailTool(waiter)
+const deleteFileTool = createDeleteFileTool(waiter);
+const sendEmailTool = createSendEmailTool(waiter);
 
 const { session } = await createAgentSession({
   model,
@@ -190,7 +195,7 @@ const { session } = await createAgentSession({
   customTools: [deleteFileTool, sendEmailTool],
   sessionManager: SessionManager.inMemory(),
   resourceLoader,
-})
+});
 ```
 
 Notice how the same `waiter` function is shared across multiple tools. This works because only one tool executes at a time in the agent loop -- when a tool calls `waiter()`, it creates a fresh Promise that occupies the `pendingResolve` slot until the user responds.
@@ -215,10 +220,11 @@ The confirmation pattern is a safety mechanism, but it is not foolproof. Keep th
 
 :::tip
 **Good confirmation prompts have three properties:**
+
 1. **Specific** -- show exactly what will happen (the full path, the email address, the command)
 2. **Contextual** -- show why the agent wants to do this (the reason parameter)
 3. **Defaulting to safe** -- if the user hits Enter or the connection drops, nothing destructive happens
-:::
+   :::
 
 For CLI applications, the pattern in this chapter (print a warning, wait for `y`/`n`) is appropriate. For GUI applications, consider:
 
@@ -238,9 +244,9 @@ const waiterWithTimeout = (): Promise<{ confirmed: boolean }> =>
   Promise.race([
     waiter(),
     new Promise<{ confirmed: boolean }>((resolve) =>
-      setTimeout(() => resolve({ confirmed: false }), 60_000)
+      setTimeout(() => resolve({ confirmed: false }), 60_000),
     ),
-  ])
+  ]);
 ```
 
 **Forgetting to test the cancellation path**: It is easy to test that "yes" works, but always verify that "no" produces a clean cancellation result and that the agent recovers gracefully.
@@ -252,6 +258,7 @@ bun run ch05
 ```
 
 Then try:
+
 - "Delete the file /tmp/old-backup.log because it is outdated" -- confirm with `y` or `n`
 - "Send an email to alice@example.com about the meeting" -- confirm with `y` or `n`
 

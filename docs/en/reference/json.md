@@ -18,9 +18,26 @@ Events are defined in `AgentSessionEvent`, which extends `AgentEvent` with sessi
 type AgentSessionEvent =
   | AgentEvent
   | { type: "auto_compaction_start"; reason: "threshold" | "overflow" }
-  | { type: "auto_compaction_end"; result: CompactionResult | undefined; aborted: boolean; willRetry: boolean; errorMessage?: string }
-  | { type: "auto_retry_start"; attempt: number; maxAttempts: number; delayMs: number; errorMessage: string }
-  | { type: "auto_retry_end"; success: boolean; attempt: number; finalError?: string };
+  | {
+      type: "auto_compaction_end";
+      result: CompactionResult | undefined;
+      aborted: boolean;
+      willRetry: boolean;
+      errorMessage?: string;
+    }
+  | {
+      type: "auto_retry_start";
+      attempt: number;
+      maxAttempts: number;
+      delayMs: number;
+      errorMessage: string;
+    }
+  | {
+      type: "auto_retry_end";
+      success: boolean;
+      attempt: number;
+      finalError?: string;
+    };
 ```
 
 Base events from `AgentEvent`:
@@ -30,13 +47,38 @@ type AgentEvent =
   | { type: "agent_start" }
   | { type: "agent_end"; messages: AgentMessage[] }
   | { type: "turn_start" }
-  | { type: "turn_end"; message: AgentMessage; toolResults: ToolResultMessage[] }
+  | {
+      type: "turn_end";
+      message: AgentMessage;
+      toolResults: ToolResultMessage[];
+    }
   | { type: "message_start"; message: AgentMessage }
-  | { type: "message_update"; message: AgentMessage; assistantMessageEvent: AssistantMessageEvent }
+  | {
+      type: "message_update";
+      message: AgentMessage;
+      assistantMessageEvent: AssistantMessageEvent;
+    }
   | { type: "message_end"; message: AgentMessage }
-  | { type: "tool_execution_start"; toolCallId: string; toolName: string; args: any }
-  | { type: "tool_execution_update"; toolCallId: string; toolName: string; args: any; partialResult: any }
-  | { type: "tool_execution_end"; toolCallId: string; toolName: string; result: any; isError: boolean };
+  | {
+      type: "tool_execution_start";
+      toolCallId: string;
+      toolName: string;
+      args: any;
+    }
+  | {
+      type: "tool_execution_update";
+      toolCallId: string;
+      toolName: string;
+      args: any;
+      partialResult: any;
+    }
+  | {
+      type: "tool_execution_end";
+      toolCallId: string;
+      toolName: string;
+      result: any;
+      isError: boolean;
+    };
 ```
 
 ### Event Lifecycle
@@ -67,27 +109,33 @@ agent_end
 
 The `message_update` event carries an `assistantMessageEvent` field with fine-grained streaming data:
 
-| Event Type | Fields | Description |
-|-----------|--------|-------------|
-| `start` | `partial` | Streaming begins |
-| `text_start` | `contentIndex`, `partial` | New text block starts |
-| `text_delta` | `contentIndex`, `delta`, `partial` | Text chunk received |
-| `text_end` | `contentIndex`, `content`, `partial` | Text block complete |
-| `thinking_start` | `contentIndex`, `partial` | Thinking block starts |
-| `thinking_delta` | `contentIndex`, `delta`, `partial` | Thinking chunk received |
-| `thinking_end` | `contentIndex`, `content`, `partial` | Thinking block complete |
-| `toolcall_start` | `contentIndex`, `partial` | Tool call starts |
-| `toolcall_delta` | `contentIndex`, `delta`, `partial` | Tool call argument chunk |
-| `toolcall_end` | `contentIndex`, `toolCall`, `partial` | Tool call complete |
-| `done` | `reason`, `message` | Message complete |
-| `error` | `reason`, `error` | Message failed |
+| Event Type       | Fields                                | Description              |
+| ---------------- | ------------------------------------- | ------------------------ |
+| `start`          | `partial`                             | Streaming begins         |
+| `text_start`     | `contentIndex`, `partial`             | New text block starts    |
+| `text_delta`     | `contentIndex`, `delta`, `partial`    | Text chunk received      |
+| `text_end`       | `contentIndex`, `content`, `partial`  | Text block complete      |
+| `thinking_start` | `contentIndex`, `partial`             | Thinking block starts    |
+| `thinking_delta` | `contentIndex`, `delta`, `partial`    | Thinking chunk received  |
+| `thinking_end`   | `contentIndex`, `content`, `partial`  | Thinking block complete  |
+| `toolcall_start` | `contentIndex`, `partial`             | Tool call starts         |
+| `toolcall_delta` | `contentIndex`, `delta`, `partial`    | Tool call argument chunk |
+| `toolcall_end`   | `contentIndex`, `toolCall`, `partial` | Tool call complete       |
+| `done`           | `reason`, `message`                   | Message complete         |
+| `error`          | `reason`, `error`                     | Message failed           |
 
 ## Output Format
 
 Each line is a JSON object. The first line is the session header:
 
 ```json
-{"type":"session","version":3,"id":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","timestamp":"2025-01-15T10:30:00.000Z","cwd":"/path/to/project"}
+{
+  "type": "session",
+  "version": 3,
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "cwd": "/path/to/project"
+}
 ```
 
 Followed by events:
@@ -135,7 +183,11 @@ pi --mode json "Create a hello.ts file" -m "Now add a test for it" 2>/dev/null
 ### Programmatic usage with Node.js
 
 ```typescript
-import { createAgentSession, runPrintMode, SessionManager } from "@mariozechner/pi-coding-agent";
+import {
+  createAgentSession,
+  runPrintMode,
+  SessionManager,
+} from "@mariozechner/pi-coding-agent";
 
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
