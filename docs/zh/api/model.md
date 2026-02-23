@@ -19,7 +19,7 @@ const model = createModel()
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `AI_PROVIDER` | `anthropic` | 提供商名称：`anthropic`、`openai`、`google`、`deepseek` |
-| `AI_MODEL` | `claude-sonnet-4-20250514` | 所选提供商的模型 ID |
+| `AI_MODEL` | `claude-sonnet-4-6` | 所选提供商的模型 ID |
 
 ## 提供商映射
 
@@ -64,7 +64,7 @@ const PROVIDER_MAP: Record<string, { api: string; provider: string; envKey: stri
 
 export function createModel(): Model<Api> {
   const provider = process.env.AI_PROVIDER || 'anthropic'
-  const modelId = process.env.AI_MODEL || 'claude-sonnet-4-20250514'
+  const modelId = process.env.AI_MODEL || 'claude-sonnet-4-6'
   const m = PROVIDER_MAP[provider] ?? PROVIDER_MAP.anthropic
 
   if (!process.env[m.envKey]) {

@@ -14,7 +14,7 @@ const PROVIDER_MAP: Record<string, { api: string; provider: string; envKey: stri
  */
 export function createModel(): Model<Api> {
   const provider = process.env.AI_PROVIDER || 'anthropic'
-  const modelId = process.env.AI_MODEL || 'claude-sonnet-4-20250514'
+  const modelId = process.env.AI_MODEL || 'claude-sonnet-4-6'
   const m = PROVIDER_MAP[provider] ?? PROVIDER_MAP.anthropic
 
   // Verify the API key is set

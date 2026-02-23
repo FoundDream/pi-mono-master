@@ -19,7 +19,7 @@ const model = createModel()
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `AI_PROVIDER` | `anthropic` | Provider name: `anthropic`, `openai`, `google`, `deepseek` |
-| `AI_MODEL` | `claude-sonnet-4-20250514` | Model ID for the selected provider |
+| `AI_MODEL` | `claude-sonnet-4-6` | Model ID for the selected provider |
 
 ## Provider Map
 
@@ -64,7 +64,7 @@ const PROVIDER_MAP: Record<string, { api: string; provider: string; envKey: stri
 
 export function createModel(): Model<Api> {
   const provider = process.env.AI_PROVIDER || 'anthropic'
-  const modelId = process.env.AI_MODEL || 'claude-sonnet-4-20250514'
+  const modelId = process.env.AI_MODEL || 'claude-sonnet-4-6'
   const m = PROVIDER_MAP[provider] ?? PROVIDER_MAP.anthropic
 
   if (!process.env[m.envKey]) {

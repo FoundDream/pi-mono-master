@@ -70,7 +70,7 @@ Set your provider and API key in `.env`:
 
 ```bash
 AI_PROVIDER=anthropic          # or: openai, google, deepseek
-AI_MODEL=claude-sonnet-4-20250514  # or: gpt-4o, gemini-2.0-flash
+AI_MODEL=claude-sonnet-4-6        # or: gpt-5.2, gemini-2.5-flash
 ANTHROPIC_API_KEY=sk-ant-xxx   # your API key
 ```
 

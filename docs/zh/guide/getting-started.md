@@ -10,16 +10,16 @@
 
 通过这 8 个章节，你将从一个只会"问一答一"的最简 Agent 出发，逐步构建出一个拥有以下能力的完整 AI Agent：
 
-| 章节 | 核心能力 | 你将实现的效果 |
-|------|---------|--------------|
-| 01 - Hello Agent | 基础对话 | 发送一条消息，收到一个完整回复 |
-| 02 - 流式输出 | 实时响应 | ChatGPT 风格的打字机效果 |
-| 03 - 自定义工具 | 工具调用 | Agent 能查天气、做计算 |
-| 04 - 会话持久化 | 记忆能力 | 关闭程序后重新打开，Agent 还记得你是谁 |
-| 05 - 确认模式 | 安全控制 | 执行危险操作前先征得用户同意 |
-| 06 - 系统提示词与技能 | 人格定制 | 自定义 Agent 的行为风格和技能包 |
-| 07 - 多会话管理 | 并行对话 | 同时管理多个独立的对话上下文 |
-| 08 - 完整 CLI Agent | 全部整合 | 一个功能完整、可投入使用的命令行 Agent |
+| 章节                  | 核心能力 | 你将实现的效果                         |
+| --------------------- | -------- | -------------------------------------- |
+| 01 - Hello Agent      | 基础对话 | 发送一条消息，收到一个完整回复         |
+| 02 - 流式输出         | 实时响应 | ChatGPT 风格的打字机效果               |
+| 03 - 自定义工具       | 工具调用 | Agent 能查天气、做计算                 |
+| 04 - 会话持久化       | 记忆能力 | 关闭程序后重新打开，Agent 还记得你是谁 |
+| 05 - 确认模式         | 安全控制 | 执行危险操作前先征得用户同意           |
+| 06 - 系统提示词与技能 | 人格定制 | 自定义 Agent 的行为风格和技能包        |
+| 07 - 多会话管理       | 并行对话 | 同时管理多个独立的对话上下文           |
+| 08 - 完整 CLI Agent   | 全部整合 | 一个功能完整、可投入使用的命令行 Agent |
 
 每个章节都是**独立可运行**的，你可以按顺序学习，也可以跳到感兴趣的章节。但我们建议你按顺序来，因为每一章都建立在前一章的基础概念之上。
 
@@ -36,7 +36,7 @@
 
 ```bash
 # 克隆仓库
-git clone <repo-url>
+git clone https://github.com/FoundDream/pi-mono-master.git
 cd pi-mono-master
 
 # 安装依赖
@@ -56,8 +56,8 @@ cp .env.example .env
 编辑 `.env` 设置你的提供商和密钥：
 
 ```bash
-AI_PROVIDER=anthropic          # 或: openai, google, deepseek
-AI_MODEL=claude-sonnet-4-20250514  # 或: gpt-4o, gemini-2.0-flash
+AI_PROVIDER=anthropic          # 或: openai
+AI_MODEL=claude-sonnet-4-6        # 或: gpt-5.2
 ANTHROPIC_API_KEY=sk-ant-xxx   # 你的 API Key
 ```
 
@@ -67,12 +67,12 @@ ANTHROPIC_API_KEY=sk-ant-xxx   # 你的 API Key
 
 ### 支持的提供商
 
-| 提供商 | `AI_PROVIDER` | API Key 环境变量 | 示例模型 |
-|--------|---------------|-----------------|----------|
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-20250514` |
-| OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
-| Google | `google` | `GOOGLE_API_KEY` | `gemini-2.0-flash` |
-| DeepSeek | `deepseek` | `OPENAI_API_KEY` | `deepseek-chat` |
+| 提供商    | `AI_PROVIDER` | API Key 环境变量    | 示例模型                   |
+| --------- | ------------- | ------------------- | -------------------------- |
+| Anthropic | `anthropic`   | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6`  |
+| OpenAI    | `openai`      | `OPENAI_API_KEY`    | `gpt-5.2`           |
+| Google    | `google`      | `GOOGLE_API_KEY`    | `gemini-2.5-flash`   |
+| DeepSeek  | `deepseek`    | `OPENAI_API_KEY`    | `deepseek-chat`      |
 
 :::tip 提示
 不确定选哪个模型？如果你刚开始学习，推荐使用 **Anthropic Claude Sonnet** —— 它在工具调用和指令遵循方面表现优秀，非常适合 Agent 开发。DeepSeek 是性价比较高的选择，适合快速实验。
@@ -122,13 +122,13 @@ pi-mono-master/
 
 ## 核心依赖
 
-| 包名 | 用途 |
-|------|------|
-| `@mariozechner/pi-coding-agent` | Agent 框架（会话、工具、资源） |
-| `@mariozechner/pi-ai` | 模型抽象层（Anthropic、OpenAI、Google） |
-| `@sinclair/typebox` | 工具参数的 TypeBox Schema |
-| `dotenv` | 环境变量加载 |
-| `tsx` | TypeScript 执行 |
+| 包名                            | 用途                                    |
+| ------------------------------- | --------------------------------------- |
+| `@mariozechner/pi-coding-agent` | Agent 框架（会话、工具、资源）          |
+| `@mariozechner/pi-ai`           | 模型抽象层（Anthropic、OpenAI、Google） |
+| `@sinclair/typebox`             | 工具参数的 TypeBox Schema               |
+| `dotenv`                        | 环境变量加载                            |
+| `tsx`                           | TypeScript 执行                         |
 
 这些依赖各司其职：`pi-coding-agent` 是 Agent 的"大脑"，负责协调会话、工具调用和事件系统；`pi-ai` 是"翻译官"，将不同 AI 提供商的 API 统一成一致的接口；`typebox` 用于定义工具的参数类型，确保 LLM 传入的参数是类型安全的。
 

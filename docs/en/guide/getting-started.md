@@ -4,7 +4,7 @@ Welcome to the **pi-coding-agent tutorial** -- a progressive, hands-on guide to 
 
 ## Why pi-coding-agent?
 
-Most AI tutorials stop at "call the API and print the response." Real-world agents, however, need much more: they stream responses in real time, invoke external tools, remember previous conversations, ask the user for permission before taking dangerous actions, and manage multiple concurrent sessions. **pi-coding-agent** is a framework that handles all of this plumbing so you can focus on the *behavior* of your agent rather than the infrastructure.
+Most AI tutorials stop at "call the API and print the response." Real-world agents, however, need much more: they stream responses in real time, invoke external tools, remember previous conversations, ask the user for permission before taking dangerous actions, and manage multiple concurrent sessions. **pi-coding-agent** is a framework that handles all of this plumbing so you can focus on the _behavior_ of your agent rather than the infrastructure.
 
 Think of pi-coding-agent as the "web framework" for AI agents. Just as Express or Fastify gives you routing, middleware, and request handling so you don't rewrite HTTP parsing from scratch, pi-coding-agent gives you session management, tool execution, event streaming, and resource loading so you don't reinvent the agent lifecycle from scratch.
 
@@ -61,7 +61,7 @@ Clone the repository and install dependencies:
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/FoundDream/pi-mono-master.git
 cd pi-mono-master
 
 # Install dependencies
@@ -84,7 +84,7 @@ Edit `.env` to set your provider and key:
 
 ```bash
 AI_PROVIDER=anthropic          # or: openai, google, deepseek
-AI_MODEL=claude-sonnet-4-20250514  # or: gpt-4o, gemini-2.0-flash
+AI_MODEL=claude-sonnet-4-6        # or: gpt-5.2, gemini-2.5-flash
 ANTHROPIC_API_KEY=sk-ant-xxx   # your API key
 ```
 
@@ -92,12 +92,12 @@ The `shared/model.ts` helper reads these environment variables at startup and co
 
 ### Supported Providers
 
-| Provider | `AI_PROVIDER` | API Key Env Var | Example Model |
-|----------|---------------|-----------------|---------------|
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-20250514` |
-| OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
-| Google | `google` | `GOOGLE_API_KEY` | `gemini-2.0-flash` |
-| DeepSeek | `deepseek` | `OPENAI_API_KEY` | `deepseek-chat` |
+| Provider  | `AI_PROVIDER` | API Key Env Var     | Example Model              |
+| --------- | ------------- | ------------------- | -------------------------- |
+| Anthropic | `anthropic`   | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6`  |
+| OpenAI    | `openai`      | `OPENAI_API_KEY`    | `gpt-5.2`           |
+| Google    | `google`      | `GOOGLE_API_KEY`    | `gemini-2.5-flash`   |
+| DeepSeek  | `deepseek`    | `OPENAI_API_KEY`    | `deepseek-chat`      |
 
 :::tip
 DeepSeek uses the OpenAI-compatible API format, which is why it shares the `OPENAI_API_KEY` environment variable. If you want to use both OpenAI and DeepSeek, you'll need to switch the key when switching providers.
@@ -142,13 +142,13 @@ Each chapter directory contains an `index.ts` entry point and occasionally addit
 
 ## Key Dependencies
 
-| Package | Purpose |
-|---------|---------|
-| `@mariozechner/pi-coding-agent` | Agent framework -- sessions, tools, resource loading, event system |
-| `@mariozechner/pi-ai` | Model abstraction layer -- unified interface for Anthropic, OpenAI, Google |
-| `@sinclair/typebox` | TypeBox schemas for defining tool parameters (used instead of Zod) |
-| `dotenv` | Environment variable loading from `.env` files |
-| `tsx` | TypeScript execution without a build step |
+| Package                         | Purpose                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| `@mariozechner/pi-coding-agent` | Agent framework -- sessions, tools, resource loading, event system         |
+| `@mariozechner/pi-ai`           | Model abstraction layer -- unified interface for Anthropic, OpenAI, Google |
+| `@sinclair/typebox`             | TypeBox schemas for defining tool parameters (used instead of Zod)         |
+| `dotenv`                        | Environment variable loading from `.env` files                             |
+| `tsx`                           | TypeScript execution without a build step                                  |
 
 :::tip
 You don't need to understand all of these packages before starting. Each chapter introduces the relevant packages as they become needed.

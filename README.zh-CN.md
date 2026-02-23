@@ -70,7 +70,7 @@ bun run ch01
 
 ```bash
 AI_PROVIDER=anthropic          # 可选: openai, google, deepseek
-AI_MODEL=claude-sonnet-4-20250514  # 可选: gpt-4o, gemini-2.0-flash
+AI_MODEL=claude-sonnet-4-6        # 可选: gpt-5.2, gemini-2.5-flash
 ANTHROPIC_API_KEY=sk-ant-xxx   # 你的 API 密钥
 ```
 
