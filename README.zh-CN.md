@@ -11,7 +11,7 @@
 
 > 从零开始，一步步学会构建 AI Agent — 从最小化的 "hello world" 到生产级 CLI Agent。
 
-使用 [`@mariozechner/pi-coding-agent`](https://github.com/nicepkg/pi) 构建 AI Agent 的渐进式 8 章教程。每个章节可独立运行，涵盖流式输出、自定义工具、会话持久化、技能系统等核心模式。
+使用 [`@mariozechner/pi-coding-agent`](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent) 构建 AI Agent 的渐进式 8 章教程。每个章节可独立运行，涵盖流式输出、自定义工具、会话持久化、技能系统等核心模式。
 
 ## 文档站点
 
